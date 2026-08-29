@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { bustStorefrontCache } from "@/lib/cache";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
@@ -144,6 +145,7 @@ export async function createProduct(
   } catch (e) {
     return { error: e instanceof Error ? e.message : "Could not create product" };
   }
+  bustStorefrontCache();
   revalidatePath("/admin/products");
   redirect(`/admin/products/${newId}?created=1`);
 }
@@ -214,6 +216,7 @@ export async function updateProduct(
   } catch (e) {
     return { error: e instanceof Error ? e.message : "Could not update product" };
   }
+  bustStorefrontCache();
   revalidatePath("/admin/products");
   revalidatePath(`/admin/products/${id}`);
   return { ok: true };
@@ -225,6 +228,7 @@ export async function deleteProduct(fd: FormData) {
   if (id) {
     await db.product.delete({ where: { id } });
   }
+  bustStorefrontCache();
   revalidatePath("/admin/products");
   redirect("/admin/products");
 }
@@ -241,5 +245,6 @@ export async function quickToggle(fd: FormData) {
     where: { id },
     data: { [field]: !(p as unknown as Record<string, boolean>)[field] },
   });
+  bustStorefrontCache();
   revalidatePath("/admin/products");
 }

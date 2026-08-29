@@ -1,3 +1,4 @@
+import { unstable_cache } from "next/cache";
 import { db } from "./db";
 
 export type ContactInfo = {
@@ -64,11 +65,20 @@ export const FALLBACK_SITE: SiteConfig = {
   stats: [],
 };
 
+const readSettingCached = unstable_cache(
+  async (key: string): Promise<string | null> => {
+    const row = await db.setting.findUnique({ where: { key } });
+    return row?.value ?? null;
+  },
+  ["setting"],
+  { revalidate: 300, tags: ["settings"] },
+);
+
 export async function getSetting<T = unknown>(key: string, fallback: T): Promise<T> {
   try {
-    const row = await db.setting.findUnique({ where: { key } });
-    if (!row) return fallback;
-    return JSON.parse(row.value) as T;
+    const raw = await readSettingCached(key);
+    if (raw == null) return fallback;
+    return JSON.parse(raw) as T;
   } catch {
     return fallback;
   }

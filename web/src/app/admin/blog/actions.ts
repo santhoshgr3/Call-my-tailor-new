@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { bustStorefrontCache } from "@/lib/cache";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
@@ -51,6 +52,7 @@ export async function saveBlogPost(fd: FormData) {
     await db.blogPost.create({ data: { ...f, slug } });
   }
   revalidatePath("/admin/blog");
+  bustStorefrontCache();
   revalidatePath("/blog");
   redirect("/admin/blog");
 }
@@ -60,6 +62,7 @@ export async function deleteBlogPost(fd: FormData) {
   const id = String(fd.get("id") || "");
   if (id) await db.blogPost.delete({ where: { id } });
   revalidatePath("/admin/blog");
+  bustStorefrontCache();
   revalidatePath("/blog");
   redirect("/admin/blog");
 }

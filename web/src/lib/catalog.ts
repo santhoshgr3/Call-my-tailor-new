@@ -1,3 +1,4 @@
+import { unstable_cache } from "next/cache";
 import { db } from "./db";
 import type { Prisma } from "@prisma/client";
 
@@ -26,7 +27,13 @@ export type MenuNode = {
   children: MenuNode[];
 };
 
-export async function getMenuTree(): Promise<MenuNode[]> {
+export const getMenuTree = unstable_cache(
+  _getMenuTree,
+  ["menu-tree"],
+  { revalidate: 300, tags: ["catalog"] },
+);
+
+async function _getMenuTree(): Promise<MenuNode[]> {
   let cats: { id: string; slug: string; name: string; parentId: string | null }[] = [];
   try {
     cats = await db.category.findMany({

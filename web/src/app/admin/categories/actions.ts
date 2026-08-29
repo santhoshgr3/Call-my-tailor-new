@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { bustStorefrontCache } from "@/lib/cache";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
@@ -46,6 +47,7 @@ export async function createCategory(fd: FormData) {
   if (!f.name) return;
   const slug = await uniqueSlug(slugInput);
   await db.category.create({ data: { ...f, slug } });
+  bustStorefrontCache();
   revalidatePath("/admin/categories");
   redirect("/admin/categories");
 }
@@ -74,6 +76,7 @@ export async function updateCategory(fd: FormData) {
     },
   });
   revalidatePath("/admin/categories");
+  bustStorefrontCache();
   revalidatePath("/");
   redirect("/admin/categories");
 }
@@ -84,6 +87,7 @@ export async function deleteCategory(fd: FormData) {
   if (!id) return;
   await db.category.updateMany({ where: { parentId: id }, data: { parentId: null } });
   await db.category.delete({ where: { id } });
+  bustStorefrontCache();
   revalidatePath("/admin/categories");
   redirect("/admin/categories");
 }

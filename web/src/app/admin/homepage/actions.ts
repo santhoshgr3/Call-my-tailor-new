@@ -1,12 +1,14 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { bustStorefrontCache } from "@/lib/cache";
 import { db } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
 import { setSetting } from "@/lib/settings";
 
 const rv = () => {
   revalidatePath("/admin/homepage");
+  bustStorefrontCache();
   revalidatePath("/");
 };
 

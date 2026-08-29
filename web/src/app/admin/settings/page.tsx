@@ -1,4 +1,5 @@
 import { getSetting, setSetting, getSiteConfig } from "@/lib/settings";
+import { bustStorefrontCache } from "@/lib/cache";
 import { requireAdmin } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { PageHeader, Card, Field, inputCls, SubmitButton } from "@/components/admin/ui";
@@ -52,6 +53,7 @@ async function saveSettings(fd: FormData) {
     default_description: String(fd.get("seo_desc") || ""),
   });
 
+  bustStorefrontCache();
   revalidatePath("/", "layout");
 }
 
