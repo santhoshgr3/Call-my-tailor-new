@@ -1,0 +1,208 @@
+{
+  "html": "<div class=\"footer-main collapse description-has-toggle\" id=\"collapse-footer\">\n\t\n\t\t  <div class=\"so-page-builder\">\n\t\t\t\t\t\t<div class=\"container-fluid page-builder-ltr\">\n\t\t\t\t<div class=\"row row_3vy7  footer-top \">\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<div class=\"col-lg-12 col-md-12 col-sm-12 col-xs-12 col_tt1l  container ftop\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<div class=\"row row_1olj  \">\n\t\n\t\t\t<div class=\"col-lg-8 col-md-7 col-sm-12 col-xs-12 col_vagh col-style\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n \n   \n\n<div class=\"module newsletter-footer1\">\n    <div class=\"newsletter\" style=\"width:100%     ; background-color: #fff ; \">\n         \n        \n        <div class=\"title-block\">\n                            <div class=\"page-heading font-title\">\n                    Signup for Newsletter\n                </div>\n                <div class=\"promotext\">We’ll never share your email address with a third-party. </div>\n                                </div>\n\n        <div class=\"block_content\">\n            <form method=\"post\" id=\"signup\" name=\"signup\" class=\"form-group form-inline signup send-mail\">\n                <div class=\"form-group\">\n                    <div class=\"input-box\">\n                        <input type=\"email\" placeholder=\"Your email address...\" value=\"\" class=\"form-control\" id=\"txtemail\" name=\"txtemail\" size=\"55\">\n                    </div>\n                    <div class=\"subcribe\">\n                        <button class=\"btn btn-primary btn-default font-title\" type=\"submit\" onclick=\"return subscribe_newsletter();\" name=\"submit\">\n                            Subscribe\n                        </button>\n                    </div>\n                </div>\n            </form>\n            \n\n        </div> <!--/.modcontent-->\n                \n    </div>\n\n\n\n<script type=\"text/javascript\">\n    function subscribe_newsletter()\n    {\n        var emailpattern = /^\\w+([\\.-]?\\w+)*@\\w+([\\.-]?\\w+)*(\\.\\w{2,3})+$/;\n        var email = $('#txtemail').val();\n        var d = new Date();\n        var createdate = d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();\n        var status   = 0;\n        var dataString = 'email='+email+'&createdate='+createdate+'&status='+status;\n\n        if(email != \"\"){\n\n            if(!emailpattern.test(email))\n            {\n\n                $('.show-error').remove();\n                $('.send-mail').after('<div class=\"alert alert-danger show-error\" role=\"alert\"> <button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\"><span aria-hidden=\"true\">×</span></button> Invalid Email </div>')\n                return false;\n            }\n            else\n            {\n                $.ajax({\n                    url: 'index.php?route=extension/module/so_newletter_custom_popup/newsletter',\n                    type: 'post',\n                    data: dataString,\n                    dataType: 'json',\n                    success: function(json) {\n                        $('.show-error').remove();\n                        if(json.error == false) {\n                            $('.send-mail').after('<div class=\"alert alert-success show-error\" role=\"alert\"> <button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\"><span aria-hidden=\"true\">×</span></button> ' + json.message + '</div>');\n                            setTimeout(function () {\n                                var this_close = $('.popup-close');\n                                this_close.parent().css('display', 'none');\n                                this_close.parents().find('.so_newletter_custom_popup_bg').removeClass('popup_bg');\n                            }, 3000);\n\n                        }else{\n                            $('.send-mail').after('<div class=\"alert alert-danger show-error\" role=\"alert\"> <button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\"><span aria-hidden=\"true\">×</span></button> ' + json.message + '</div>');\n                        }\n                        var x = document.getElementsByClassName('signup');\n                            for (i = 0; i < x.length; i++) {\n                            x[i].reset();\n                        }\n                    }\n                });\n                return false;\n            }\n        } else{\n            alert(\"Email is required\");\n            $(email).focus();\n            return false;\n        }\n    }\n</script>\n</div>\n\n\n\t\t\t\t\t\t\t\t\t\t\n\t\t\t\n\t\t\t\t\t</div>\n\t\t\t<div class=\"col-lg-4 col-md-5 col-sm-12 col-xs-12 col_1vgt col-style\">\n\t\t\t\t\t\t\t\t\t\t\t\t<ul class=\"socials\">\n <li class=\"facebook\"><a class=\"_blank\" href=\"https://www.facebook.com/SmartAddons.page/\" target=\"_blank\"><i class=\"fa fa-facebook\"></i><span>Facebook</span></a></li>\n <li class=\"twitter\"><a class=\"_blank\" href=\"https://twitter.com/smartaddons\" target=\"_blank\"><i class=\"fa fa-twitter\"></i><span>Twitter</span></a></li>\n <li class=\"google_plus\"><a class=\"_blank\" href=\"https://plus.google.com/u/0/+Smartaddons/posts\" target=\"_blank\"><i class=\"fa fa-google-plus\"></i><span>Google Plus</span></a></li>\n <li class=\"pinterest\"><a class=\"_blank\" href=\"https://www.pinterest.com/smartaddons/\" target=\"_blank\"><i class=\"fa fa-pinterest\"></i><span>Pinterest</span></a></li>\n</ul>\n\t\t\t\t\t\t\t\t\t\t\n\t\t\t\n\t\t\t\t\t</div>\n\t</div>\n\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t</div>\t\t\t\n\t\t\t\t\t\t\t\n\t\t\t\t</div>\n\t\t\t</div>\n\n\t\t\t\t\t\t\t\t\t<div class=\"container page-builder-ltr\">\n\t\t\t\t<div class=\"row row_560y  footer-middle \">\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<div class=\"col-lg-3 col-md-3 col-sm-12 col-xs-12 col_i76p  col-style\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<div class=\"infos-footer\">\n<iframe src=\"https://www.youtube.com/embed/88RmDQejfyQ\" title=\"YouTube video player\" frameborder=\"0\" allow=\"accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture\" allowfullscreen=\"\"></iframe>\n\n</div>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t</div>\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"col-lg-2 col-md-2 col-sm-4 col-xs-12 col_njm1  col-style\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<div class=\"box-information box-footer\">\n <div class=\"module clearfix\">\n <h3 class=\"modtitle\">Information</h3>\n <div class=\"modcontent\">\n <ul class=\"menu\">\n<li><a href=\"https://callmytailor.com/about-us\">About Us</a></li>\n<li><a href=\"https://callmytailor.com/why-callmytailor\">Why call my tailor</a></li>\n<li><a href=\"https://callmytailor.com/faqs\">FAQ's</a></li>\n<li><a href=\"https://callmytailor.com/testionials\">Testionials</a></li>\n<li><a href=\"https://callmytailor.com/how-it-works\">How it works</a></li>\n<li><a href=\"https://callmytailor.com/price-list\">Price List</a></li>\n </ul>\n </div>\n </div>\n</div>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t</div>\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"col-lg-2 col-md-2 col-sm-4 col-xs-12 col_py4d  col-style\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<div class=\"box-account box-footer\">\n <div class=\"module clearfix\">\n <h3 class=\"modtitle\">Disclaimer</h3>\n <div class=\"modcontent\">\n <ul class=\"menu\">\n<li><a href=\"https://callmytailor.com/terms-and-conditions\">Terms and Conditions</a></li>\n<li><a href=\"https://callmytailor.com/privacy-policy\">Privacy Policy</a></li>\n<li><a href=\"https://callmytailor.com/refund-replacement\">Refund &amp; Replacement</a></li>\n<li><a href=\"https://callmytailor.com/complaint-advice\">Complaint &amp; Advise</a></li>\n<li><a href=\"https://callmytailor.com/payment-method\">Payment Method</a></li>\n<li><a href=\"https://callmytailor.com/track-my-order\">Track My Order</a></li>\n </ul>\n </div>\n </div>\n</div>\n\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t</div>\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"col-lg-2 col-md-2 col-sm-4 col-xs-12 col_slxc  col-style\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<div class=\"box-service box-footer\">\n  <div class=\"module clearfix\">\n    <h3 class=\"modtitle\">Explore More</h3>\n    <div class=\"modcontent\">\n      <ul class=\"menu\">\n        <li><a href=\"https://callmytailor.com/contact-us/\">Contact Us</a></li>\n        <li><a href=\"https://callmytailor.com/join-us\">Join Us</a></li>\n        <li><a href=\"https://callmytailor.com/index.php?route=information/sitemap\">Site Map</a></li>\n        <li><a href=\"https://callmytailor.com/index.php?route=affiliate/login\">Affiliate</a></li>\n        <li><a href=\"https://callmytailor.com/customer-support\">Customer Support</a></li>\n        <li><a href=\"https://callmytailor.com/gallery\">Gallery</a></li>\n      </ul>\n    </div>\n  </div>\n</div>\n\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t</div>\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"col-lg-3 col-md-3 col-sm-12 col-xs-12 col_5rbh  col-style\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<div class=\"box-service box-footer\">\n  <div class=\"module clearfix\">\n    <h3 class=\"modtitle\">Instagram Gallery</h3>\n    <div class=\"modcontent\">\n      <div class=\"lightbox-gallery\">\n        <div class=\"col-lg-4 col-md-4 col-sm-4 col-xs-4 item ftrbox\">\n          <div class=\"ftrphoto\"> <a href=\"https://www.instagram.com/doorstep_tailor_drapper/\" data-lightbox=\"photos\"> <img class=\"img-fluid\" src=\"https://callmytailor.com/image/catalog/home/ig-1.jpg\"> </a> </div>\n        </div>\n        <div class=\"col-lg-4 col-md-4 col-sm-4 col-xs-4 item ftrbox\">\n          <div class=\"ftrphoto\"> <a href=\"https://www.instagram.com/doorstep_tailor_drapper/\" data-lightbox=\"photos\"> <img class=\"img-fluid\" src=\"https://callmytailor.com/image/catalog/home/ig-2.jpg\"> </a> </div>\n        </div>\n        <div class=\"col-lg-4 col-md-4 col-sm-4 col-xs-4 item ftrbox\">\n          <div class=\"ftrphoto\"> <a href=\"https://www.instagram.com/doorstep_tailor_drapper/\" data-lightbox=\"photos\"> <img class=\"img-fluid\" src=\"https://callmytailor.com/image/catalog/home/ig-3.jpg\"> </a> </div>\n        </div>\n        <div class=\"col-lg-4 col-md-4 col-sm-4 col-xs-4 item ftrbox\">\n          <div class=\"ftrphoto\"> <a href=\"https://www.instagram.com/doorstep_tailor_drapper/\" data-lightbox=\"photos\"> <img class=\"img-fluid\" src=\"https://callmytailor.com/image/catalog/home/ig-4.jpg\"> </a> </div>\n        </div>\n        <div class=\"col-lg-4 col-md-4 col-sm-4 col-xs-4 item ftrbox\">\n          <div class=\"ftrphoto\"> <a href=\"https://callmytailor.com/image/catalog/home/instagram-5.jpg\" data-lightbox=\"photos\"> <img class=\"img-fluid\" src=\"https://callmytailor.com/image/catalog/home/ig-5.jpg\"> </a> </div>\n        </div>\n        <div class=\"col-lg-4 col-md-4 col-sm-4 col-xs-4 item ftrbox\">\n          <div class=\"ftrphoto\"> <a href=\"https://www.instagram.com/doorstep_tailor_drapper/\" target=\"_blank\"> <img class=\"img-fluid\" src=\"https://callmytailor.com/image/catalog/home/more.jpg\"> </a> </div>\n        </div>\n      </div>\n    </div>\n  </div>\n</div>\n\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t</div>\t\t\t\n\t\t\t\t\t\t\t\n\t\t\t\t</div>\n\t\t\t</div>\n\n\t\t\t\t\t\t\t\t\t<div class=\"container page-builder-ltr\">\n\t\t\t\t<div class=\"row row_nfrt  row-style \">\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<div class=\"col-lg-12 col-md-12 col-sm-12 col-xs-12 col_apdj  col-style\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<ul class=\"footer-links font-title\">\n        <li><a href=\"https://callmytailor.com/suit-blazer/formal-suit\">Formal Suit</a></li>\n\t<li><a href=\"https://callmytailor.com/suit-blazer/party-suits\">Party Suit</a></li>\n\t<li><a href=\"https://callmytailor.com/suit-blazer/casual-suit\">Casual Suit</a></li>\n\t<li><a href=\"https://callmytailor.com/suit-blazer/tuxedo\">Tuxedo</a></li>\n\t<li><a href=\"https://callmytailor.com/ethnic-wear/bandhgala-suit\">Bandhgala Suit</a></li>\n\t<li><a href=\"https://callmytailor.com/ethnic-wear/kurta-jacket\">Kurta Jacket</a></li>\n\t<li><a href=\"https://callmytailor.com/ethnic-wear/indo-western\">Indo Western</a></li>\n\t<li><a href=\"https://callmytailor.com/ethnic-wear/sherwani\">Sherwani</a></li>\n\t<li><a href=\"https://callmytailor.com/regular-wear/shirts\">Formal Shirt</a></li>\n\t<li><a href=\"https://callmytailor.com/shirt/casual-shirt\">Casual Shirt</a></li>\n\t<li><a href=\"https://callmytailor.com/kurta/simple-kurta\">Simple Kurta</a></li>\n\t<li><a href=\"https://callmytailor.com/kurta/punjabi-kurta\">Punjabi Kurta</a></li>\n\t<li><a href=\"https://callmytailor.com/kurta/pathani-kurta\">Pathani Kurta</a></li>\n\t<li><a href=\"https://callmytailor.com/kurta/designer-kurta\">Designer Kurta</a></li>\n\t<li><a href=\"https://callmytailor.com/accessories/tie\">Tie</a></li>\n\t<li><a href=\"https://callmytailor.com/accessories/broch\">Broch</a></li>\n\t<li><a href=\"https://callmytailor.com/accessories/cufflink\">Cufflink</a></li>\n\t<li><a href=\"https://callmytailor.com/accessories/pocket-square\">Pocket Square</a></li>\n\t<li><a href=\"https://callmytailor.com/accessories/malas\">Malas</a></li>\n\t<li><a href=\"https://callmytailor.com/accessories/safa-turban\">Safa, Turban</a></li>\n </ul> \n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t</div>\t\t\t\n\t\t\t\t\t\t\t\n\t\t\t\t</div>\n\t\t\t</div>\n\n\t\t\t\t</div>\n\n\t\t\t\n\t</div>\n\t\n\t<div class=\"description-toggle hidden-lg hidden-md\">\n         <a class=\"showmore\" data-toggle=\"collapse\" href=\"#collapse-footer\" aria-expanded=\"false\" aria-controls=\"collapse-footer\">\n            <span class=\"toggle-more\">Show More <i class=\"fa fa-angle-down\"></i></span> \n            <span class=\"toggle-less\">Show Less <i class=\"fa fa-angle-up\"></i></span>   \n\t\t</a>        \n\t</div>\n\t\t\n\t\n\t \n\t<div class=\"footer-bottom \">\n\t\t<div class=\"container\">\n\t\t\t\t\t</div>\n\t\t<div class=\"copyright-w\">\n\t\t\t<div class=\"container\">\n\t\t\t\t<div class=\"copyright\">\n\t\t\t\t\t\t\t\t\t\t\tCallmytailor © 2026 All Rights Reserved.\n\t\t\t\t\t\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\n\t\t\n\t</div>",
+  "text": "Signup for Newsletter We’ll never share your email address with a third-party. Subscribe function subscribe_newsletter() { var emailpattern = /^\\w+([\\.-]?\\w+)*@\\w+([\\.-]?\\w+)*(\\.\\w{2,3})+$/; var email = $('#txtemail').val(); var d = new Date(); var createdate = d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds(); var status = 0; var dataString = 'email='+email+'&createdate='+createdate+'&status='+status; if(email != \"\"){ if(!emailpattern.test(email)) { $('.show-error').remove(); $('.send-mail').after('<div class=\"alert alert-danger show-error\" role=\"alert\"> <button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\"><span aria-hidden=\"true\">×</span></button> Invalid Email </div>') return false; } else { $.ajax({ url: 'index.php?route=extension/module/so_newletter_custom_popup/newsletter', type: 'post', data: dataString, dataType: 'json', success: function(json) { $('.show-error').remove(); if(json.error == false) { $('.send-mail').after('<div class=\"alert alert-success show-error\" role=\"alert\"> <button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\"><span aria-hidden=\"true\">×</span></button> ' + json.message + '</div>'); setTimeout(function () { var this_close = $('.popup-close'); this_close.parent().css('display', 'none'); this_close.parents().find('.so_newletter_custom_popup_bg').removeClass('popup_bg'); }, 3000); }else{ $('.send-mail').after('<div class=\"alert alert-danger show-error\" role=\"alert\"> <button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\"><span aria-hidden=\"true\">×</span></button> ' + json.message + '</div>'); } var x = document.getElementsByClassName('signup'); for (i = 0; i < x.length; i++) { x[i].reset(); } } }); return false; } } else{ alert(\"Email is required\"); $(email).focus(); return false; } } Facebook Twitter Google Plus Pinterest Information About Us Why call my tailor FAQ's Testionials How it works Price List Disclaimer Terms and Conditions Privacy Policy Refund & Replacement Complaint & Advise Payment Method Track My Order Explore More Contact Us Join Us Site Map Affiliate Customer Support Gallery Instagram Gallery Formal Suit Party Suit Casual Suit Tuxedo Bandhgala Suit Kurta Jacket Indo Western Sherwani Formal Shirt Casual Shirt Simple Kurta Punjabi Kurta Pathani Kurta Designer Kurta Tie Broch Cufflink Pocket Square Malas Safa, Turban Show More Show Less Callmytailor © 2026 All Rights Reserved.",
+  "links": [
+    {
+      "text": "Facebook",
+      "href": "https://www.facebook.com/SmartAddons.page/"
+    },
+    {
+      "text": "Twitter",
+      "href": "https://twitter.com/smartaddons"
+    },
+    {
+      "text": "Google Plus",
+      "href": "https://plus.google.com/u/0/+Smartaddons/posts"
+    },
+    {
+      "text": "Pinterest",
+      "href": "https://www.pinterest.com/smartaddons/"
+    },
+    {
+      "text": "About Us",
+      "href": "https://callmytailor.com/about-us"
+    },
+    {
+      "text": "Why call my tailor",
+      "href": "https://callmytailor.com/why-callmytailor"
+    },
+    {
+      "text": "FAQ's",
+      "href": "https://callmytailor.com/faqs"
+    },
+    {
+      "text": "Testionials",
+      "href": "https://callmytailor.com/testionials"
+    },
+    {
+      "text": "How it works",
+      "href": "https://callmytailor.com/how-it-works"
+    },
+    {
+      "text": "Price List",
+      "href": "https://callmytailor.com/price-list"
+    },
+    {
+      "text": "Terms and Conditions",
+      "href": "https://callmytailor.com/terms-and-conditions"
+    },
+    {
+      "text": "Privacy Policy",
+      "href": "https://callmytailor.com/privacy-policy"
+    },
+    {
+      "text": "Refund & Replacement",
+      "href": "https://callmytailor.com/refund-replacement"
+    },
+    {
+      "text": "Complaint & Advise",
+      "href": "https://callmytailor.com/complaint-advice"
+    },
+    {
+      "text": "Payment Method",
+      "href": "https://callmytailor.com/payment-method"
+    },
+    {
+      "text": "Track My Order",
+      "href": "https://callmytailor.com/track-my-order"
+    },
+    {
+      "text": "Contact Us",
+      "href": "https://callmytailor.com/contact-us/"
+    },
+    {
+      "text": "Join Us",
+      "href": "https://callmytailor.com/join-us"
+    },
+    {
+      "text": "Site Map",
+      "href": "https://callmytailor.com/index.php?route=information/sitemap"
+    },
+    {
+      "text": "Affiliate",
+      "href": "https://callmytailor.com/index.php?route=affiliate/login"
+    },
+    {
+      "text": "Customer Support",
+      "href": "https://callmytailor.com/customer-support"
+    },
+    {
+      "text": "Gallery",
+      "href": "https://callmytailor.com/gallery"
+    },
+    {
+      "text": "Formal Suit",
+      "href": "https://callmytailor.com/suit-blazer/formal-suit"
+    },
+    {
+      "text": "Party Suit",
+      "href": "https://callmytailor.com/suit-blazer/party-suits"
+    },
+    {
+      "text": "Casual Suit",
+      "href": "https://callmytailor.com/suit-blazer/casual-suit"
+    },
+    {
+      "text": "Tuxedo",
+      "href": "https://callmytailor.com/suit-blazer/tuxedo"
+    },
+    {
+      "text": "Bandhgala Suit",
+      "href": "https://callmytailor.com/ethnic-wear/bandhgala-suit"
+    },
+    {
+      "text": "Kurta Jacket",
+      "href": "https://callmytailor.com/ethnic-wear/kurta-jacket"
+    },
+    {
+      "text": "Indo Western",
+      "href": "https://callmytailor.com/ethnic-wear/indo-western"
+    },
+    {
+      "text": "Sherwani",
+      "href": "https://callmytailor.com/ethnic-wear/sherwani"
+    },
+    {
+      "text": "Formal Shirt",
+      "href": "https://callmytailor.com/regular-wear/shirts"
+    },
+    {
+      "text": "Casual Shirt",
+      "href": "https://callmytailor.com/shirt/casual-shirt"
+    },
+    {
+      "text": "Simple Kurta",
+      "href": "https://callmytailor.com/kurta/simple-kurta"
+    },
+    {
+      "text": "Punjabi Kurta",
+      "href": "https://callmytailor.com/kurta/punjabi-kurta"
+    },
+    {
+      "text": "Pathani Kurta",
+      "href": "https://callmytailor.com/kurta/pathani-kurta"
+    },
+    {
+      "text": "Designer Kurta",
+      "href": "https://callmytailor.com/kurta/designer-kurta"
+    },
+    {
+      "text": "Tie",
+      "href": "https://callmytailor.com/accessories/tie"
+    },
+    {
+      "text": "Broch",
+      "href": "https://callmytailor.com/accessories/broch"
+    },
+    {
+      "text": "Cufflink",
+      "href": "https://callmytailor.com/accessories/cufflink"
+    },
+    {
+      "text": "Pocket Square",
+      "href": "https://callmytailor.com/accessories/pocket-square"
+    },
+    {
+      "text": "Malas",
+      "href": "https://callmytailor.com/accessories/malas"
+    },
+    {
+      "text": "Safa, Turban",
+      "href": "https://callmytailor.com/accessories/safa-turban"
+    },
+    {
+      "text": "Show More Show Less",
+      "href": "https://callmytailor.com/#collapse-footer"
+    }
+  ],
+  "socials": [
+    "https://www.instagram.com/doorstep_tailor_drapper?igsh=Z3prZzM5ZG03cTZu",
+    "https://www.facebook.com/share/1GeVVaWS33/",
+    "https://www.linkedin.com/company/call-my-tailor/",
+    "https://www.youtube.com/@callmytailor9266",
+    "https://in.pinterest.com/callmytailorstyle/",
+    "https://www.facebook.com/v2.4/dialog/oauth?client_id=442675926063537&state=8e7b7c352ee38975ea5cdcf7311a69bd&response_type=code&sdk=php-sdk-5.5.0&redirect_uri=https%3A%2F%2Fcallmytailor.com%2Findex.php%3Froute%3Dextension%2Fmodule%2Fso_sociallogin%2FFacebookLogin&scope=public_profile%2Cemail",
+    "https://m.facebook.com/story.php?story_fbid=3031624776848720&id=100000036833357",
+    "https://www.facebook.com/100000177326362/posts/2613885631960655/",
+    "https://www.facebook.com/100001257668498/posts/2265303343521566/",
+    "https://www.facebook.com/100001257668498/posts/2265303343521566/",
+    "https://m.facebook.com/story.php?story_fbid=2077922385588879&id=100001134123637",
+    "https://m.facebook.com/story.php?story_fbid=2145572175541694&id=100002667966322",
+    "https://www.facebook.com/100001377466152/posts/2104284962960732/",
+    "https://m.facebook.com/story.php?story_fbid=2739523899443474&id=100001576729159",
+    "https://m.facebook.com/story.php?story_fbid=3031624776848720&id=100000036833357",
+    "https://m.facebook.com/story.php?story_fbid=3031624776848720&id=100000036833357",
+    "https://api.whatsapp.com/send?phone=918882222900",
+    "https://www.facebook.com/SmartAddons.page/",
+    "https://www.pinterest.com/smartaddons/",
+    "https://www.instagram.com/doorstep_tailor_drapper/",
+    "https://www.instagram.com/doorstep_tailor_drapper/",
+    "https://www.instagram.com/doorstep_tailor_drapper/",
+    "https://www.instagram.com/doorstep_tailor_drapper/",
+    "https://callmytailor.com/image/catalog/home/instagram-5.jpg",
+    "https://www.instagram.com/doorstep_tailor_drapper/"
+  ],
+  "phone": null,
+  "whatsapp": "918882222900",
+  "emails": []
+}

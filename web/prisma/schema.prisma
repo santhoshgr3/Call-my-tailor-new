@@ -1,0 +1,350 @@
+// Call My Tailor — data model
+// Local dev uses SQLite. For production on Supabase, change provider to "postgresql"
+// and point DATABASE_URL at the Supabase connection string. No code changes needed.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ----------------------------- Catalog -----------------------------
+
+model Category {
+  id              String            @id @default(cuid())
+  slug            String            @unique
+  name            String
+  parentId        String?
+  parent          Category?         @relation("CategoryTree", fields: [parentId], references: [id])
+  children        Category[]        @relation("CategoryTree")
+  description     String?
+  descriptionHtml String?
+  image           String?
+  metaTitle       String?
+  metaDescription String?
+  sortOrder       Int               @default(0)
+  isActive        Boolean           @default(true)
+  showInMenu      Boolean           @default(true)
+  products        ProductCategory[]
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@index([parentId])
+}
+
+model Product {
+  id              String            @id @default(cuid())
+  slug            String            @unique
+  name            String
+  sku             String?
+  price           Int               @default(0)
+  oldPrice        Int?
+  shortDescription String?
+  description     String?
+  descriptionHtml String?
+  stockStatus     String            @default("In Stock")
+  quantity        Int               @default(100)
+  isActive        Boolean           @default(true)
+  isFeatured      Boolean           @default(false)
+  isBestSeller    Boolean           @default(false)
+  isNewArrival    Boolean           @default(false)
+  isTrending      Boolean           @default(false)
+  hasImage        Boolean           @default(true)
+  rating          Float             @default(0)
+  ratingCount     Int               @default(0)
+  soldCount       Int               @default(0)
+  metaTitle       String?
+  metaDescription String?
+  legacyId        String?           @unique
+  categories      ProductCategory[]
+  images          ProductImage[]
+  specs           ProductSpec[]
+  options         ProductOption[]
+  reviews         Review[]
+  orderItems      OrderItem[]
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@index([isActive])
+}
+
+model ProductCategory {
+  productId  String
+  categoryId String
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([productId, categoryId])
+  @@index([categoryId])
+}
+
+model ProductImage {
+  id        String  @id @default(cuid())
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  url       String
+  alt       String?
+  sortOrder Int     @default(0)
+
+  @@index([productId])
+}
+
+model ProductSpec {
+  id        String  @id @default(cuid())
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  key       String
+  value     String
+  sortOrder Int     @default(0)
+
+  @@index([productId])
+}
+
+model ProductOption {
+  id         String               @id @default(cuid())
+  productId  String
+  product    Product              @relation(fields: [productId], references: [id], onDelete: Cascade)
+  label      String
+  type       String               @default("select") // select | radio | text
+  required   Boolean              @default(false)
+  sortOrder  Int                  @default(0)
+  values     ProductOptionValue[]
+
+  @@index([productId])
+}
+
+model ProductOptionValue {
+  id         String        @id @default(cuid())
+  optionId   String
+  option     ProductOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  label      String
+  priceDelta Int           @default(0)
+  sortOrder  Int           @default(0)
+
+  @@index([optionId])
+}
+
+model Review {
+  id           String   @id @default(cuid())
+  productId    String
+  product      Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  customerName String
+  email        String?
+  rating       Int      @default(5)
+  title        String?
+  body         String
+  isApproved   Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  @@index([productId])
+}
+
+// ----------------------------- Customers & Auth -----------------------------
+
+model Customer {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String
+  firstName    String
+  lastName     String?
+  phone        String?
+  role         String    @default("customer") // customer | admin
+  isActive     Boolean   @default(true)
+  addresses    Address[]
+  orders       Order[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model Address {
+  id         String   @id @default(cuid())
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  fullName   String
+  phone      String
+  line1      String
+  line2      String?
+  city       String
+  state      String
+  pincode    String
+  country    String   @default("India")
+  isDefault  Boolean  @default(false)
+
+  @@index([customerId])
+}
+
+// ----------------------------- Orders -----------------------------
+
+model Order {
+  id              String      @id @default(cuid())
+  orderNumber     String      @unique
+  customerId      String?
+  customer        Customer?   @relation(fields: [customerId], references: [id])
+  email           String
+  phone           String
+  status          String      @default("pending") // pending | confirmed | in_production | ready | shipped | delivered | cancelled
+  paymentStatus   String      @default("unpaid") // unpaid | paid | refunded
+  paymentMethod   String      @default("cod")
+  paymentRef      String?
+  subtotal        Int         @default(0)
+  shipping        Int         @default(0)
+  discount        Int         @default(0)
+  total           Int         @default(0)
+  couponCode      String?
+  shippingAddress String // JSON string
+  notes           String?
+  items           OrderItem[]
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@index([status])
+  @@index([customerId])
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String?
+  product   Product? @relation(fields: [productId], references: [id])
+  name      String
+  sku       String?
+  image     String?
+  unitPrice Int     @default(0)
+  qty       Int     @default(1)
+  options   String? // JSON string
+  lineTotal Int     @default(0)
+
+  @@index([orderId])
+}
+
+model Coupon {
+  id          String    @id @default(cuid())
+  code        String    @unique
+  type        String    @default("percent") // percent | fixed
+  value       Int       @default(0)
+  minSubtotal Int       @default(0)
+  isActive    Boolean   @default(true)
+  expiresAt   DateTime?
+  usageLimit  Int?
+  usedCount   Int       @default(0)
+  createdAt   DateTime  @default(now())
+}
+
+// ----------------------------- Home visit booking -----------------------------
+
+model HomeVisitBooking {
+  id            String   @id @default(cuid())
+  name          String
+  phone         String
+  email         String?
+  address       String
+  city          String?
+  pincode       String?
+  category      String?
+  preferredDate String?
+  preferredTime String?
+  message       String?
+  status        String   @default("new") // new | contacted | scheduled | completed | cancelled
+  createdAt     DateTime @default(now())
+
+  @@index([status])
+}
+
+// ----------------------------- Content / CMS -----------------------------
+
+model Testimonial {
+  id        String  @id @default(cuid())
+  name      String
+  role      String?
+  text      String
+  imageUrl  String?
+  fbUrl     String?
+  rating    Int     @default(5)
+  sortOrder Int     @default(0)
+  isActive  Boolean @default(true)
+}
+
+model BlogPost {
+  id              String    @id @default(cuid())
+  slug            String    @unique
+  title           String
+  subtitle        String?
+  author          String?
+  excerpt         String?
+  contentHtml     String
+  coverImage      String?
+  metaTitle       String?
+  metaDescription String?
+  isPublished     Boolean   @default(true)
+  publishedAt     DateTime  @default(now())
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+model InfoPage {
+  id              String   @id @default(cuid())
+  slug            String   @unique
+  title           String
+  contentHtml     String
+  metaTitle       String?
+  metaDescription String?
+  isPublished     Boolean  @default(true)
+  updatedAt       DateTime @updatedAt
+}
+
+model HeroSlide {
+  id        String  @id @default(cuid())
+  imageUrl  String
+  headline  String?
+  subtext   String?
+  link      String?
+  sortOrder Int     @default(0)
+  isActive  Boolean @default(true)
+}
+
+model PromoBanner {
+  id          String  @id @default(cuid())
+  imageUrl    String
+  title       String?
+  subtitle    String?
+  buttonLabel String?
+  link        String?
+  position    String  @default("home-top") // home-top | home-mid
+  sortOrder   Int     @default(0)
+  isActive    Boolean @default(true)
+}
+
+model FabricBrand {
+  id        String  @id @default(cuid())
+  name      String
+  logoUrl   String
+  sortOrder Int     @default(0)
+  isActive  Boolean @default(true)
+}
+
+model Setting {
+  key       String   @id
+  value     String // JSON string
+  updatedAt DateTime @updatedAt
+}
+
+model NewsletterSubscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  subject   String?
+  message   String
+  status    String   @default("new")
+  createdAt DateTime @default(now())
+}

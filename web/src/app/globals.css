@@ -1,0 +1,171 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand: #eb3740;
+  --color-brand-dark: #10131d;
+  --color-brand-hover: #d32732;
+  --color-ink: #222222;
+  --color-muted: #666666;
+  --color-faint: #888888;
+  --color-line: #e5e5e5;
+  --color-soft: #f7f7f7;
+  --color-wa: #25d366;
+
+  --font-sans: Arial, Helvetica, "Segoe UI", system-ui, sans-serif;
+
+  --shadow-card: 0 1px 4px rgba(0, 0, 0, 0.08);
+  --shadow-pop: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    background: #ffffff;
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  h1, h2, h3, h4, h5 {
+    font-weight: 700;
+    line-height: 1.25;
+    color: var(--color-brand-dark);
+  }
+  a {
+    color: inherit;
+  }
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* Brand gradient button used across the original site */
+.btn-brand {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  background: linear-gradient(180deg, #f0454e 0%, #eb3740 55%, #cf2630 100%);
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  padding: 0.7rem 1.5rem;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(235, 55, 64, 0.35);
+  transition: filter 0.15s ease, transform 0.1s ease;
+  font-size: 13px;
+}
+.btn-brand:hover {
+  filter: brightness(1.06);
+}
+.btn-brand:active {
+  transform: translateY(1px);
+}
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  border: 1px solid var(--color-brand);
+  color: var(--color-brand);
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 0.65rem 1.4rem;
+  border-radius: 6px;
+  font-size: 13px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.btn-outline:hover {
+  background: var(--color-brand);
+  color: #fff;
+}
+.btn-dark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  background: var(--color-brand-dark);
+  color: #fff;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 0.7rem 1.5rem;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.container-cmt {
+  width: 100%;
+  max-width: 1240px;
+  margin-inline: auto;
+  padding-inline: 15px;
+}
+
+.section-title {
+  text-align: center;
+  font-size: 26px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-bottom: 6px;
+  position: relative;
+}
+.section-title::after {
+  content: "";
+  display: block;
+  width: 60px;
+  height: 3px;
+  background: var(--color-brand);
+  margin: 12px auto 0;
+}
+
+.prose-cmt :where(h2) {
+  font-size: 22px;
+  margin: 1.4em 0 0.5em;
+}
+.prose-cmt :where(h3) {
+  font-size: 18px;
+  margin: 1.2em 0 0.4em;
+}
+.prose-cmt :where(p) {
+  margin: 0 0 1em;
+}
+.prose-cmt :where(ul) {
+  list-style: disc;
+  padding-left: 1.4em;
+  margin: 0 0 1em;
+}
+.prose-cmt :where(ol) {
+  list-style: decimal;
+  padding-left: 1.4em;
+  margin: 0 0 1em;
+}
+.prose-cmt :where(a) {
+  color: var(--color-brand);
+  text-decoration: underline;
+}
+.prose-cmt :where(table) {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 0 1em;
+}
+.prose-cmt :where(td, th) {
+  border: 1px solid var(--color-line);
+  padding: 8px 10px;
+  text-align: left;
+}
+.prose-cmt :where(img) {
+  border-radius: 6px;
+  margin: 0.5em 0;
+}
+
+/* hide scrollbars on horizontal rails */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
