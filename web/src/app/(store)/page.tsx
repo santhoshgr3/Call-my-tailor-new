@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { db } from "@/lib/db";
-import { getRail, PRODUCT_CARD_SELECT } from "@/lib/catalog";
+import { getRail, PRODUCT_CARD_SELECT, type ProductCard as TCard } from "@/lib/catalog";
 import { getSiteConfig, getSetting } from "@/lib/settings";
+import { dbStatus } from "@/lib/health";
+import { SetupNotice } from "@/components/SetupNotice";
 import { ProductCard } from "@/components/product/ProductCard";
 import { HeroCarousel } from "@/components/home/HeroCarousel";
 import { ProductTabs } from "@/components/home/ProductTabs";
@@ -9,7 +11,15 @@ import { StatCounter } from "@/components/home/StatCounter";
 
 export const dynamic = "force-dynamic";
 
-async function trendingFor(slug: string) {
+async function safe<T>(fn: () => Promise<T>, fallback: T): Promise<T> {
+  try {
+    return await fn();
+  } catch {
+    return fallback;
+  }
+}
+
+async function trendingFor(slug: string): Promise<TCard[]> {
   const cat = await db.category.findUnique({ where: { slug }, select: { id: true } });
   if (!cat) return [];
   const kids = await db.category.findMany({ where: { parentId: cat.id }, select: { id: true } });
@@ -25,55 +35,70 @@ async function trendingFor(slug: string) {
 }
 
 export default async function HomePage() {
+  const status = await dbStatus();
+  if (status !== "ok") return <SetupNotice status={status} />;
+
   const site = await getSiteConfig();
   const layout = await getSetting<Record<string, boolean>>("home_layout", {});
 
   const [slides, promos, best, fresh, rated, brands, testimonials, posts] = await Promise.all([
-    db.heroSlide.findMany({ where: { isActive: true }, orderBy: { sortOrder: "asc" } }),
-    db.promoBanner.findMany({ where: { isActive: true }, orderBy: { sortOrder: "asc" }, take: 2 }),
-    getRail("best", 10),
-    getRail("new", 10),
-    getRail("rating", 10),
-    db.fabricBrand.findMany({ where: { isActive: true }, orderBy: { sortOrder: "asc" } }),
-    db.testimonial.findMany({ where: { isActive: true }, orderBy: { sortOrder: "asc" } }),
-    db.blogPost.findMany({ where: { isPublished: true }, orderBy: { publishedAt: "desc" }, take: 3 }),
+    safe(() => db.heroSlide.findMany({ where: { isActive: true }, orderBy: { sortOrder: "asc" } }), []),
+    safe(() => db.promoBanner.findMany({ where: { isActive: true }, orderBy: { sortOrder: "asc" }, take: 2 }), []),
+    safe(() => getRail("best", 10), [] as TCard[]),
+    safe(() => getRail("new", 10), [] as TCard[]),
+    safe(() => getRail("rating", 10), [] as TCard[]),
+    safe(() => db.fabricBrand.findMany({ where: { isActive: true }, orderBy: { sortOrder: "asc" } }), []),
+    safe(() => db.testimonial.findMany({ where: { isActive: true }, orderBy: { sortOrder: "asc" } }), []),
+    safe(() => db.blogPost.findMany({ where: { isPublished: true }, orderBy: { publishedAt: "desc" }, take: 3 }), []),
   ]);
 
-  const trendingTabs = await Promise.all(
-    [
-      { label: "All", slug: "catalogue" },
-      { label: "Accessories", slug: "accessories" },
-      { label: "Ethnic Wear", slug: "ethnic-wear" },
-      { label: "Kurta", slug: "kurta" },
-      { label: "Suit/Blazer", slug: "suit-blazer" },
-    ].map(async (t) => ({ label: t.label, items: await trendingFor(t.slug) })),
+  const trendingTabs = await safe(
+    () =>
+      Promise.all(
+        [
+          { label: "All", slug: "catalogue" },
+          { label: "Accessories", slug: "accessories" },
+          { label: "Ethnic Wear", slug: "ethnic-wear" },
+          { label: "Kurta", slug: "kurta" },
+          { label: "Suit/Blazer", slug: "suit-blazer" },
+        ].map(async (t) => ({ label: t.label, items: await trendingFor(t.slug) })),
+      ),
+    [] as { label: string; items: TCard[] }[],
   );
 
-  const specThumbs = await Promise.all(
-    (site.specializations ?? []).map(async (s) => {
-      const cat = await db.category.findUnique({ where: { slug: s.slug }, select: { id: true } });
-      const p = cat
-        ? await db.product.findFirst({
-            where: { categories: { some: { categoryId: cat.id } } },
-            select: { images: { take: 1, select: { url: true } } },
-          })
-        : null;
-      return { ...s, image: p?.images[0]?.url || "/img/placeholder.svg" };
-    }),
+  const specThumbs = await safe(
+    () =>
+      Promise.all(
+        (site.specializations ?? []).map(async (s) => {
+          const cat = await db.category.findUnique({ where: { slug: s.slug }, select: { id: true } });
+          const p = cat
+            ? await db.product.findFirst({
+                where: { categories: { some: { categoryId: cat.id } } },
+                select: { images: { take: 1, select: { url: true } } },
+              })
+            : null;
+          return { ...s, image: p?.images[0]?.url || "/img/placeholder.svg" };
+        }),
+      ),
+    [] as { title: string; slug: string; image: string }[],
   );
 
-  const orderCats = await Promise.all(
-    (site.order_by_category ?? []).map(async (o) => {
-      const leaf = o.slug.split("/").pop()!;
-      const cat = await db.category.findUnique({ where: { slug: leaf }, select: { id: true } });
-      const p = cat
-        ? await db.product.findFirst({
-            where: { categories: { some: { categoryId: cat.id } } },
-            select: { images: { take: 1, select: { url: true } } },
-          })
-        : null;
-      return { ...o, image: p?.images[0]?.url || "/img/placeholder.svg" };
-    }),
+  const orderCats = await safe(
+    () =>
+      Promise.all(
+        (site.order_by_category ?? []).map(async (o) => {
+          const leaf = o.slug.split("/").pop()!;
+          const cat = await db.category.findUnique({ where: { slug: leaf }, select: { id: true } });
+          const p = cat
+            ? await db.product.findFirst({
+                where: { categories: { some: { categoryId: cat.id } } },
+                select: { images: { take: 1, select: { url: true } } },
+              })
+            : null;
+          return { ...o, image: p?.images[0]?.url || "/img/placeholder.svg" };
+        }),
+      ),
+    [] as { label: string; slug: string; image: string }[],
   );
 
   return (

@@ -65,12 +65,19 @@ export async function getAllCategoriesFlat() {
 
 export async function resolveCategory(slugs: string[]) {
   const leaf = slugs[slugs.length - 1];
-  const cat = await db.category.findUnique({
-    where: { slug: leaf },
-    include: { parent: true, children: { where: { isActive: true }, orderBy: { sortOrder: "asc" } } },
-  });
-  if (!cat || !cat.isActive) return null;
-  return cat;
+  try {
+    const cat = await db.category.findUnique({
+      where: { slug: leaf },
+      include: {
+        parent: true,
+        children: { where: { isActive: true }, orderBy: { sortOrder: "asc" } },
+      },
+    });
+    if (!cat || !cat.isActive) return null;
+    return cat;
+  } catch {
+    return null;
+  }
 }
 
 export type SortKey =
@@ -150,29 +157,40 @@ export async function getCategoryProducts(opts: {
 }
 
 export async function getProductBySlug(slug: string) {
-  return db.product.findUnique({
-    where: { slug },
-    include: {
-      images: { orderBy: { sortOrder: "asc" } },
-      specs: { orderBy: { sortOrder: "asc" } },
-      options: { orderBy: { sortOrder: "asc" }, include: { values: { orderBy: { sortOrder: "asc" } } } },
-      categories: { include: { category: { include: { parent: true } } } },
-      reviews: { where: { isApproved: true }, orderBy: { createdAt: "desc" } },
-    },
-  });
+  try {
+    return await db.product.findUnique({
+      where: { slug },
+      include: {
+        images: { orderBy: { sortOrder: "asc" } },
+        specs: { orderBy: { sortOrder: "asc" } },
+        options: {
+          orderBy: { sortOrder: "asc" },
+          include: { values: { orderBy: { sortOrder: "asc" } } },
+        },
+        categories: { include: { category: { include: { parent: true } } } },
+        reviews: { where: { isApproved: true }, orderBy: { createdAt: "desc" } },
+      },
+    });
+  } catch {
+    return null;
+  }
 }
 
 export async function getRelatedProducts(productId: string, categoryIds: string[], take = 10) {
-  return db.product.findMany({
-    where: {
-      isActive: true,
-      id: { not: productId },
-      categories: { some: { categoryId: { in: categoryIds } } },
-    },
-    orderBy: [{ hasImage: "desc" }, { isBestSeller: "desc" }, { createdAt: "desc" }],
-    take,
-    select: PRODUCT_CARD_SELECT,
-  });
+  try {
+    return await db.product.findMany({
+      where: {
+        isActive: true,
+        id: { not: productId },
+        categories: { some: { categoryId: { in: categoryIds } } },
+      },
+      orderBy: [{ hasImage: "desc" }, { isBestSeller: "desc" }, { createdAt: "desc" }],
+      take,
+      select: PRODUCT_CARD_SELECT,
+    });
+  } catch {
+    return [];
+  }
 }
 
 export async function getRail(kind: "best" | "new" | "rating" | "featured" | "trending", take = 12) {
@@ -189,16 +207,20 @@ export async function getRail(kind: "best" | "new" | "rating" | "featured" | "tr
     where.rating = { gt: 0 };
     orderBy.unshift({ rating: "desc" });
   }
-  const items = await db.product.findMany({ where, orderBy, take, select: PRODUCT_CARD_SELECT });
-  if (items.length === 0) {
-    return db.product.findMany({
-      where: { isActive: true },
-      orderBy: [{ hasImage: "desc" }, { isBestSeller: "desc" }, { createdAt: "desc" }],
-      take,
-      select: PRODUCT_CARD_SELECT,
-    });
+  try {
+    const items = await db.product.findMany({ where, orderBy, take, select: PRODUCT_CARD_SELECT });
+    if (items.length === 0) {
+      return db.product.findMany({
+        where: { isActive: true },
+        orderBy: [{ hasImage: "desc" }, { isBestSeller: "desc" }, { createdAt: "desc" }],
+        take,
+        select: PRODUCT_CARD_SELECT,
+      });
+    }
+    return items;
+  } catch {
+    return [];
   }
-  return items;
 }
 
 export async function searchProducts(q: string, page = 1, perPage = 24) {
@@ -212,15 +234,19 @@ export async function searchProducts(q: string, page = 1, perPage = 24) {
       { sku: { contains: term } },
     ],
   };
-  const [total, items] = await Promise.all([
-    db.product.count({ where }),
-    db.product.findMany({
-      where,
-      orderBy: [{ hasImage: "desc" }, { isBestSeller: "desc" }, { name: "asc" }],
-      skip: (page - 1) * perPage,
-      take: perPage,
-      select: PRODUCT_CARD_SELECT,
-    }),
-  ]);
-  return { items, total, page, pages: Math.max(1, Math.ceil(total / perPage)) };
+  try {
+    const [total, items] = await Promise.all([
+      db.product.count({ where }),
+      db.product.findMany({
+        where,
+        orderBy: [{ hasImage: "desc" }, { isBestSeller: "desc" }, { name: "asc" }],
+        skip: (page - 1) * perPage,
+        take: perPage,
+        select: PRODUCT_CARD_SELECT,
+      }),
+    ]);
+    return { items, total, page, pages: Math.max(1, Math.ceil(total / perPage)) };
+  } catch {
+    return { items: [], total: 0, page, pages: 1 };
+  }
 }

@@ -7,6 +7,16 @@ import { ProductCard } from "@/components/product/ProductCard";
 import { Pagination } from "@/components/catalog/Pagination";
 import { SortSelect } from "@/components/catalog/SortSelect";
 import { pageTitle } from "@/lib/seo";
+import { dbStatus } from "@/lib/health";
+import { SetupNotice } from "@/components/SetupNotice";
+
+async function safeInfoPage(slug: string) {
+  try {
+    return await db.infoPage.findUnique({ where: { slug, isPublished: true } });
+  } catch {
+    return null;
+  }
+}
 
 type Params = { slug: string[] };
 type Search = { [k: string]: string | string[] | undefined };
@@ -33,11 +43,11 @@ export async function generateMetadata({
       description: cat.metaDescription || undefined,
     };
   }
-  const page = await db.infoPage.findUnique({ where: { slug: slug[0] } });
+  const page = await safeInfoPage(slug[0]);
   if (page) {
     return { title: pageTitle(page.metaTitle || page.title), description: page.metaDescription || undefined };
   }
-  return { title: "Not found" };
+  return { title: "Call My Tailor" };
 }
 
 export default async function CatchAllPage({
@@ -49,12 +59,16 @@ export default async function CatchAllPage({
 }) {
   const { slug } = await params;
   const sp = await searchParams;
+
+  const status = await dbStatus();
+  if (status !== "ok") return <SetupNotice status={status} />;
+
   const cat = await loadCategory(slug);
 
   if (cat) return <CategoryView cat={cat} sp={sp} basePath={"/" + slug.join("/")} />;
 
   if (slug.length === 1) {
-    const page = await db.infoPage.findUnique({ where: { slug: slug[0], isPublished: true } });
+    const page = await safeInfoPage(slug[0]);
     if (page) {
       return (
         <article className="container-cmt py-10">

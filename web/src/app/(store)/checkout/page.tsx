@@ -10,7 +10,9 @@ export default async function CheckoutPage() {
   const user = await getCurrentUser();
   const uid = await getSessionUserId();
   const address = uid
-    ? await db.address.findFirst({ where: { customerId: uid, isDefault: true } })
+    ? await db.address
+        .findFirst({ where: { customerId: uid, isDefault: true } })
+        .catch(() => null)
     : null;
 
   return (

@@ -10,6 +10,8 @@ import { ProductGallery } from "@/components/product/ProductGallery";
 import { BuyBox } from "@/components/product/BuyBox";
 import { ProductTabsView } from "@/components/product/ProductTabsView";
 import { ProductCard } from "@/components/product/ProductCard";
+import { dbStatus } from "@/lib/health";
+import { SetupNotice } from "@/components/SetupNotice";
 
 export async function generateMetadata({
   params,
@@ -32,6 +34,10 @@ export default async function ProductPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
+
+  const status = await dbStatus();
+  if (status !== "ok") return <SetupNotice status={status} />;
+
   const p = await getProductBySlug(slug);
   if (!p || !p.isActive) notFound();
 

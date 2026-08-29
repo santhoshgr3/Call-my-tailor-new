@@ -1,14 +1,19 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { db } from "@/lib/db";
+import { dbStatus } from "@/lib/health";
+import { SetupNotice } from "@/components/SetupNotice";
 
 export const metadata: Metadata = { title: "Blog" };
+export const dynamic = "force-dynamic";
 
 export default async function BlogIndex() {
-  const posts = await db.blogPost.findMany({
-    where: { isPublished: true },
-    orderBy: { publishedAt: "desc" },
-  });
+  const status = await dbStatus();
+  if (status !== "ok") return <SetupNotice status={status} />;
+
+  const posts = await db.blogPost
+    .findMany({ where: { isPublished: true }, orderBy: { publishedAt: "desc" } })
+    .catch(() => []);
 
   return (
     <div className="container-cmt py-10">

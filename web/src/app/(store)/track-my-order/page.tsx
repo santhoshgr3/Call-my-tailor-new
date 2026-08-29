@@ -138,10 +138,12 @@ export default async function TrackOrderPage({
 }
 
 async function lookup(orderNumber: string, contact: string) {
-  const order = await db.order.findUnique({
-    where: { orderNumber: orderNumber.toUpperCase() },
-    include: { items: true },
-  });
+  const order = await db.order
+    .findUnique({
+      where: { orderNumber: orderNumber.toUpperCase() },
+      include: { items: true },
+    })
+    .catch(() => null);
   if (!order) return null;
   const digits = contact.replace(/\D/g, "");
   const emailMatch = order.email.toLowerCase() === contact;

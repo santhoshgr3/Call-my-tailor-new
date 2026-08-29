@@ -3,6 +3,10 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { db } from "@/lib/db";
 import { pageTitle } from "@/lib/seo";
+import { dbStatus } from "@/lib/health";
+import { SetupNotice } from "@/components/SetupNotice";
+
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params,
@@ -10,8 +14,8 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const post = await db.blogPost.findUnique({ where: { slug } });
-  if (!post) return { title: "Post not found" };
+  const post = await db.blogPost.findUnique({ where: { slug } }).catch(() => null);
+  if (!post) return { title: "Call My Tailor" };
   return {
     title: pageTitle(post.metaTitle || post.title),
     description: post.metaDescription || post.excerpt || undefined,
@@ -24,14 +28,22 @@ export default async function BlogPostPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const post = await db.blogPost.findUnique({ where: { slug, isPublished: true } });
+
+  const status = await dbStatus();
+  if (status !== "ok") return <SetupNotice status={status} />;
+
+  const post = await db.blogPost
+    .findUnique({ where: { slug, isPublished: true } })
+    .catch(() => null);
   if (!post) notFound();
 
-  const more = await db.blogPost.findMany({
-    where: { isPublished: true, id: { not: post.id } },
-    orderBy: { publishedAt: "desc" },
-    take: 3,
-  });
+  const more = await db.blogPost
+    .findMany({
+      where: { isPublished: true, id: { not: post.id } },
+      orderBy: { publishedAt: "desc" },
+      take: 3,
+    })
+    .catch(() => []);
 
   return (
     <article className="container-cmt py-10">

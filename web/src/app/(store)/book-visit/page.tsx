@@ -11,11 +11,13 @@ export const metadata: Metadata = {
 
 export default async function BookVisitPage() {
   const site = await getSiteConfig();
-  const cats = await db.category.findMany({
-    where: { parentId: null, isActive: true },
-    orderBy: { sortOrder: "asc" },
-    select: { name: true, slug: true },
-  });
+  const cats = await db.category
+    .findMany({
+      where: { parentId: null, isActive: true },
+      orderBy: { sortOrder: "asc" },
+      select: { name: true, slug: true },
+    })
+    .catch(() => [] as { name: string; slug: string }[]);
 
   return (
     <div className="container-cmt py-10">
