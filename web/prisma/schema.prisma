@@ -1,13 +1,20 @@
-// Call My Tailor — data model
-// Local dev uses SQLite. For production on Supabase, change provider to "postgresql"
-// and point DATABASE_URL at the Supabase connection string. No code changes needed.
+// Call My Tailor — data model (PostgreSQL).
+//
+// Set DATABASE_URL to a Postgres connection string for BOTH local dev and
+// production (there is no bundled local DB anymore).
+//   - Vercel Postgres / Neon: use the connection string they give you as-is.
+//   - Supabase: Project Settings -> Database -> Connection string -> URI
+//     (use the "Session pooler" / :5432 string so `prisma db push` can run).
+//
+// First-time setup (locally, with DATABASE_URL in web/.env):
+//   npm run db:deploy      # = prisma db push + seed
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 

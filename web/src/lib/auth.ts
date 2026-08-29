@@ -62,14 +62,26 @@ export type SessionUser = {
 export async function getCurrentUser(): Promise<SessionUser | null> {
   const id = await getSessionUserId();
   if (!id) return null;
-  const u = await db.customer.findUnique({
-    where: { id },
-    select: { id: true, email: true, firstName: true, lastName: true, phone: true, role: true, isActive: true },
-  });
-  if (!u || !u.isActive) return null;
-  const { isActive, ...rest } = u;
-  void isActive;
-  return rest;
+  try {
+    const u = await db.customer.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        phone: true,
+        role: true,
+        isActive: true,
+      },
+    });
+    if (!u || !u.isActive) return null;
+    const { isActive, ...rest } = u;
+    void isActive;
+    return rest;
+  } catch {
+    return null;
+  }
 }
 
 export async function requireUser(next = "/account"): Promise<SessionUser> {

@@ -37,12 +37,37 @@ export type SiteConfig = {
   } | null;
 };
 
-const DEFAULTS: Record<string, unknown> = {};
+/** Used when the DB is unreachable (e.g. during `next build` before the
+ *  DATABASE_URL is wired up). Keeps the build green; real values load at runtime. */
+export const FALLBACK_SITE: SiteConfig = {
+  brand: "Call My Tailor",
+  tagline: "For Custom Clothing",
+  top_bar: ["Gurranteed Fitting", "Free Home Visit"],
+  socials: {},
+  contact: {
+    address: "",
+    phone: "+91 888-2222-900",
+    phone_raw: "918882222900",
+    whatsapp: "918882222900",
+    email: "callmytailor@gmail.com",
+    hours: "",
+    people: [],
+  },
+  booking_url: "https://booking.callmytailor.com/",
+  top_tags: [],
+  specializations: [],
+  order_by_category: [],
+  payment_partners: [],
+  footer_information_links: [],
+  why_choose_us: [],
+  how_it_works: [],
+  stats: [],
+};
 
 export async function getSetting<T = unknown>(key: string, fallback: T): Promise<T> {
-  const row = await db.setting.findUnique({ where: { key } });
-  if (!row) return (DEFAULTS[key] as T) ?? fallback;
   try {
+    const row = await db.setting.findUnique({ where: { key } });
+    if (!row) return fallback;
     return JSON.parse(row.value) as T;
   } catch {
     return fallback;
@@ -59,18 +84,23 @@ export async function setSetting(key: string, value: unknown) {
 }
 
 export async function getAllSettings(): Promise<Record<string, unknown>> {
-  const rows = await db.setting.findMany();
-  const out: Record<string, unknown> = {};
-  for (const r of rows) {
-    try {
-      out[r.key] = JSON.parse(r.value);
-    } catch {
-      out[r.key] = r.value;
+  try {
+    const rows = await db.setting.findMany();
+    const out: Record<string, unknown> = {};
+    for (const r of rows) {
+      try {
+        out[r.key] = JSON.parse(r.value);
+      } catch {
+        out[r.key] = r.value;
+      }
     }
+    return out;
+  } catch {
+    return {};
   }
-  return out;
 }
 
 export async function getSiteConfig(): Promise<SiteConfig> {
-  return getSetting<SiteConfig>("site", {} as SiteConfig);
+  const cfg = await getSetting<SiteConfig | null>("site", null);
+  return cfg ?? FALLBACK_SITE;
 }

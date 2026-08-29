@@ -20,17 +20,20 @@ CMT/
 
 * Node.js 20.9+ (tested on v26)
 * npm
-
-No Docker or local database needed — dev uses a bundled **SQLite** file.
+* A **PostgreSQL** database (used for both local dev and production). Free options:
+  [Neon](https://neon.tech), [Supabase](https://supabase.com),
+  [Vercel Postgres](https://vercel.com/storage/postgres). Takes ~2 minutes to create.
 
 ## 2. Run it locally
 
 ```bash
 cd web
 npm install
-cp .env.example .env          # already present; edit AUTH_SECRET for anything real
-npm run db:push               # create the SQLite schema (web/prisma/dev.db)
-npm run db:seed               # load scraped catalog + demo data
+cp .env.example .env
+#  -> edit web/.env:
+#     DATABASE_URL = your Postgres connection string
+#     AUTH_SECRET  = any long random string
+npm run db:deploy             # prisma db push + seed the scraped catalog & demo data
 npm run dev                   # http://localhost:3000
 ```
 
@@ -51,11 +54,41 @@ Admin panel: <http://localhost:3000/admin>
 | Command             | What it does                                          |
 |---------------------|------------------------------------------------------|
 | `npm run dev`       | Start the dev server (Turbopack)                     |
-| `npm run build`     | Production build                                     |
+| `npm run build`     | `prisma generate` + production build                 |
+| `npm run db:deploy` | `prisma db push` + seed (first-time / fresh DB)      |
 | `npm run db:seed`   | Re-seed the database from `../scraper/data`          |
 | `npm run db:reset`  | Drop everything and re-seed                          |
 | `npm run db:studio` | Open Prisma Studio to browse the DB                  |
 | `npm run optimize:images` | Re-encode oversized images in `public/img` (needs `sharp`) |
+
+---
+
+## 2b. Deploy to Vercel
+
+The repo builds on Vercel out of the box. Once:
+
+1. **Import the repo** into Vercel. Set the **Root Directory** to `web`.
+2. Add **Environment Variables** (Project → Settings → Environment Variables):
+   * `DATABASE_URL` — your Postgres connection string
+     (Supabase: use the *Session pooler* / `:5432` URI, not transaction `:6543`).
+   * `AUTH_SECRET` — any long random string.
+   * `NEXT_PUBLIC_SITE_URL` — your deployed URL, e.g. `https://your-app.vercel.app`.
+   * *(optional)* `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `NEXT_PUBLIC_RAZORPAY_KEY_ID`.
+3. **Deploy.** The build runs `prisma generate` automatically; it does **not** touch
+   the database, so it succeeds even before the DB has any tables.
+4. **Create the schema + seed data** once — from your machine, with the same
+   `DATABASE_URL` in `web/.env`:
+   ```bash
+   cd web && npm run db:deploy
+   ```
+   (or run `npx prisma db push` then `npm run db:seed`).
+5. Redeploy / open the site — the storefront and `/admin` now have data.
+
+> Uploaded images (admin "Upload" button) are written to the app's filesystem,
+> which is ephemeral on Vercel. For persistent uploads, point
+> `src/app/api/admin/upload/route.ts` at Supabase Storage / S3 / Vercel Blob.
+> Image **URLs** you paste into the admin (incl. the ~130 MB of catalog images
+> committed under `public/img/`) work fine.
 
 ---
 
@@ -123,8 +156,10 @@ Admin panel: <http://localhost:3000/admin>
   Storefront routes live under `src/app/(store)/` so `/admin` has its own chrome.
 * **Auth** — email + bcrypt, JWT session in an httpOnly cookie (`jose`).
   `getCurrentUser()` / `requireUser()` / `requireAdmin()` in `src/lib/auth.ts`.
-* **Data** — Prisma. All mutations are **server actions** or route handlers with
-  Zod validation (`src/lib/validation.ts`).
+* **Data** — Prisma + **PostgreSQL**. All mutations are **server actions** or route
+  handlers with Zod validation (`src/lib/validation.ts`). Every route is
+  `dynamic = "force-dynamic"` (set on the layouts) — nothing is prerendered against
+  the DB, so `next build` never needs a database connection.
 * **Cart** — client context + `localStorage`; the server re-prices every line
   against the DB at checkout (`src/lib/orders.ts`).
 * **Images** — scraped originals live in `web/public/img/` (~130 MB after
@@ -140,19 +175,6 @@ Admin panel: <http://localhost:3000/admin>
   admin product form). The product page shows the adjusted "Your price" live, and
   `priceCart()` recomputes `base + Σ deltas` server-side so the client can't tamper
   with it.
-
-### Moving to Supabase (Postgres) later
-
-The schema is plain Prisma. To run on Supabase:
-
-1. `web/prisma/schema.prisma` → change `datasource db { provider = "postgresql" }`.
-2. Set `DATABASE_URL` to the Supabase connection string (use the pooured `6543`
-   URL for the app, direct `5432` for migrations).
-3. `npx prisma migrate deploy` (or `db push`), then `npm run db:seed`.
-4. Optionally swap the local upload handler in
-   `src/app/api/admin/upload/route.ts` for Supabase Storage.
-
-No application code changes are required for the database swap.
 
 ---
 
@@ -176,8 +198,9 @@ few hundred hits, so image downloads may need a second pass.
 
 ## 6. Known limitations
 
-* Database is local **SQLite** — see "Moving to Supabase" above for the one-line
-  switch to Postgres.
+* Admin image **uploads** hit the local filesystem — ephemeral on serverless hosts
+  like Vercel. Pasting image URLs works; for uploaded files, wire
+  `src/app/api/admin/upload/route.ts` to Vercel Blob / S3 / Supabase Storage.
 * Wishlist / product-compare from the original OpenCart theme are not reimplemented
   (not core to how the business operates).
 * This is a development rebuild for demonstration; it reuses Call My Tailor's

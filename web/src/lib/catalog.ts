@@ -27,11 +27,16 @@ export type MenuNode = {
 };
 
 export async function getMenuTree(): Promise<MenuNode[]> {
-  const cats = await db.category.findMany({
-    where: { isActive: true, showInMenu: true },
-    orderBy: { sortOrder: "asc" },
-    select: { id: true, slug: true, name: true, parentId: true },
-  });
+  let cats: { id: string; slug: string; name: string; parentId: string | null }[] = [];
+  try {
+    cats = await db.category.findMany({
+      where: { isActive: true, showInMenu: true },
+      orderBy: { sortOrder: "asc" },
+      select: { id: true, slug: true, name: true, parentId: true },
+    });
+  } catch {
+    return [];
+  }
   const bySlug = new Map<string, string>(cats.map((c) => [c.id, c.slug]));
   const roots: MenuNode[] = [];
   const nodeById = new Map<string, MenuNode>();

@@ -3,6 +3,10 @@ import "./globals.css";
 import { CartProvider } from "@/components/cart/CartProvider";
 import { getSetting } from "@/lib/settings";
 
+// This is a database-backed store (cart, orders, admin) — never statically
+// prerender. Also lets `next build` succeed before DATABASE_URL is wired up.
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata(): Promise<Metadata> {
   const seo = await getSetting<{ default_title: string; default_description: string }>("seo", {
     default_title: "Call My Tailor",

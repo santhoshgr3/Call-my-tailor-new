@@ -6,6 +6,8 @@ import { getMenuTree } from "@/lib/catalog";
 import { getSiteConfig } from "@/lib/settings";
 import { getCurrentUser } from "@/lib/auth";
 
+export const dynamic = "force-dynamic";
+
 export default async function StoreLayout({
   children,
 }: {
