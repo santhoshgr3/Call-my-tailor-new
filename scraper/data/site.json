@@ -48,19 +48,23 @@
   "specializations": [
     {
       "title": "Wedding Attire",
-      "slug": "wedding-attire"
+      "slug": "wedding-attire",
+      "image": "/img/spec-wedding.jpg"
     },
     {
       "title": "Ethnic Wear",
-      "slug": "ethnic-wear"
+      "slug": "ethnic-wear",
+      "image": "/img/spec-ethnic.jpg"
     },
     {
       "title": "Accessories",
-      "slug": "accessories"
+      "slug": "accessories",
+      "image": "/img/spec-accessories.jpg"
     },
     {
       "title": "Suit & Blazer",
-      "slug": "suit-blazer"
+      "slug": "suit-blazer",
+      "image": "/img/spec-suit.jpg"
     }
   ],
   "order_by_category": [

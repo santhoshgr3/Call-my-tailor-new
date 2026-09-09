@@ -20,7 +20,7 @@ export type SiteConfig = {
   contact: ContactInfo;
   booking_url: string;
   top_tags: string[];
-  specializations: { title: string; slug: string }[];
+  specializations: { title: string; slug: string; image?: string }[];
   order_by_category: { label: string; slug: string }[];
   payment_partners: string[];
   footer_information_links: { text: string; href: string }[];

@@ -150,7 +150,11 @@ async function loadHomeData(): Promise<HomeData> {
       coverImage: p.coverImage,
     })),
     trendingTabs: trendingDefs.map((t, i) => ({ label: t.label, items: trending[i] })),
-    specThumbs: (site.specializations ?? []).map((s) => ({ ...s, image: thumbFor(s.slug) })),
+    specThumbs: (site.specializations ?? []).map((s) => ({
+      ...s,
+      image:
+        s.image && !s.image.includes("placeholder") ? s.image : thumbFor(s.slug),
+    })),
     orderCats: (site.order_by_category ?? []).map((o) => ({
       ...o,
       image: thumbFor(o.slug.split("/").pop()!),

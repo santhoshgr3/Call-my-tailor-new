@@ -28,10 +28,10 @@ const site = {
   booking_url: 'https://booking.callmytailor.com/',
   top_tags: ['Formal Suit', 'Party suit', 'Casual suit', 'Tuxedo', 'Bandhgala suit', 'Kurta jacket', 'indo-western', 'Sherwani', 'Shirts', 'Simple Kurta', 'Punjabi Kurta'],
   specializations: [
-    { title: 'Wedding Attire', slug: 'wedding-attire' },
-    { title: 'Ethnic Wear', slug: 'ethnic-wear' },
-    { title: 'Accessories', slug: 'accessories' },
-    { title: 'Suit & Blazer', slug: 'suit-blazer' },
+    { title: 'Wedding Attire', slug: 'wedding-attire', image: '/img/spec-wedding.jpg' },
+    { title: 'Ethnic Wear', slug: 'ethnic-wear', image: '/img/spec-ethnic.jpg' },
+    { title: 'Accessories', slug: 'accessories', image: '/img/spec-accessories.jpg' },
+    { title: 'Suit & Blazer', slug: 'suit-blazer', image: '/img/spec-suit.jpg' },
   ],
   order_by_category: [
     { label: 'FORMAL SUIT', slug: 'suit-blazer/formal-suit' },
