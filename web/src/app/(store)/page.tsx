@@ -7,6 +7,7 @@ import { ProductCard } from "@/components/product/ProductCard";
 import { HeroCarousel } from "@/components/home/HeroCarousel";
 import { ProductTabs } from "@/components/home/ProductTabs";
 import { StatCounter } from "@/components/home/StatCounter";
+import { HowIcon, StepArrow } from "@/components/home/HowIcons";
 
 export const dynamic = "force-dynamic";
 
@@ -62,17 +63,28 @@ export default async function HomePage() {
 
       {/* HOW IT WORK */}
       {layout.show_how_it_works !== false && (site.how_it_works?.length ?? 0) > 0 && (
-        <section className="bg-soft py-12">
+        <section className="py-12">
           <div className="container-cmt">
-            <h2 className="section-title">{site.section_titles?.[0] || "How It Work"}</h2>
-            <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {site.how_it_works.map((s) => (
-                <div key={s.step} className="relative rounded border border-line bg-white p-6 text-center">
-                  <div className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-brand text-xl font-extrabold text-white">
-                    {s.step}
+            <h2 className="section-title section-title--left">
+              {site.section_titles?.[0] || "How It Work"}
+            </h2>
+            <div className="mt-8 flex flex-col items-stretch gap-6 rounded-lg bg-soft px-6 py-8 md:flex-row md:items-center md:justify-between md:gap-2">
+              {site.how_it_works.map((s, i) => (
+                <div key={s.step} className="flex items-center gap-2 md:flex-1">
+                  <div className="flex items-center gap-3">
+                    <HowIcon step={s.step} className="h-11 w-11 shrink-0" />
+                    <div>
+                      <p className="text-[13px] font-bold uppercase leading-tight text-brand-dark">
+                        {s.title}
+                      </p>
+                      <p className="text-[13px] uppercase leading-tight text-muted">{s.text}</p>
+                    </div>
                   </div>
-                  <h4 className="mt-4 text-sm font-bold uppercase">{s.title}</h4>
-                  <p className="mt-1 text-xs uppercase text-faint">{s.text}</p>
+                  {i < site.how_it_works.length - 1 && (
+                    <span className="ml-auto">
+                      <StepArrow />
+                    </span>
+                  )}
                 </div>
               ))}
             </div>
