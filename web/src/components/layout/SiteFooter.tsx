@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { SiteConfig } from "@/lib/settings";
 import { NewsletterForm } from "./NewsletterForm";
+import { SocialIcons } from "./SocialIcons";
 
 export function SiteFooter({ site }: { site: SiteConfig }) {
   const c = site.contact ?? ({} as SiteConfig["contact"]);
@@ -22,8 +23,9 @@ export function SiteFooter({ site }: { site: SiteConfig }) {
 
       <div className="container-cmt grid gap-8 py-10 md:grid-cols-4">
         <div>
-          <span className="block text-xl font-extrabold uppercase text-white">
-            Call<span className="text-brand">My</span>Tailor
+          <span className="inline-block rounded bg-white px-3 py-2">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo.png" alt="Call My Tailor" width={200} height={71} className="h-10 w-auto" />
           </span>
           <p className="mt-3 text-sm leading-relaxed">{c.address}</p>
           <p className="mt-3 text-sm">
@@ -66,12 +68,25 @@ export function SiteFooter({ site }: { site: SiteConfig }) {
           <ul className="space-y-1.5 text-sm">
             {Object.entries(site.socials ?? {}).map(([k, v]) => (
               <li key={k}>
-                <a href={v} target="_blank" rel="noopener noreferrer" className="capitalize hover:text-brand">
+                <a
+                  href={v}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="capitalize hover:text-brand"
+                >
                   {k}
                 </a>
               </li>
             ))}
+            <li>
+              <Link href="/sitemap.xml" className="hover:text-brand">
+                Sitemap
+              </Link>
+            </li>
           </ul>
+          <div className="mt-4">
+            <SocialIcons socials={site.socials ?? {}} variant="dark" />
+          </div>
           <div className="mt-4 flex flex-wrap gap-2">
             {(site.payment_partners ?? []).map((p) => (
               <span key={p} className="rounded bg-white/10 px-2 py-1 text-[11px] text-white/70">

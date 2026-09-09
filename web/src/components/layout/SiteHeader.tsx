@@ -7,40 +7,7 @@ import { useCart } from "@/components/cart/CartProvider";
 import { formatINR } from "@/lib/money";
 import type { MenuNode } from "@/lib/catalog";
 import type { SiteConfig } from "@/lib/settings";
-
-const IG = "instagram",
-  FB = "facebook",
-  LI = "linkedin",
-  YT = "youtube",
-  PIN = "pinterest";
-
-function SocialIcons({ socials }: { socials: Record<string, string> }) {
-  const items: [string, string][] = [
-    [IG, "Instagram"],
-    [FB, "Facebook"],
-    [LI, "LinkedIn"],
-    [YT, "YouTube"],
-    [PIN, "Pinterest"],
-  ];
-  return (
-    <div className="flex items-center gap-3">
-      {items.map(([k, label]) =>
-        socials?.[k] ? (
-          <a
-            key={k}
-            href={socials[k]}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={label}
-            className="text-white/90 hover:text-white text-xs font-semibold uppercase"
-          >
-            {label.slice(0, 2)}
-          </a>
-        ) : null,
-      )}
-    </div>
-  );
-}
+import { SocialIcons } from "./SocialIcons";
 
 export function SiteHeader({
   menu,
@@ -90,13 +57,15 @@ export function SiteHeader({
 
       {/* main header */}
       <div className="container-cmt flex items-center gap-6 py-4">
-        <Link href="/" className="shrink-0">
-          <span className="block text-2xl font-extrabold uppercase leading-none text-brand-dark">
-            Call<span className="text-brand">My</span>Tailor
-          </span>
-          <span className="mt-0.5 block text-[10px] uppercase tracking-[0.25em] text-faint">
-            {site.tagline || "For Custom Clothing"}
-          </span>
+        <Link href="/" className="shrink-0" aria-label={site.brand || "Call My Tailor"}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo.png"
+            alt={site.brand || "Call My Tailor"}
+            width={200}
+            height={71}
+            className="h-12 w-auto"
+          />
         </Link>
 
         <form
