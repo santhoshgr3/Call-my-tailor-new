@@ -157,7 +157,10 @@ async function loadHomeData(): Promise<HomeData> {
     })),
     orderCats: (site.order_by_category ?? []).map((o) => ({
       ...o,
-      image: thumbFor(o.slug.split("/").pop()!),
+      image:
+        o.image && !o.image.includes("placeholder")
+          ? o.image
+          : thumbFor(o.slug.split("/").pop()!),
     })),
   };
 }

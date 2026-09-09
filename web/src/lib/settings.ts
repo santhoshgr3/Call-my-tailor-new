@@ -21,7 +21,7 @@ export type SiteConfig = {
   booking_url: string;
   top_tags: string[];
   specializations: { title: string; slug: string; image?: string }[];
-  order_by_category: { label: string; slug: string }[];
+  order_by_category: { label: string; slug: string; image?: string }[];
   payment_partners: string[];
   footer_information_links: { text: string; href: string }[];
   why_choose_us: { icon: string; title: string; text: string }[];

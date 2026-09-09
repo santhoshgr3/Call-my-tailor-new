@@ -70,39 +70,38 @@
   "order_by_category": [
     {
       "label": "FORMAL SUIT",
-      "slug": "suit-blazer/formal-suit"
+      "slug": "suit-blazer/formal-suit",
+      "image": "/img/cat-formal-suit.jpg"
     },
     {
       "label": "PARTY SUIT",
-      "slug": "suit-blazer/party-suits"
+      "slug": "suit-blazer/party-suits",
+      "image": "/img/cat-party-suit.jpg"
     },
     {
       "label": "TUXEDO",
-      "slug": "suit-blazer/tuxedo"
+      "slug": "suit-blazer/tuxedo",
+      "image": "/img/cat-tuxedo.jpg"
     },
     {
       "label": "BANDHGALA SUIT",
-      "slug": "ethnic-wear/bandhgala-suit"
+      "slug": "ethnic-wear/bandhgala-suit",
+      "image": "/img/cat-bandhgala.jpg"
     },
     {
       "label": "INDO WESTERN",
-      "slug": "ethnic-wear/indo-western"
+      "slug": "ethnic-wear/indo-western",
+      "image": "/img/cat-indo-western.jpg"
     },
     {
       "label": "SHERWANI",
-      "slug": "wedding-attire/sherwani"
+      "slug": "wedding-attire/sherwani",
+      "image": "/img/cat-sherwani.jpg"
     },
     {
       "label": "KURTA",
-      "slug": "kurta"
-    },
-    {
-      "label": "REGULAR WEAR",
-      "slug": "regular-wear"
-    },
-    {
-      "label": "ACCESSORIES",
-      "slug": "accessories"
+      "slug": "kurta",
+      "image": "/img/cat-kurta.jpg"
     }
   ],
   "footer_information_links": [

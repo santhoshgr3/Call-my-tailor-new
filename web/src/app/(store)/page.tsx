@@ -8,6 +8,7 @@ import { HeroCarousel } from "@/components/home/HeroCarousel";
 import { ProductTabs } from "@/components/home/ProductTabs";
 import { StatCounter } from "@/components/home/StatCounter";
 import { HowIcon, StepArrow } from "@/components/home/HowIcons";
+import { ThreadRing } from "@/components/home/ThreadRing";
 
 export const dynamic = "force-dynamic";
 
@@ -150,22 +151,25 @@ export default async function HomePage() {
                   <span>›</span>
                 </div>
               </div>
-              <div className="no-scrollbar mt-6 flex gap-4 overflow-x-auto pb-2">
+              <div className="no-scrollbar mt-6 flex gap-3 overflow-x-auto pb-2">
                 {orderCats.map((o) => (
                   <Link
                     key={o.slug}
                     href={`/${o.slug}`}
-                    className="group w-[42%] shrink-0 rounded bg-white p-3 text-center shadow-card sm:w-[30%] md:w-[22%] lg:w-[13.5%]"
+                    className="group w-[44%] shrink-0 rounded bg-white p-3 text-center shadow-card sm:w-[31%] md:w-[23%] lg:w-[13.6%]"
                   >
-                    <span className="relative mx-auto block aspect-square w-full overflow-hidden rounded-full ring-2 ring-brand ring-offset-2">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={o.image}
-                        alt={o.label}
-                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-                      />
+                    <span className="relative mx-auto block aspect-square w-full p-[6%]">
+                      <span className="block h-full w-full overflow-hidden rounded-full">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={o.image}
+                          alt={o.label}
+                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        />
+                      </span>
+                      <ThreadRing />
                     </span>
-                    <span className="mt-3 block rounded bg-soft px-1 py-1.5 text-[11px] font-bold uppercase text-brand-dark group-hover:text-brand">
+                    <span className="mt-2 block rounded bg-soft px-1 py-1.5 text-[11px] font-bold uppercase text-brand-dark group-hover:text-brand">
                       {o.label}
                     </span>
                   </Link>
