@@ -84,26 +84,42 @@ export default async function HomePage() {
       {layout.show_specialization !== false && specThumbs.length > 0 && (
         <section className="py-12">
           <div className="container-cmt">
-            <h2 className="section-title">{site.section_titles?.[1] || "Our Specialization"}</h2>
-            <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {specThumbs.map((s) => (
-                <Link
-                  key={s.slug}
-                  href={`/${s.slug}`}
-                  className="group relative overflow-hidden rounded border border-line"
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={s.image}
-                    alt={s.title}
-                    className="aspect-[4/3] w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                  <span className="absolute inset-x-0 bottom-0 bg-brand-dark/80 p-3 text-center text-sm font-bold uppercase text-white">
-                    {s.title} »
-                  </span>
-                </Link>
-              ))}
-            </div>
+            <h2 className="section-title section-title--left">
+              {site.section_titles?.[1] || "Our Specialization"}
+            </h2>
+            {(() => {
+              const spanClass = [
+                "md:col-start-1 md:row-start-1 md:row-span-2",
+                "md:col-start-2 md:row-start-1",
+                "md:col-start-2 md:row-start-2",
+                "md:col-start-3 md:row-start-1 md:row-span-2",
+              ];
+              return (
+                <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 md:grid-rows-2">
+                  {specThumbs.slice(0, 4).map((s, i) => (
+                    <Link
+                      key={s.slug}
+                      href={`/${s.slug}`}
+                      className={`group relative block overflow-hidden rounded ${
+                        spanClass[i] ?? ""
+                      } ${i === 0 || i === 3 ? "min-h-[360px]" : "min-h-[220px]"}`}
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={s.image}
+                        alt={s.title}
+                        className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                      <span className="absolute inset-x-0 bottom-6 flex justify-center">
+                        <span className="btn-brand !rounded !px-6 !py-2.5 !text-sm !normal-case shadow-lg">
+                          {s.title} &gt;&gt;
+                        </span>
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+              );
+            })()}
           </div>
         </section>
       )}

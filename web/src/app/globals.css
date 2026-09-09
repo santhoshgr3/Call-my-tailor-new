@@ -120,6 +120,14 @@
   background: var(--color-brand);
   margin: 12px auto 0;
 }
+.section-title.section-title--left {
+  text-align: left;
+}
+.section-title.section-title--left::after {
+  margin-left: 0;
+  margin-right: auto;
+  width: 90px;
+}
 
 .prose-cmt :where(h2) {
   font-size: 22px;
