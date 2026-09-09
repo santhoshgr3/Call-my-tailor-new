@@ -126,25 +126,39 @@ export default async function HomePage() {
 
       {/* ORDER BY CATEGORY */}
       {layout.show_order_by_category !== false && orderCats.length > 0 && (
-        <section className="bg-soft py-12">
+        <section className="py-12">
           <div className="container-cmt">
-            <h2 className="section-title">{site.section_titles?.[2] || "Order by Category"}</h2>
-            <div className="mt-8 grid grid-cols-3 gap-4 md:grid-cols-5 lg:grid-cols-9">
-              {orderCats.map((o) => (
-                <Link key={o.slug} href={`/${o.slug}`} className="group text-center">
-                  <span className="block overflow-hidden rounded-full border-2 border-white shadow-card">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={o.image}
-                      alt={o.label}
-                      className="aspect-square w-full object-cover transition-transform duration-500 group-hover:scale-110"
-                    />
-                  </span>
-                  <span className="mt-2 block text-[11px] font-bold uppercase text-brand-dark group-hover:text-brand">
-                    {o.label}
-                  </span>
-                </Link>
-              ))}
+            <div className="rounded-lg bg-soft p-6">
+              <div className="section-head">
+                <h2 className="text-brand-dark">
+                  {site.section_titles?.[2] || "Order by Category"}
+                </h2>
+                <div className="flex items-center gap-2 text-lg text-faint">
+                  <span>‹</span>
+                  <span>›</span>
+                </div>
+              </div>
+              <div className="no-scrollbar mt-6 flex gap-4 overflow-x-auto pb-2">
+                {orderCats.map((o) => (
+                  <Link
+                    key={o.slug}
+                    href={`/${o.slug}`}
+                    className="group w-[42%] shrink-0 rounded bg-white p-3 text-center shadow-card sm:w-[30%] md:w-[22%] lg:w-[13.5%]"
+                  >
+                    <span className="relative mx-auto block aspect-square w-full overflow-hidden rounded-full ring-2 ring-brand ring-offset-2">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={o.image}
+                        alt={o.label}
+                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      />
+                    </span>
+                    <span className="mt-3 block rounded bg-soft px-1 py-1.5 text-[11px] font-bold uppercase text-brand-dark group-hover:text-brand">
+                      {o.label}
+                    </span>
+                  </Link>
+                ))}
+              </div>
             </div>
           </div>
         </section>
@@ -167,20 +181,24 @@ export default async function HomePage() {
 
       {/* WHY CHOOSE US */}
       {layout.show_why_choose_us !== false && (site.why_choose_us?.length ?? 0) > 0 && (
-        <section className="bg-brand-dark py-12 text-white">
-          <div className="container-cmt">
-            <h2 className="section-title !text-white">Why Choose Us</h2>
-            <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <section
+          className="relative bg-cover bg-center py-16 text-white"
+          style={{ backgroundImage: "url(/whychoose-bg.jpg)" }}
+        >
+          <div className="absolute inset-0 bg-black/45" />
+          <div className="container-cmt relative">
+            <h2 className="mb-10 text-center text-3xl font-bold text-white">Why Choose Us</h2>
+            <div className="grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
               {site.why_choose_us.map((w, i) => (
-                <div key={i} className="flex items-start gap-4">
+                <div key={i} className="text-center">
                   {w.icon && (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={w.icon} alt="" className="h-12 w-12 shrink-0 object-contain" />
+                    <span className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-white">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={w.icon} alt="" className="h-8 w-8 object-contain" />
+                    </span>
                   )}
-                  <div>
-                    <h4 className="text-base font-bold text-white">{w.title}</h4>
-                    <p className="text-sm text-white/70">{w.text}</p>
-                  </div>
+                  <h3 className="mt-3 text-lg font-semibold text-white">{w.title}</h3>
+                  <p className="mt-1 text-[13px] leading-snug text-white/85">{w.text}</p>
                 </div>
               ))}
             </div>
@@ -189,26 +207,37 @@ export default async function HomePage() {
       )}
 
       {/* TRENDING ITEMS */}
-      {layout.show_trending !== false && (
+      {layout.show_trending !== false && trendingTabs.length > 0 && (
         <section className="py-12">
           <div className="container-cmt">
-            <h2 className="section-title">{site.section_titles?.[3] || "Trending Items"}</h2>
-            <div className="mt-8">
-              <ProductTabs tabs={trendingTabs} />
-            </div>
+            <ProductTabs
+              heading={site.section_titles?.[3] || "Trending Items"}
+              tabs={trendingTabs}
+            />
           </div>
         </section>
       )}
 
       {/* MADE FOR YOU CTA */}
       {layout.show_made_cta !== false && site.made_cta && (
-        <section className="bg-soft py-14">
-          <div className="container-cmt flex flex-col items-center gap-4 text-center">
-            <h2 className="text-2xl font-extrabold uppercase text-brand-dark md:text-3xl">
-              {site.made_cta.title}
-            </h2>
-            <p className="max-w-2xl text-sm text-muted">{site.made_cta.text}</p>
-            <a href={site.made_cta.link || site.booking_url} className="btn-brand mt-2">
+        <section
+          className="relative bg-cover bg-center"
+          style={{ backgroundImage: "url(/made-bg.jpg)" }}
+        >
+          <div className="absolute inset-0 bg-black/55" />
+          <div className="container-cmt relative flex flex-col items-start gap-6 py-16 md:flex-row md:items-center md:justify-between">
+            <div className="max-w-2xl">
+              <h2 className="font-script text-4xl leading-tight text-white md:text-5xl">
+                {site.made_cta.title}
+              </h2>
+              <p className="mt-3 text-[15px] leading-relaxed text-white/90">
+                {site.made_cta.text}
+              </p>
+            </div>
+            <a
+              href={site.made_cta.link || site.booking_url}
+              className="btn-made shrink-0"
+            >
               {site.made_cta.button || "Book Visit & Order Now"}
             </a>
           </div>
@@ -257,10 +286,16 @@ export default async function HomePage() {
 
       {/* STATS */}
       {layout.show_stats !== false && (site.stats?.length ?? 0) > 0 && (
-        <section className="bg-brand-dark py-12">
-          <div className="container-cmt grid grid-cols-2 gap-8 lg:grid-cols-4">
+        <section
+          className="relative bg-cover bg-fixed bg-center py-14"
+          style={{ backgroundImage: "url(/stats-bg.jpg)" }}
+        >
+          <div className="absolute inset-0 bg-black/55" />
+          <div className="container-cmt relative grid grid-cols-2 gap-4 lg:grid-cols-4">
             {site.stats.map((s, i) => (
-              <StatCounter key={i} value={s.value} label={s.label} />
+              <div key={i} className="border border-white/25 px-2 py-6">
+                <StatCounter value={s.value} label={s.label} />
+              </div>
             ))}
           </div>
         </section>

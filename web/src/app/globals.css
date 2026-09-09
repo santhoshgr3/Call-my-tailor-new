@@ -129,6 +129,53 @@
   width: 90px;
 }
 
+/* header row used on carousel sections: title left, controls right, red rule under */
+.section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid var(--color-line);
+  padding-bottom: 10px;
+  position: relative;
+}
+.section-head::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  width: 90px;
+  height: 3px;
+  background: var(--color-brand);
+}
+.section-head h2 {
+  font-size: 24px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.font-script {
+  font-family: "Monotype Corsiva", "Segoe Script", "Bradley Hand", "Brush Script MT",
+    "Snell Roundhand", cursive;
+}
+
+/* sharp red CTA button like the original "Made for You" section */
+.btn-made {
+  display: inline-block;
+  background: #ed1d24;
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 15px 40px;
+  font-size: 15px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.btn-made:hover {
+  background: #fff;
+  color: #ed1d24;
+}
+
 .prose-cmt :where(h2) {
   font-size: 22px;
   margin: 1.4em 0 0.5em;
