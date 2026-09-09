@@ -64,12 +64,12 @@ export default async function HomePage() {
 
       {/* HOW IT WORK */}
       {layout.show_how_it_works !== false && (site.how_it_works?.length ?? 0) > 0 && (
-        <section className="py-12">
+        <section className="py-7">
           <div className="container-cmt">
             <h2 className="section-title section-title--left">
               {site.section_titles?.[0] || "How It Work"}
             </h2>
-            <div className="mt-8 flex flex-col items-stretch gap-6 rounded-lg bg-soft px-6 py-8 md:flex-row md:items-center md:justify-between md:gap-2">
+            <div className="mt-5 flex flex-col items-stretch gap-6 rounded-lg bg-soft px-5 py-5 md:flex-row md:items-center md:justify-between md:gap-2">
               {site.how_it_works.map((s, i) => (
                 <div key={s.step} className="flex items-center gap-2 md:flex-1">
                   <div className="flex items-center gap-3">
@@ -95,7 +95,7 @@ export default async function HomePage() {
 
       {/* OUR SPECIALIZATION */}
       {layout.show_specialization !== false && specThumbs.length > 0 && (
-        <section className="py-12">
+        <section className="py-7">
           <div className="container-cmt">
             <h2 className="section-title section-title--left">
               {site.section_titles?.[1] || "Our Specialization"}
@@ -108,7 +108,7 @@ export default async function HomePage() {
                 "md:col-start-3 md:row-start-1 md:row-span-2",
               ];
               return (
-                <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 md:grid-rows-2">
+                <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 md:grid-rows-2">
                   {specThumbs.slice(0, 4).map((s, i) => (
                     <Link
                       key={s.slug}
@@ -139,9 +139,9 @@ export default async function HomePage() {
 
       {/* ORDER BY CATEGORY */}
       {layout.show_order_by_category !== false && orderCats.length > 0 && (
-        <section className="py-12">
+        <section className="py-7">
           <div className="container-cmt">
-            <div className="rounded-lg bg-soft p-6">
+            <div className="rounded-lg bg-soft p-4">
               <div className="section-head">
                 <h2 className="text-brand-dark">
                   {site.section_titles?.[2] || "Order by Category"}
@@ -151,25 +151,23 @@ export default async function HomePage() {
                   <span>›</span>
                 </div>
               </div>
-              <div className="no-scrollbar mt-6 flex gap-3 overflow-x-auto pb-2">
+              <div className="no-scrollbar mt-4 flex gap-3 overflow-x-auto pb-1">
                 {orderCats.map((o) => (
                   <Link
                     key={o.slug}
                     href={`/${o.slug}`}
                     className="group w-[44%] shrink-0 border border-line bg-white text-center sm:w-[31%] md:w-[23%] lg:w-[13.6%]"
                   >
-                    <span className="relative block aspect-square w-full p-2">
-                      <span className="block h-full w-full overflow-hidden">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={o.image}
-                          alt={o.label}
-                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                        />
-                      </span>
-                      <ThreadRing className="p-2" />
+                    <span className="relative block aspect-square w-full">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={o.image}
+                        alt={o.label}
+                        className="h-full w-full object-contain object-center p-1 transition-transform duration-500 group-hover:scale-105"
+                      />
+                      <ThreadRing />
                     </span>
-                    <span className="block bg-soft px-1 py-2 text-[12px] font-semibold uppercase text-ink group-hover:text-brand">
+                    <span className="block border-t border-line bg-soft px-1 py-2 text-[12px] font-semibold uppercase text-ink group-hover:text-brand">
                       {o.label}
                     </span>
                   </Link>
@@ -182,7 +180,7 @@ export default async function HomePage() {
 
       {/* RAILS: bestsellers / new / rating */}
       {layout.show_rails !== false && (
-        <section className="py-12">
+        <section className="py-7">
           <div className="container-cmt">
             <ProductTabs
               tabs={[
@@ -198,7 +196,7 @@ export default async function HomePage() {
       {/* WHY CHOOSE US */}
       {layout.show_why_choose_us !== false && (site.why_choose_us?.length ?? 0) > 0 && (
         <section
-          className="relative bg-cover bg-center py-16 text-white"
+          className="relative bg-cover bg-center py-10 text-white"
           style={{ backgroundImage: "url(/whychoose-bg.jpg)" }}
         >
           <div className="absolute inset-0 bg-black/45" />
@@ -224,7 +222,7 @@ export default async function HomePage() {
 
       {/* TRENDING ITEMS */}
       {layout.show_trending !== false && trendingTabs.length > 0 && (
-        <section className="py-12">
+        <section className="py-7">
           <div className="container-cmt">
             <ProductTabs
               heading={site.section_titles?.[3] || "Trending Items"}
@@ -241,7 +239,7 @@ export default async function HomePage() {
           style={{ backgroundImage: "url(/made-bg.jpg)" }}
         >
           <div className="absolute inset-0 bg-black/55" />
-          <div className="container-cmt relative flex flex-col items-start gap-6 py-16 md:flex-row md:items-center md:justify-between">
+          <div className="container-cmt relative flex flex-col items-start gap-6 py-10 md:flex-row md:items-center md:justify-between">
             <div className="max-w-2xl">
               <h2 className="font-script text-4xl leading-tight text-white md:text-5xl">
                 {site.made_cta.title}
@@ -262,10 +260,10 @@ export default async function HomePage() {
 
       {/* FABRIC BRANDS */}
       {layout.show_fabric_brands !== false && brands.length > 0 && (
-        <section className="py-12">
+        <section className="py-7">
           <div className="container-cmt">
             <h2 className="section-title">Our Fabric&apos;s Branded</h2>
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-6">
+            <div className="mt-5 flex flex-wrap items-center justify-center gap-6">
               {brands.map((b) => (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
@@ -282,10 +280,10 @@ export default async function HomePage() {
 
       {/* TESTIMONIALS */}
       {layout.show_testimonials !== false && testimonials.length > 0 && (
-        <section className="bg-soft py-12">
+        <section className="bg-soft py-7">
           <div className="container-cmt">
             <h2 className="section-title">Testimonials</h2>
-            <div className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
               {testimonials.slice(0, 6).map((t) => (
                 <figure key={t.id} className="rounded border border-line bg-white p-5">
                   <blockquote className="text-sm text-muted">“{t.text}”</blockquote>
@@ -303,7 +301,7 @@ export default async function HomePage() {
       {/* STATS */}
       {layout.show_stats !== false && (site.stats?.length ?? 0) > 0 && (
         <section
-          className="relative bg-cover bg-fixed bg-center py-14"
+          className="relative bg-cover bg-fixed bg-center py-9"
           style={{ backgroundImage: "url(/stats-bg.jpg)" }}
         >
           <div className="absolute inset-0 bg-black/55" />
@@ -319,10 +317,10 @@ export default async function HomePage() {
 
       {/* LATEST BLOG */}
       {layout.show_latest_blog !== false && posts.length > 0 && (
-        <section className="py-12">
+        <section className="py-7">
           <div className="container-cmt">
             <h2 className="section-title">Latest Blog</h2>
-            <div className="mt-8 grid gap-6 md:grid-cols-3">
+            <div className="mt-5 grid gap-6 md:grid-cols-3">
               {posts.map((p) => (
                 <article key={p.id} className="overflow-hidden rounded border border-line">
                   <Link href={`/blog/${p.slug}`}>

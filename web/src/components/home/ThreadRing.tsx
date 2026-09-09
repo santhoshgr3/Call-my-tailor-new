@@ -1,7 +1,7 @@
 /**
  * Decorative "tailor thread" overlay for the Order-by-Category tiles, matching
- * callmytailor.com: a thin dashed red circle inscribed in the square photo, with
- * a black needle passing through the lower-right and a small curl of red thread.
+ * callmytailor.com: a thin dashed red circle over the photo, with a fine black
+ * needle at the lower right and a small curl of red thread.
  */
 export function ThreadRing({ className = "" }: { className?: string }) {
   return (
@@ -10,37 +10,23 @@ export function ThreadRing({ className = "" }: { className?: string }) {
       className={`pointer-events-none absolute inset-0 h-full w-full ${className}`}
       aria-hidden
     >
-      {/* dashed red ring */}
       <circle
         cx="60"
         cy="60"
-        r="57"
+        r="55"
         fill="none"
         stroke="#eb3740"
-        strokeWidth="1.6"
+        strokeWidth="1.4"
         strokeDasharray="5 4"
-        strokeLinecap="round"
       />
-      {/* needle — a fine black line crossing the lower-right and running off the tile */}
-      <g stroke="#111" strokeLinecap="round">
-        <path d="M84 74 L120 120" strokeWidth="2.2" />
-      </g>
-      <ellipse
-        cx="85.5"
-        cy="76"
-        rx="1.6"
-        ry="3"
-        fill="none"
-        stroke="#111"
-        strokeWidth="1.3"
-        transform="rotate(38 85.5 76)"
-      />
+      {/* needle */}
+      <line x1="86" y1="80" x2="108" y2="108" stroke="#111" strokeWidth="1.8" strokeLinecap="round" />
       {/* thread curl */}
       <path
-        d="M116 116 c 6 -4 6 -14 -3 -16 c -9 -2 -14 8 -7 14 c 5 4 13 2 15 -6"
+        d="M104 106c5-3 4-11-3-12s-11 6-5 11c4 3 10 1 11-5"
         fill="none"
         stroke="#eb3740"
-        strokeWidth="1.8"
+        strokeWidth="1.5"
         strokeLinecap="round"
       />
     </svg>
