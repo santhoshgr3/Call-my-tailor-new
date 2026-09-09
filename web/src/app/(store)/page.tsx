@@ -156,20 +156,20 @@ export default async function HomePage() {
                   <Link
                     key={o.slug}
                     href={`/${o.slug}`}
-                    className="group w-[44%] shrink-0 rounded bg-white p-3 text-center shadow-card sm:w-[31%] md:w-[23%] lg:w-[13.6%]"
+                    className="group w-[44%] shrink-0 border border-line bg-white text-center sm:w-[31%] md:w-[23%] lg:w-[13.6%]"
                   >
-                    <span className="relative mx-auto block aspect-square w-full p-[6%]">
-                      <span className="block h-full w-full overflow-hidden rounded-full">
+                    <span className="relative block aspect-square w-full p-2">
+                      <span className="block h-full w-full overflow-hidden">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={o.image}
                           alt={o.label}
-                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                         />
                       </span>
-                      <ThreadRing />
+                      <ThreadRing className="p-2" />
                     </span>
-                    <span className="mt-2 block rounded bg-soft px-1 py-1.5 text-[11px] font-bold uppercase text-brand-dark group-hover:text-brand">
+                    <span className="block bg-soft px-1 py-2 text-[12px] font-semibold uppercase text-ink group-hover:text-brand">
                       {o.label}
                     </span>
                   </Link>
