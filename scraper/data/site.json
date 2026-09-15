@@ -177,5 +177,197 @@
     "UPI",
     "Paytm",
     "Razorpay"
-  ]
+  ],
+  "footer_columns": [
+    {
+      "title": "Information",
+      "links": [
+        {
+          "text": "About Us",
+          "href": "/about-us"
+        },
+        {
+          "text": "Why call my tailor",
+          "href": "/why-callmytailor"
+        },
+        {
+          "text": "FAQ's",
+          "href": "/faqs"
+        },
+        {
+          "text": "Testimonials",
+          "href": "/testimonials"
+        },
+        {
+          "text": "How it works",
+          "href": "/how-it-works"
+        },
+        {
+          "text": "Price List",
+          "href": "/price-list"
+        }
+      ]
+    },
+    {
+      "title": "Disclaimer",
+      "links": [
+        {
+          "text": "Terms and Conditions",
+          "href": "/terms-and-conditions"
+        },
+        {
+          "text": "Privacy Policy",
+          "href": "/privacy-policy"
+        },
+        {
+          "text": "Refund & Replacement",
+          "href": "/refund-replacement"
+        },
+        {
+          "text": "Complaint & Advise",
+          "href": "/complaint-advice"
+        },
+        {
+          "text": "Payment Method",
+          "href": "/payment-method"
+        },
+        {
+          "text": "Track My Order",
+          "href": "/track-my-order"
+        }
+      ]
+    },
+    {
+      "title": "Explore More",
+      "links": [
+        {
+          "text": "Contact Us",
+          "href": "/contact-us"
+        },
+        {
+          "text": "Join Us",
+          "href": "/join-us"
+        },
+        {
+          "text": "Customer Support",
+          "href": "/customer-support"
+        },
+        {
+          "text": "Gallery",
+          "href": "/gallery"
+        }
+      ]
+    }
+  ],
+  "footer_video": "https://www.youtube.com/watch?v=88RmDQejfyQ",
+  "footer_gallery": [
+    {
+      "image": "/img/foot-ig-1.jpg",
+      "href": "https://www.instagram.com/doorstep_tailor_drapper/"
+    },
+    {
+      "image": "/img/foot-ig-2.jpg",
+      "href": "https://www.instagram.com/doorstep_tailor_drapper/"
+    },
+    {
+      "image": "/img/foot-ig-3.jpg",
+      "href": "https://www.instagram.com/doorstep_tailor_drapper/"
+    },
+    {
+      "image": "/img/foot-ig-4.jpg",
+      "href": "https://www.instagram.com/doorstep_tailor_drapper/"
+    },
+    {
+      "image": "/img/foot-ig-5.jpg",
+      "href": "https://www.instagram.com/doorstep_tailor_drapper/"
+    }
+  ],
+  "footer_gallery_more": {
+    "image": "/img/foot-more.jpg",
+    "href": "https://www.instagram.com/doorstep_tailor_drapper/"
+  },
+  "footer_tags": [
+    {
+      "text": "Formal Suit",
+      "href": "/suit-blazer/formal-suit"
+    },
+    {
+      "text": "Party Suit",
+      "href": "/suit-blazer/party-suits"
+    },
+    {
+      "text": "Casual Suit",
+      "href": "/suit-blazer/casual-suit"
+    },
+    {
+      "text": "Tuxedo",
+      "href": "/suit-blazer/tuxedo"
+    },
+    {
+      "text": "Bandhgala Suit",
+      "href": "/ethnic-wear/bandhgala-suit"
+    },
+    {
+      "text": "Kurta Jacket",
+      "href": "/ethnic-wear/kurta-jacket"
+    },
+    {
+      "text": "Indo Western",
+      "href": "/ethnic-wear/indo-western"
+    },
+    {
+      "text": "Sherwani",
+      "href": "/wedding-attire/sherwani"
+    },
+    {
+      "text": "Formal Shirt",
+      "href": "/regular-wear/shirts"
+    },
+    {
+      "text": "Casual Shirt",
+      "href": "/regular-wear/shirts"
+    },
+    {
+      "text": "Simple Kurta",
+      "href": "/kurta/simple-kurta"
+    },
+    {
+      "text": "Punjabi Kurta",
+      "href": "/kurta/punjabi-kurta"
+    },
+    {
+      "text": "Pathani Kurta",
+      "href": "/kurta/pathani-kurta"
+    },
+    {
+      "text": "Designer Kurta",
+      "href": "/kurta/designer-kurta"
+    },
+    {
+      "text": "Tie",
+      "href": "/accessories/tie"
+    },
+    {
+      "text": "Broch",
+      "href": "/accessories/broch"
+    },
+    {
+      "text": "Cufflink",
+      "href": "/accessories/cufflink"
+    },
+    {
+      "text": "Pocket Square",
+      "href": "/accessories/pocket-square"
+    },
+    {
+      "text": "Malas",
+      "href": "/wedding-accessories/malas"
+    },
+    {
+      "text": "Safa, Turban",
+      "href": "/wedding-accessories/safa-turban"
+    }
+  ],
+  "newsletter_heading": "Signup For Newsletter",
+  "copyright": "Callmytailor © 2026 All Rights Reserved."
 }

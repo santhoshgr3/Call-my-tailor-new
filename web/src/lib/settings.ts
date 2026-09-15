@@ -24,6 +24,13 @@ export type SiteConfig = {
   order_by_category: { label: string; slug: string; image?: string }[];
   payment_partners: string[];
   footer_information_links: { text: string; href: string }[];
+  footer_columns?: { title: string; links: { text: string; href: string }[] }[];
+  footer_video?: string | null;
+  footer_gallery?: { image: string; href: string }[];
+  footer_gallery_more?: { image: string; href: string } | null;
+  footer_tags?: { text: string; href: string }[];
+  newsletter_heading?: string;
+  copyright?: string;
   why_choose_us: { icon: string; title: string; text: string }[];
   how_it_works: { step: number; title: string; text: string }[];
   stats: { value: string; label: string }[];

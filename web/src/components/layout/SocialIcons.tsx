@@ -24,19 +24,22 @@ const SOCIAL_ICONS: Record<string, { label: string; path: string }> = {
 export function SocialIcons({
   socials,
   variant = "light",
+  withSeparators = false,
 }: {
   socials: Record<string, string>;
   variant?: "light" | "dark";
+  withSeparators?: boolean;
 }) {
   const order = ["instagram", "facebook", "linkedin", "youtube", "pinterest"];
   const cls =
     variant === "light" ? "text-white/85 hover:text-white" : "text-white/60 hover:text-brand";
+  const present = order.filter((k) => socials?.[k]);
   return (
     <div className="flex items-center gap-3">
-      {order.map((k) =>
-        socials?.[k] ? (
+      {present.map((k, i) => (
+        <span key={k} className="flex items-center gap-3">
+          {withSeparators && i > 0 && <span className="text-white/25">|</span>}
           <a
-            key={k}
             href={socials[k]}
             target="_blank"
             rel="noopener noreferrer"
@@ -47,8 +50,8 @@ export function SocialIcons({
               <path d={SOCIAL_ICONS[k].path} />
             </svg>
           </a>
-        ) : null,
-      )}
+        </span>
+      ))}
     </div>
   );
 }

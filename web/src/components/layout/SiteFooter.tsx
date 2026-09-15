@@ -3,103 +3,149 @@ import type { SiteConfig } from "@/lib/settings";
 import { NewsletterForm } from "./NewsletterForm";
 import { SocialIcons } from "./SocialIcons";
 
+function FooterLinkList({ links }: { links: { text: string; href: string }[] }) {
+  return (
+    <ul className="space-y-2 text-sm">
+      {links.map((l) => (
+        <li key={l.href + l.text}>
+          <Link href={l.href} className="flex items-center gap-2 text-white/75 hover:text-brand">
+            <span className="text-[10px] text-white/40">⊙</span>
+            {l.text}
+          </Link>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export function SiteFooter({ site }: { site: SiteConfig }) {
-  const c = site.contact ?? ({} as SiteConfig["contact"]);
-  const info = site.footer_information_links as { text: string; href: string }[] | undefined;
+  const columns = site.footer_columns?.length
+    ? site.footer_columns
+    : [{ title: "Information", links: site.footer_information_links ?? [] }];
+  const gallery = site.footer_gallery ?? [];
+  const more = site.footer_gallery_more;
+  const tags = site.footer_tags ?? [];
+  const videoId = (site.footer_video ?? "").match(/(?:v=|youtu\.be\/|embed\/)([a-zA-Z0-9_-]{11})/)?.[1];
+
   return (
     <footer className="mt-16 bg-brand-dark text-white/80">
       {/* newsletter */}
       <div className="border-b border-white/10">
-        <div className="container-cmt flex flex-col items-center justify-between gap-4 py-6 md:flex-row">
-          <div>
-            <h4 className="text-lg font-bold text-white">Signup for Newsletter</h4>
-            <p className="text-sm text-white/60">
-              We&apos;ll never share your email address with a third-party.
-            </p>
+        <div className="container-cmt flex flex-col items-center justify-between gap-5 py-6 lg:flex-row">
+          <div className="flex items-center gap-4">
+            <span className="text-2xl text-white">➤</span>
+            <div>
+              <h4 className="text-lg font-bold text-white">
+                {site.newsletter_heading || "Signup For Newsletter"}
+              </h4>
+              <p className="text-sm text-white/50">
+                We&apos;ll never share your email address with a third-party.
+              </p>
+            </div>
           </div>
           <NewsletterForm />
+          <div className="flex items-center gap-3 text-sm text-white/70">
+            <SocialIcons socials={site.socials ?? {}} variant="light" withSeparators />
+          </div>
         </div>
       </div>
 
-      <div className="container-cmt grid gap-8 py-10 md:grid-cols-4">
+      {/* main columns */}
+      <div className="container-cmt grid gap-8 py-10 lg:grid-cols-[1.3fr_1fr_1fr_1fr_1.3fr]">
+        {/* video */}
         <div>
-          <span className="inline-block rounded bg-white px-3 py-2">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo.png" alt="Call My Tailor" width={200} height={71} className="h-10 w-auto" />
-          </span>
-          <p className="mt-3 text-sm leading-relaxed">{c.address}</p>
-          <p className="mt-3 text-sm">
-            <span className="font-semibold text-white">Phone:</span> {c.phone}
-          </p>
-          <p className="text-sm">
-            <span className="font-semibold text-white">Email:</span> {c.email}
-          </p>
-          <p className="mt-2 text-xs text-white/50">{c.hours}</p>
+          {videoId ? (
+            <a
+              href={`https://www.youtube.com/watch?v=${videoId}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group relative block aspect-video w-full overflow-hidden rounded"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={`https://img.youtube.com/vi/${videoId}/hqdefault.jpg`}
+                alt="Call My Tailor video"
+                className="h-full w-full object-cover"
+              />
+              <span className="absolute inset-0 flex items-center justify-center bg-black/25 transition-colors group-hover:bg-black/40">
+                <span className="grid h-12 w-12 place-items-center rounded-full bg-brand text-lg text-white shadow-lg transition-transform group-hover:scale-110">
+                  ▶
+                </span>
+              </span>
+            </a>
+          ) : (
+            <div className="rounded bg-white p-2">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/logo.png" alt="Call My Tailor" width={200} height={71} className="h-10 w-auto" />
+            </div>
+          )}
         </div>
 
-        <div>
-          <h5 className="mb-3 text-sm font-bold uppercase text-white">Information</h5>
-          <ul className="space-y-1.5 text-sm">
-            {(info ?? []).map((l) => (
-              <li key={l.href}>
-                <Link href={l.href} className="hover:text-brand">
-                  {l.text}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
+        {columns.map((col) => (
+          <div key={col.title}>
+            <h5 className="relative mb-4 pb-2 text-sm font-bold uppercase text-white after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-8 after:bg-brand">
+              {col.title}
+            </h5>
+            <FooterLinkList links={col.links} />
+          </div>
+        ))}
 
-        <div>
-          <h5 className="mb-3 text-sm font-bold uppercase text-white">Shop</h5>
-          <ul className="space-y-1.5 text-sm">
-            {(site.order_by_category ?? []).map((o) => (
-              <li key={o.slug}>
-                <Link href={`/${o.slug}`} className="hover:text-brand">
-                  {o.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div>
-          <h5 className="mb-3 text-sm font-bold uppercase text-white">Get in touch</h5>
-          <ul className="space-y-1.5 text-sm">
-            {Object.entries(site.socials ?? {}).map(([k, v]) => (
-              <li key={k}>
+        {/* instagram gallery */}
+        {gallery.length > 0 && (
+          <div>
+            <h5 className="relative mb-4 pb-2 text-sm font-bold uppercase text-white after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-8 after:bg-brand">
+              Instagram Gallery
+            </h5>
+            <div className="grid grid-cols-3 gap-1.5">
+              {gallery.slice(0, 5).map((g, i) => (
                 <a
-                  href={v}
+                  key={i}
+                  href={g.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="capitalize hover:text-brand"
+                  className="block aspect-square overflow-hidden rounded"
                 >
-                  {k}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={g.image} alt="" className="h-full w-full object-cover transition-transform hover:scale-110" />
                 </a>
-              </li>
-            ))}
-            <li>
-              <Link href="/sitemap.xml" className="hover:text-brand">
-                Sitemap
-              </Link>
-            </li>
-          </ul>
-          <div className="mt-4">
-            <SocialIcons socials={site.socials ?? {}} variant="dark" />
+              ))}
+              {more && (
+                <a
+                  href={more.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="relative block aspect-square overflow-hidden rounded"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={more.image} alt="More on Instagram" className="h-full w-full object-cover" />
+                  <span className="absolute inset-0 flex items-center justify-center bg-black/45 text-sm font-bold text-white">
+                    More
+                  </span>
+                </a>
+              )}
+            </div>
           </div>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {(site.payment_partners ?? []).map((p) => (
-              <span key={p} className="rounded bg-white/10 px-2 py-1 text-[11px] text-white/70">
-                {p}
+        )}
+      </div>
+
+      {/* bottom category tag strip */}
+      {tags.length > 0 && (
+        <div className="border-t border-white/10">
+          <div className="container-cmt flex flex-wrap items-center gap-x-2 gap-y-1 py-4 text-xs text-white/50">
+            {tags.map((t, i) => (
+              <span key={t.href + t.text} className="flex items-center gap-2">
+                <Link href={t.href} className="hover:text-brand">
+                  {t.text}
+                </Link>
+                {i < tags.length - 1 && <span className="text-white/25">|</span>}
               </span>
             ))}
           </div>
         </div>
-      </div>
+      )}
 
       <div className="border-t border-white/10 py-4 text-center text-xs text-white/50">
-        © {new Date().getFullYear()} Call My Tailor. All rights reserved. · A demo rebuild for
-        development purposes.
+        {site.copyright || `Callmytailor © ${new Date().getFullYear()} All Rights Reserved.`}
       </div>
     </footer>
   );
