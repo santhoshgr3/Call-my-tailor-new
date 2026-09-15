@@ -11,7 +11,7 @@
   --color-soft: #f7f7f7;
   --color-wa: #25d366;
 
-  --font-sans: Arial, Helvetica, "Segoe UI", system-ui, sans-serif;
+  --font-sans: var(--font-roboto), Roboto, Arial, Helvetica, sans-serif;
 
   --shadow-card: 0 1px 4px rgba(0, 0, 0, 0.08);
   --shadow-pop: 0 8px 30px rgba(0, 0, 0, 0.12);

@@ -1,7 +1,16 @@
 import type { Metadata } from "next";
+import { Roboto } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "@/components/cart/CartProvider";
 import { getSetting } from "@/lib/settings";
+
+const roboto = Roboto({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "700"],
+  style: ["normal", "italic"],
+  variable: "--font-roboto",
+  display: "swap",
+});
 
 // This is a database-backed store (cart, orders, admin) — never statically
 // prerender. Also lets `next build` succeed before DATABASE_URL is wired up.
@@ -24,7 +33,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body className="antialiased">
+      <body className={`${roboto.variable} antialiased`}>
         <CartProvider>{children}</CartProvider>
       </body>
     </html>
