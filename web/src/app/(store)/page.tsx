@@ -44,7 +44,7 @@ export default async function HomePage() {
       <section className="container-cmt py-5">
         <div className="grid gap-4 lg:grid-cols-[1fr_360px]">
           <HeroCarousel slides={slides} />
-          <div className="hidden grid-rows-2 gap-4 lg:grid">
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-1 lg:grid-rows-2 lg:gap-4">
             {promos.map((b) => (
               <a
                 key={b.id}

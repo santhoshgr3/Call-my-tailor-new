@@ -17,7 +17,7 @@ export function HeroCarousel({ slides }: { slides: Slide[] }) {
   if (n === 0) return null;
 
   return (
-    <div className="relative h-full min-h-[280px] overflow-hidden rounded md:min-h-[420px]">
+    <div className="relative h-full overflow-hidden rounded bg-brand-dark aspect-[16/9] sm:aspect-auto sm:min-h-[420px]">
       {slides.map((s, idx) => (
         <a
           key={idx}
@@ -27,7 +27,11 @@ export function HeroCarousel({ slides }: { slides: Slide[] }) {
           }`}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={s.imageUrl} alt={s.headline || "slide"} className="h-full w-full object-cover" />
+          <img
+            src={s.imageUrl}
+            alt={s.headline || "slide"}
+            className="h-full w-full bg-brand-dark object-contain sm:object-cover"
+          />
         </a>
       ))}
       {n > 1 && (
