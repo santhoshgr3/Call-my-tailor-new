@@ -9,6 +9,7 @@ import { ProductTabs } from "@/components/home/ProductTabs";
 import { StatCounter } from "@/components/home/StatCounter";
 import { HowIcon, StepArrow } from "@/components/home/HowIcons";
 import { ThreadRing } from "@/components/home/ThreadRing";
+import { BrandStrip } from "@/components/home/BrandStrip";
 
 export const dynamic = "force-dynamic";
 
@@ -262,18 +263,10 @@ export default async function HomePage() {
       {layout.show_fabric_brands !== false && brands.length > 0 && (
         <section className="py-7">
           <div className="container-cmt">
-            <h2 className="section-title">Our Fabric&apos;s Branded</h2>
-            <div className="mt-5 flex flex-wrap items-center justify-center gap-6">
-              {brands.map((b) => (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  key={b.id}
-                  src={b.logoUrl}
-                  alt={b.name}
-                  className="h-14 w-auto object-contain opacity-80 grayscale transition hover:opacity-100 hover:grayscale-0"
-                />
-              ))}
-            </div>
+            <h2 className="mb-4 text-2xl font-bold uppercase text-brand-dark">
+              Our Fabric&apos;s Branded
+            </h2>
+            <BrandStrip brands={brands} />
           </div>
         </section>
       )}

@@ -299,9 +299,22 @@ async function main() {
 
   // ---------------- Fabric brands ----------------
   const brands: string[] = home.fabric_brands || [];
+  const FABRIC_BRAND_NAMES = [
+    "Raymond",
+    "Vimal",
+    "Grasim",
+    "Grado",
+    "J.Hampstead",
+    "Mistair",
+    "Siyaram's",
+    "Linen Club",
+    "Mark Peanni",
+    "Cadini",
+    "Don & Julio",
+  ];
   for (const [i, b] of brands.entries()) {
     await db.fabricBrand.create({
-      data: { name: `Brand ${i + 1}`, logoUrl: localImg(b), sortOrder: i },
+      data: { name: FABRIC_BRAND_NAMES[i] || `Brand ${i + 1}`, logoUrl: localImg(b), sortOrder: i },
     });
   }
   console.log(`Fabric brands: ${brands.length}`);
