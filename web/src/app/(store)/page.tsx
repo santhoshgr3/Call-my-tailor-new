@@ -208,10 +208,8 @@ export default async function HomePage() {
               {site.why_choose_us.map((w, i) => (
                 <div key={i} className="text-center">
                   {w.icon && (
-                    <span className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-white">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={w.icon} alt="" className="h-8 w-8 object-contain" />
-                    </span>
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={w.icon} alt="" className="mx-auto h-[70px] w-[70px] object-contain" />
                   )}
                   <h3 className="mt-3 text-lg font-semibold text-white">{w.title}</h3>
                   <p className="mt-1 text-[13px] leading-snug text-white/85">{w.text}</p>
