@@ -104,20 +104,23 @@ const SORT_MAP: Record<SortKey, Prisma.ProductOrderByWithRelationInput[]> = {
   "rating-desc": [{ hasImage: "desc" }, { rating: "desc" }, { ratingCount: "desc" }],
 };
 
-export async function getCategoryProducts(opts: {
-  categoryId: string;
-  includeDescendants?: boolean;
-  page?: number;
-  perPage?: number;
-  sort?: SortKey;
-  minPrice?: number;
-  maxPrice?: number;
-}) {
-  const { categoryId, includeDescendants = true } = opts;
-  const page = Math.max(1, opts.page ?? 1);
-  const perPage = opts.perPage ?? 15;
-  const sort = opts.sort ?? "default";
+export const MANUFACTURER_CANONICAL: Record<string, string> = {
+  RAYMOND: "Raymond",
+  VIMAL: "Vimal",
+  GRASIM: "Grasim",
+  GRADO: "Grado",
+  "J. HAMSTEAD": "J.Hampstead",
+  "J.HAMSTEAD": "J.Hampstead",
+  MISTAIR: "Mistair",
+  "SIYARAM'S": "Siyaram's",
+  SIYARAMS: "Siyaram's",
+  "LINEN CLUB": "Linen Club",
+  "MARK PEANNI": "Mark Peanni",
+  CADINI: "Cadini",
+  "DON & JULIO": "Don & Julio",
+};
 
+async function resolveCategoryIds(categoryId: string, includeDescendants: boolean) {
   let categoryIds = [categoryId];
   if (includeDescendants) {
     const kids = await db.category.findMany({
@@ -126,6 +129,59 @@ export async function getCategoryProducts(opts: {
     });
     categoryIds = [categoryId, ...kids.map((k) => k.id)];
   }
+  return categoryIds;
+}
+
+export async function getCategoryFacets(categoryId: string, includeDescendants = true) {
+  const categoryIds = await resolveCategoryIds(categoryId, includeDescendants);
+  const baseWhere: Prisma.ProductWhereInput = {
+    isActive: true,
+    categories: { some: { categoryId: { in: categoryIds } } },
+  };
+
+  try {
+    const [brandSpecs, weaveCount] = await Promise.all([
+      db.productSpec.findMany({
+        where: { key: "Fabric Brand", product: baseWhere },
+        select: { value: true },
+      }),
+      db.productSpec.count({ where: { key: "Fabric Weave", product: baseWhere } }),
+    ]);
+
+    const counts = new Map<string, number>();
+    for (const s of brandSpecs) {
+      const canonical = MANUFACTURER_CANONICAL[s.value.trim().toUpperCase()];
+      if (!canonical) continue;
+      counts.set(canonical, (counts.get(canonical) ?? 0) + 1);
+    }
+    const manufacturers = Array.from(counts.entries())
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+
+    return { manufacturers, weaveCount };
+  } catch {
+    return { manufacturers: [], weaveCount: 0 };
+  }
+}
+
+export async function getCategoryProducts(opts: {
+  categoryId: string;
+  includeDescendants?: boolean;
+  page?: number;
+  perPage?: number;
+  sort?: SortKey;
+  minPrice?: number;
+  maxPrice?: number;
+  q?: string;
+  manufacturer?: string;
+  weaveOnly?: boolean;
+}) {
+  const { categoryId, includeDescendants = true } = opts;
+  const page = Math.max(1, opts.page ?? 1);
+  const perPage = opts.perPage ?? 15;
+  const sort = opts.sort ?? "default";
+
+  const categoryIds = await resolveCategoryIds(categoryId, includeDescendants);
 
   const where: Prisma.ProductWhereInput = {
     isActive: true,
@@ -135,6 +191,18 @@ export async function getCategoryProducts(opts: {
     where.price = {};
     if (opts.minPrice != null) where.price.gte = opts.minPrice;
     if (opts.maxPrice != null) where.price.lte = opts.maxPrice;
+  }
+  if (opts.q) {
+    where.name = { contains: opts.q, mode: "insensitive" };
+  }
+  if (opts.manufacturer) {
+    const variants = Object.entries(MANUFACTURER_CANONICAL)
+      .filter(([, canonical]) => canonical === opts.manufacturer)
+      .map(([raw]) => raw);
+    where.specs = { some: { key: "Fabric Brand", value: { in: variants, mode: "insensitive" } } };
+  }
+  if (opts.weaveOnly) {
+    where.specs = { ...(where.specs as object), some: { key: "Fabric Weave" } };
   }
 
   const [total, items, priceAgg] = await Promise.all([
