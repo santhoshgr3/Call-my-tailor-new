@@ -4,7 +4,6 @@ import type { Metadata } from "next";
 import { getProductBySlug, getRelatedProducts } from "@/lib/catalog";
 import { pageTitle } from "@/lib/seo";
 import { getSiteConfig } from "@/lib/settings";
-import { formatINR } from "@/lib/money";
 import { Stars } from "@/components/ui/Stars";
 import { ProductGallery } from "@/components/product/ProductGallery";
 import { BuyBox } from "@/components/product/BuyBox";
@@ -89,14 +88,6 @@ export default async function ProductPage({
             )}
           </div>
 
-          <div className="mt-4 flex items-end gap-3">
-            <span className="text-3xl font-extrabold text-brand">{formatINR(p.price)}</span>
-            {p.oldPrice ? (
-              <span className="text-base text-faint line-through">{formatINR(p.oldPrice)}</span>
-            ) : null}
-          </div>
-          <p className="mt-1 text-xs text-faint">Ex Tax: {formatINR(p.price)}</p>
-
           <dl className="mt-4 space-y-1 text-sm">
             {p.sku && (
               <div className="flex gap-2">
@@ -124,6 +115,7 @@ export default async function ProductPage({
               price: p.price,
               image: p.images[0]?.url || "/img/placeholder.svg",
             }}
+            oldPrice={p.oldPrice}
             options={p.options.map((o) => ({
               id: o.id,
               label: o.label,

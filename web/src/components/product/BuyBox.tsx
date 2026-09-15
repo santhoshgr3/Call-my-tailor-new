@@ -13,12 +13,20 @@ type Option = {
   values: OptionValue[];
 };
 
+const HOME_VISIT_CHARGE = 200;
+
+function isHomeVisit(label: string) {
+  return label.trim().toLowerCase() === "tailor home visit";
+}
+
 export function BuyBox({
   product,
+  oldPrice,
   options,
   bookingUrl,
 }: {
   product: { productId: string; slug: string; name: string; price: number; image: string };
+  oldPrice?: number | null;
   options: Option[];
   bookingUrl: string;
 }) {
@@ -30,7 +38,10 @@ export function BuyBox({
   const [added, setAdded] = useState(false);
   const [error, setError] = useState("");
 
+  const homeVisitSelected = Object.values(selected).some(isHomeVisit);
+
   const effectivePrice = useMemo(() => {
+    if (Object.values(selected).some(isHomeVisit)) return HOME_VISIT_CHARGE;
     let delta = 0;
     for (const o of options) {
       const v = o.values.find((x) => x.label === selected[o.label]);
@@ -54,6 +65,30 @@ export function BuyBox({
 
   return (
     <div className="space-y-4">
+      <div>
+        {homeVisitSelected ? (
+          <>
+            <div className="flex items-end gap-3">
+              <span className="text-3xl font-extrabold text-brand">{formatINR(HOME_VISIT_CHARGE)}</span>
+              <span className="pb-1 text-xs font-bold uppercase text-faint">Home Visit Charge</span>
+            </div>
+            <p className="mt-1 text-xs text-faint">
+              Balance payable after fitting &amp; final measurement at your doorstep.
+            </p>
+          </>
+        ) : (
+          <>
+            <div className="flex items-end gap-3">
+              <span className="text-3xl font-extrabold text-brand">{formatINR(effectivePrice)}</span>
+              {oldPrice ? (
+                <span className="pb-0.5 text-base text-faint line-through">{formatINR(oldPrice)}</span>
+              ) : null}
+            </div>
+            <p className="mt-1 text-xs text-faint">Ex Tax: {formatINR(effectivePrice)}</p>
+          </>
+        )}
+      </div>
+
       {options.map((o) => (
         <div key={o.id}>
           <label className="mb-1 block text-xs font-bold uppercase text-faint">
@@ -74,13 +109,6 @@ export function BuyBox({
           </select>
         </div>
       ))}
-
-      {effectivePrice !== product.price && (
-        <p className="text-sm">
-          Your price:{" "}
-          <span className="text-lg font-extrabold text-brand">{formatINR(effectivePrice)}</span>
-        </p>
-      )}
 
       <div className="flex items-center gap-3">
         <span className="text-xs font-bold uppercase text-faint">Qty</span>
