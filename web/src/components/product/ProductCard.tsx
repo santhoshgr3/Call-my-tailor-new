@@ -7,6 +7,8 @@ import { AddToCartButton } from "./AddToCartButton";
 export function ProductCard({ p, compact = false }: { p: TCard; compact?: boolean }) {
   const img = p.images[0]?.url || "/img/placeholder.svg";
   const hover = p.images[1]?.url;
+  const available = Math.max(0, 10 - (p.soldCount ?? 0));
+  const pct = Math.max(4, Math.min(100, Math.round((available / 10) * 100)));
   return (
     <div className="group relative flex flex-col border border-line bg-white transition-shadow hover:shadow-pop">
       {p.isNewArrival && (
@@ -34,6 +36,38 @@ export function ProductCard({ p, compact = false }: { p: TCard; compact?: boolea
           )}
         </span>
       </Link>
+
+      {!compact && (
+        <div className="pointer-events-none absolute right-2 top-3 z-10 flex flex-col gap-1 opacity-0 transition-opacity duration-300 group-hover:pointer-events-auto group-hover:opacity-100">
+          <AddToCartButton
+            product={{ productId: p.id, slug: p.slug, name: p.name, price: p.price, image: img }}
+            className="grid h-8 w-8 place-items-center bg-brand-dark text-sm text-white transition-colors hover:bg-brand"
+            label="🛒"
+          />
+          <button
+            type="button"
+            aria-label="Add to wishlist"
+            className="grid h-8 w-8 place-items-center bg-brand-dark text-sm text-white transition-colors hover:bg-brand"
+          >
+            ♡
+          </button>
+          <button
+            type="button"
+            aria-label="Compare"
+            className="grid h-8 w-8 place-items-center bg-brand-dark text-sm text-white transition-colors hover:bg-brand"
+          >
+            ⇄
+          </button>
+          <Link
+            href={`/product/${p.slug}`}
+            aria-label="Quick view"
+            className="grid h-8 w-8 place-items-center bg-brand-dark text-sm text-white transition-colors hover:bg-brand"
+          >
+            👁
+          </Link>
+        </div>
+      )}
+
       <div className="flex flex-1 flex-col gap-1.5 p-3">
         <Link
           href={`/product/${p.slug}`}
@@ -42,24 +76,21 @@ export function ProductCard({ p, compact = false }: { p: TCard; compact?: boolea
           {p.name}
         </Link>
         {!compact && <Stars value={p.rating} count={p.ratingCount || undefined} />}
-        <div className="mt-auto flex items-center gap-2">
+        <div className="flex items-center gap-2">
           <span className="text-[15px] font-bold text-brand">{formatINR(p.price)}</span>
           {p.oldPrice ? (
             <span className="text-xs text-faint line-through">{formatINR(p.oldPrice)}</span>
           ) : null}
         </div>
         {!compact && (
-          <AddToCartButton
-            product={{
-              productId: p.id,
-              slug: p.slug,
-              name: p.name,
-              price: p.price,
-              image: img,
-            }}
-            className="btn-brand mt-1 w-full !py-2 !text-[11px]"
-            label="Add to Cart"
-          />
+          <div className="mt-auto pt-1">
+            <div className="h-1.5 w-full overflow-hidden rounded-full bg-line">
+              <div className="h-full rounded-full bg-brand" style={{ width: `${pct}%` }} />
+            </div>
+            <p className="mt-1 text-[10px] text-faint">
+              Available: {available} / Sold: {p.soldCount ?? 0}
+            </p>
+          </div>
         )}
       </div>
     </div>

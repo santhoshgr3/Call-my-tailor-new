@@ -6,6 +6,7 @@ import { resolveCategory, getCategoryProducts, getCategoryFacets, type SortKey }
 import { ProductCard } from "@/components/product/ProductCard";
 import { Pagination } from "@/components/catalog/Pagination";
 import { SortSelect } from "@/components/catalog/SortSelect";
+import { PriceRangeSlider } from "@/components/catalog/PriceRangeSlider";
 import { pageTitle } from "@/lib/seo";
 import { dbStatus } from "@/lib/health";
 import { SetupNotice } from "@/components/SetupNotice";
@@ -213,16 +214,22 @@ async function CategoryView({
           )}
 
           <form className="text-sm" action={basePath}>
-            <h4 className="mb-2 border-b border-line pb-2 text-xs font-bold uppercase text-faint">
-              Search
-            </h4>
-            <input
-              type="text"
-              name="q"
-              defaultValue={q}
-              placeholder="Search product..."
-              className="w-full border border-line px-2 py-1.5"
-            />
+            <div className="flex items-center border border-line">
+              <input
+                type="text"
+                name="q"
+                defaultValue={q}
+                placeholder="Search product..."
+                className="w-full px-2 py-1.5 outline-none"
+              />
+              <button
+                type="submit"
+                aria-label="Search"
+                className="grid h-8 w-9 shrink-0 place-items-center text-muted hover:text-brand"
+              >
+                🔍
+              </button>
+            </div>
           </form>
 
           {facets.weaveCount > 0 && (
@@ -230,15 +237,18 @@ async function CategoryView({
               <h4 className="mb-2 border-b border-line pb-2 text-xs font-bold uppercase text-faint">
                 Fabric Weave
               </h4>
-              <label className="flex items-center gap-2 text-sm text-muted">
-                <input type="checkbox" readOnly checked={weaveOnly} className="accent-brand" />
-                <Link
-                  href={weaveOnly ? colsHref(cols) : `${basePath}?weave=1`}
-                  className="hover:text-brand"
-                >
-                  Fabric Weave ({facets.weaveCount})
-                </Link>
-              </label>
+              <Link
+                href={weaveOnly ? colsHref(cols) : `${basePath}?weave=1`}
+                className="flex items-center justify-between gap-2 text-sm text-muted hover:text-brand"
+              >
+                <span className="flex items-center gap-2">
+                  <input type="checkbox" readOnly checked={weaveOnly} className="accent-brand" />
+                  Fabric Weave
+                </span>
+                <span className="rounded bg-soft px-1.5 py-0.5 text-[11px] text-faint">
+                  {facets.weaveCount}
+                </span>
+              </Link>
             </div>
           )}
 
@@ -255,12 +265,18 @@ async function CategoryView({
                     : `${basePath}?${new URLSearchParams({ mfr: m.name }).toString()}`;
                   return (
                     <li key={m.name}>
-                      <label className="flex items-center gap-2 text-muted">
-                        <input type="checkbox" readOnly checked={active} className="accent-brand" />
-                        <Link href={href} className="hover:text-brand">
-                          {m.name.toUpperCase()} ({m.count})
-                        </Link>
-                      </label>
+                      <Link
+                        href={href}
+                        className="flex items-center justify-between gap-2 text-muted hover:text-brand"
+                      >
+                        <span className="flex items-center gap-2">
+                          <input type="checkbox" readOnly checked={active} className="accent-brand" />
+                          {m.name.toUpperCase()}
+                        </span>
+                        <span className="rounded bg-soft px-1.5 py-0.5 text-[11px] text-faint">
+                          {m.count}
+                        </span>
+                      </Link>
                     </li>
                   );
                 })}
@@ -269,36 +285,25 @@ async function CategoryView({
           )}
 
           <form className="text-sm" action={basePath}>
-            <h4 className="mb-2 border-b border-line pb-2 text-xs font-bold uppercase text-faint">
-              Price (₹)
+            <h4 className="mb-3 border-b border-line pb-2 text-xs font-bold uppercase text-faint">
+              Price
             </h4>
-            <div className="flex items-center gap-2">
-              <input
-                type="number"
-                name="min"
-                defaultValue={minPrice}
-                placeholder={String(result.priceRange.min)}
-                className="w-full border border-line px-2 py-1"
-              />
-              <span>–</span>
-              <input
-                type="number"
-                name="max"
-                defaultValue={maxPrice}
-                placeholder={String(result.priceRange.max)}
-                className="w-full border border-line px-2 py-1"
-              />
-            </div>
+            <PriceRangeSlider
+              min={result.priceRange.min}
+              max={result.priceRange.max}
+              low={minPrice ?? result.priceRange.min}
+              high={maxPrice ?? result.priceRange.max}
+            />
             {sort !== "default" && <input type="hidden" name="sort" value={sort} />}
             {manufacturer && <input type="hidden" name="mfr" value={manufacturer} />}
             {weaveOnly && <input type="hidden" name="weave" value="1" />}
-            <button className="btn-outline mt-2 w-full !py-1.5 !text-[11px]">Apply</button>
+            <button className="btn-outline mt-3 w-full !py-1.5 !text-[11px]">Apply</button>
           </form>
 
           {(q || manufacturer || weaveOnly || minPrice != null || maxPrice != null) && (
             <Link
               href={basePath}
-              className="block w-full border border-line py-1.5 text-center text-[11px] font-bold uppercase text-muted hover:border-brand hover:text-brand"
+              className="block w-full bg-soft py-2 text-center text-[11px] font-bold uppercase text-muted hover:bg-brand hover:text-white"
             >
               Reset All
             </Link>
