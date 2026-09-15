@@ -271,35 +271,24 @@ export default async function HomePage() {
       )}
 
       {/* TESTIMONIALS */}
-      {layout.show_testimonials !== false && testimonials.length > 0 && (() => {
-        const videoTestimonials = testimonials.filter(
-          (t): t is typeof t & { videoUrl: string } => !!t.videoUrl,
-        );
-        return (
-          <section className="bg-soft py-7">
-            <div className="container-cmt">
-              <h2 className="section-title">Testimonials</h2>
-              <div className="mt-5">
-                {videoTestimonials.length > 0 ? (
-                  <VideoTestimonials items={videoTestimonials} />
-                ) : (
-                  <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-                    {testimonials.slice(0, 6).map((t) => (
-                      <figure key={t.id} className="rounded border border-line bg-white p-5">
-                        <blockquote className="text-sm text-muted">“{t.text}”</blockquote>
-                        <figcaption className="mt-3 text-sm">
-                          <span className="font-bold text-brand-dark">{t.name}</span>
-                          {t.role && <span className="block text-xs text-faint">{t.role}</span>}
-                        </figcaption>
-                      </figure>
-                    ))}
-                  </div>
-                )}
-              </div>
+      {layout.show_testimonials !== false && testimonials.length > 0 && (
+        <section className="bg-soft py-7">
+          <div className="container-cmt">
+            <h2 className="section-title">Testimonials</h2>
+            <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+              {testimonials.slice(0, 6).map((t) => (
+                <figure key={t.id} className="rounded border border-line bg-white p-5">
+                  <blockquote className="text-sm text-muted">“{t.text}”</blockquote>
+                  <figcaption className="mt-3 text-sm">
+                    <span className="font-bold text-brand-dark">{t.name}</span>
+                    {t.role && <span className="block text-xs text-faint">{t.role}</span>}
+                  </figcaption>
+                </figure>
+              ))}
             </div>
-          </section>
-        );
-      })()}
+          </div>
+        </section>
+      )}
 
       {/* STATS */}
       {layout.show_stats !== false && (site.stats?.length ?? 0) > 0 && (
@@ -317,6 +306,25 @@ export default async function HomePage() {
           </div>
         </section>
       )}
+
+      {/* VLOG */}
+      {layout.show_testimonials !== false &&
+        (() => {
+          const videoTestimonials = testimonials.filter(
+            (t): t is typeof t & { videoUrl: string } => !!t.videoUrl,
+          );
+          if (videoTestimonials.length === 0) return null;
+          return (
+            <section className="py-7">
+              <div className="container-cmt">
+                <h2 className="section-title">Vlog</h2>
+                <div className="mt-5">
+                  <VideoTestimonials items={videoTestimonials} />
+                </div>
+              </div>
+            </section>
+          );
+        })()}
 
       {/* LATEST BLOG */}
       {layout.show_latest_blog !== false && posts.length > 0 && (

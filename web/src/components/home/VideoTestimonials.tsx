@@ -79,10 +79,6 @@ export function VideoTestimonials({ items }: { items: VideoTestimonial[] }) {
                 )}
               </div>
             </div>
-            <div className="mt-2 text-center">
-              <p className="text-sm font-bold text-brand-dark">{v.name}</p>
-              {v.role && <p className="text-xs text-faint">{v.role}</p>}
-            </div>
           </div>
         ))}
       </div>
