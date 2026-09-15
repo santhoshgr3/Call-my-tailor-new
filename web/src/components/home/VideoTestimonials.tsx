@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useRef, useState } from "react";
 
 type VideoTestimonial = {
   id: string;
@@ -14,22 +14,18 @@ function toVideoId(url: string): string {
   return m ? m[1] : url.trim();
 }
 
-const PER_PAGE = 3;
-
 export function VideoTestimonials({ items }: { items: VideoTestimonial[] }) {
-  const videos = useMemo(
-    () => items.map((t) => ({ ...t, videoId: toVideoId(t.videoUrl) })),
-    [items],
-  );
-  const pages = Math.max(1, Math.ceil(videos.length / PER_PAGE));
-  const [page, setPage] = useState(0);
+  const railRef = useRef<HTMLDivElement>(null);
   const [playingId, setPlayingId] = useState<string | null>(null);
 
-  const visible = videos.slice(page * PER_PAGE, page * PER_PAGE + PER_PAGE);
+  const videos = items.map((t) => ({ ...t, videoId: toVideoId(t.videoUrl) }));
 
-  function go(dir: -1 | 1) {
-    setPlayingId(null);
-    setPage((p) => (p + dir + pages) % pages);
+  function scrollBy(dir: -1 | 1) {
+    const rail = railRef.current;
+    if (!rail) return;
+    const card = rail.querySelector<HTMLElement>("[data-card]");
+    const amount = card ? card.offsetWidth + 20 : rail.clientWidth * 0.8;
+    rail.scrollBy({ left: dir * amount, behavior: "smooth" });
   }
 
   if (videos.length === 0) return null;
@@ -37,16 +33,15 @@ export function VideoTestimonials({ items }: { items: VideoTestimonial[] }) {
   return (
     <div className="relative">
       <div
-        className={`grid gap-5 ${
-          visible.length >= 3
-            ? "sm:grid-cols-2 lg:grid-cols-3"
-            : visible.length === 2
-              ? "sm:grid-cols-2"
-              : "mx-auto max-w-md"
-        }`}
+        ref={railRef}
+        className="no-scrollbar flex snap-x snap-mandatory gap-5 overflow-x-auto scroll-smooth pb-1"
       >
-        {visible.map((v) => (
-          <div key={v.id}>
+        {videos.map((v) => (
+          <div
+            key={v.id}
+            data-card
+            className="w-[78%] shrink-0 snap-start sm:w-[45%] lg:w-[31%]"
+          >
             <div className="relative overflow-hidden rounded-lg border border-line bg-black shadow-card">
               <div className="relative aspect-video w-full">
                 {playingId === v.id ? (
@@ -83,39 +78,24 @@ export function VideoTestimonials({ items }: { items: VideoTestimonial[] }) {
         ))}
       </div>
 
-      {pages > 1 && (
+      {videos.length > 1 && (
         <>
           <button
             type="button"
             aria-label="Previous videos"
-            onClick={() => go(-1)}
-            className="absolute left-[-14px] top-[38%] hidden -translate-y-1/2 place-items-center rounded-full bg-white text-lg text-brand-dark shadow-card hover:bg-soft sm:grid sm:h-9 sm:w-9"
+            onClick={() => scrollBy(-1)}
+            className="absolute left-[-14px] top-1/2 hidden -translate-y-1/2 place-items-center rounded-full bg-white text-lg text-brand-dark shadow-card hover:bg-soft sm:grid sm:h-10 sm:w-10"
           >
             ‹
           </button>
           <button
             type="button"
             aria-label="Next videos"
-            onClick={() => go(1)}
-            className="absolute right-[-14px] top-[38%] hidden -translate-y-1/2 place-items-center rounded-full bg-white text-lg text-brand-dark shadow-card hover:bg-soft sm:grid sm:h-9 sm:w-9"
+            onClick={() => scrollBy(1)}
+            className="absolute right-[-14px] top-1/2 hidden -translate-y-1/2 place-items-center rounded-full bg-white text-lg text-brand-dark shadow-card hover:bg-soft sm:grid sm:h-10 sm:w-10"
           >
             ›
           </button>
-          <div className="mt-5 flex justify-center gap-1.5">
-            {Array.from({ length: pages }).map((_, i) => (
-              <button
-                key={i}
-                aria-label={`Go to page ${i + 1}`}
-                onClick={() => {
-                  setPlayingId(null);
-                  setPage(i);
-                }}
-                className={`h-2 rounded-full transition-all ${
-                  i === page ? "w-5 bg-brand" : "w-2 bg-line"
-                }`}
-              />
-            ))}
-          </div>
         </>
       )}
     </div>
