@@ -270,6 +270,7 @@ model Testimonial {
   text      String
   imageUrl  String?
   fbUrl     String?
+  videoUrl  String? // YouTube video ID or full URL — when set, shown in the home video carousel
   rating    Int     @default(5)
   sortOrder Int     @default(0)
   isActive  Boolean @default(true)

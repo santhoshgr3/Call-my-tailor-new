@@ -268,6 +268,37 @@ async function main() {
   });
   console.log(`Testimonials: ${t.length}`);
 
+  // Real testimonial videos from Call My Tailor's own YouTube channel
+  const videoTestimonials = [
+    {
+      name: "Customer Feedback",
+      role: "Doorstep tailoring — how it works",
+      videoUrl: "https://www.youtube.com/watch?v=88RmDQejfyQ",
+    },
+    {
+      name: "Client Review",
+      role: "Sherwani — Groom Wedding Wear",
+      videoUrl: "https://www.youtube.com/watch?v=YKrv4Gmekn4",
+    },
+    {
+      name: "Verified Customer",
+      role: "Bandhgala & Jodhpuri Suit",
+      videoUrl: "https://www.youtube.com/watch?v=zsigG47TN64",
+    },
+  ];
+  await db.testimonial.createMany({
+    data: videoTestimonials.map((v, i) => ({
+      name: v.name,
+      role: v.role,
+      text: "",
+      videoUrl: v.videoUrl,
+      rating: 5,
+      sortOrder: -100 + i,
+      isActive: true,
+    })),
+  });
+  console.log(`Video testimonials: ${videoTestimonials.length}`);
+
   // ---------------- Hero slides ----------------
   const slides: any[] = home.slides || [];
   for (const [i, s] of slides.entries()) {

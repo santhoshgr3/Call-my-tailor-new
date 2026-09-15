@@ -15,7 +15,13 @@ export type HomeData = {
   }[];
   rails: { best: ProductCard[]; fresh: ProductCard[]; rated: ProductCard[] };
   brands: { id: string; name: string; logoUrl: string }[];
-  testimonials: { id: string; name: string; role: string | null; text: string }[];
+  testimonials: {
+    id: string;
+    name: string;
+    role: string | null;
+    text: string;
+    videoUrl: string | null;
+  }[];
   posts: { id: string; slug: string; title: string; excerpt: string | null; coverImage: string | null }[];
   trendingTabs: { label: string; items: ProductCard[] }[];
   specThumbs: { title: string; slug: string; image: string }[];
@@ -141,6 +147,7 @@ async function loadHomeData(): Promise<HomeData> {
       name: t.name,
       role: t.role,
       text: t.text,
+      videoUrl: t.videoUrl,
     })),
     posts: posts.map((p) => ({
       id: p.id,

@@ -10,6 +10,7 @@ import { StatCounter } from "@/components/home/StatCounter";
 import { HowIcon, StepArrow } from "@/components/home/HowIcons";
 import { ThreadRing } from "@/components/home/ThreadRing";
 import { BrandStrip } from "@/components/home/BrandStrip";
+import { VideoTestimonials } from "@/components/home/VideoTestimonials";
 
 export const dynamic = "force-dynamic";
 
@@ -272,24 +273,35 @@ export default async function HomePage() {
       )}
 
       {/* TESTIMONIALS */}
-      {layout.show_testimonials !== false && testimonials.length > 0 && (
-        <section className="bg-soft py-7">
-          <div className="container-cmt">
-            <h2 className="section-title">Testimonials</h2>
-            <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-              {testimonials.slice(0, 6).map((t) => (
-                <figure key={t.id} className="rounded border border-line bg-white p-5">
-                  <blockquote className="text-sm text-muted">“{t.text}”</blockquote>
-                  <figcaption className="mt-3 text-sm">
-                    <span className="font-bold text-brand-dark">{t.name}</span>
-                    {t.role && <span className="block text-xs text-faint">{t.role}</span>}
-                  </figcaption>
-                </figure>
-              ))}
+      {layout.show_testimonials !== false && testimonials.length > 0 && (() => {
+        const videoTestimonials = testimonials.filter(
+          (t): t is typeof t & { videoUrl: string } => !!t.videoUrl,
+        );
+        return (
+          <section className="bg-soft py-7">
+            <div className="container-cmt">
+              <h2 className="section-title">Testimonials</h2>
+              <div className="mt-5">
+                {videoTestimonials.length > 0 ? (
+                  <VideoTestimonials items={videoTestimonials} />
+                ) : (
+                  <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+                    {testimonials.slice(0, 6).map((t) => (
+                      <figure key={t.id} className="rounded border border-line bg-white p-5">
+                        <blockquote className="text-sm text-muted">“{t.text}”</blockquote>
+                        <figcaption className="mt-3 text-sm">
+                          <span className="font-bold text-brand-dark">{t.name}</span>
+                          {t.role && <span className="block text-xs text-faint">{t.role}</span>}
+                        </figcaption>
+                      </figure>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        </section>
-      )}
+          </section>
+        );
+      })()}
 
       {/* STATS */}
       {layout.show_stats !== false && (site.stats?.length ?? 0) > 0 && (

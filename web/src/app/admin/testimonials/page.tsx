@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/auth";
+import { bustStorefrontCache } from "@/lib/cache";
 import { PageHeader, Card, Field, inputCls, SubmitButton } from "@/components/admin/ui";
 
 export const dynamic = "force-dynamic";
@@ -14,13 +15,15 @@ async function saveTestimonial(fd: FormData) {
     role: String(fd.get("role") || "").trim() || null,
     text: String(fd.get("text") || "").trim(),
     imageUrl: String(fd.get("imageUrl") || "").trim() || null,
+    videoUrl: String(fd.get("videoUrl") || "").trim() || null,
     rating: Math.min(5, Math.max(1, Math.round(Number(fd.get("rating") || 5)))),
     sortOrder: Math.round(Number(fd.get("sortOrder") || 0)),
     isActive: fd.get("isActive") === "on",
   };
-  if (!data.name || !data.text) return;
+  if (!data.name || (!data.text && !data.videoUrl)) return;
   if (id) await db.testimonial.update({ where: { id }, data });
   else await db.testimonial.create({ data });
+  bustStorefrontCache();
   revalidatePath("/admin/testimonials");
   revalidatePath("/");
 }
@@ -30,16 +33,26 @@ async function deleteTestimonial(fd: FormData) {
   await requireAdmin();
   const id = String(fd.get("id") || "");
   if (id) await db.testimonial.delete({ where: { id } });
+  bustStorefrontCache();
   revalidatePath("/admin/testimonials");
   revalidatePath("/");
 }
 
 export default async function AdminTestimonials() {
   const items = await db.testimonial.findMany({ orderBy: { sortOrder: "asc" } });
+  const videoCount = items.filter((t) => t.videoUrl).length;
 
   return (
     <div>
-      <PageHeader title="Testimonials" subtitle={`${items.length} testimonials`} />
+      <PageHeader
+        title="Testimonials"
+        subtitle={`${items.length} testimonials · ${videoCount} with video`}
+      />
+      <p className="mb-4 rounded border border-line bg-soft p-3 text-xs text-faint">
+        Add a <b>Video URL</b> (a YouTube link or video ID) to a testimonial and the homepage
+        automatically shows the <b>video carousel</b> instead of the text quotes — as long as at
+        least one testimonial has a video set.
+      </p>
 
       <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
         <div className="space-y-3">
@@ -51,7 +64,13 @@ export default async function AdminTestimonials() {
                   <input name="name" defaultValue={t.name} className={inputCls} placeholder="Name" />
                   <input name="role" defaultValue={t.role ?? ""} className={inputCls} placeholder="Role" />
                 </div>
-                <textarea name="text" defaultValue={t.text} rows={3} className={inputCls} />
+                <textarea name="text" defaultValue={t.text} rows={2} className={inputCls} placeholder="Quote text (used if no video)" />
+                <input
+                  name="videoUrl"
+                  defaultValue={t.videoUrl ?? ""}
+                  className={inputCls}
+                  placeholder="YouTube URL or video ID (e.g. https://youtu.be/xxxxxxxxxxx)"
+                />
                 <div className="grid gap-2 sm:grid-cols-3">
                   <input name="imageUrl" defaultValue={t.imageUrl ?? ""} className={inputCls} placeholder="Image URL" />
                   <input name="rating" type="number" min={1} max={5} defaultValue={t.rating} className={inputCls} />
@@ -84,8 +103,11 @@ export default async function AdminTestimonials() {
             <Field label="Role">
               <input name="role" className={inputCls} />
             </Field>
-            <Field label="Text">
-              <textarea name="text" required rows={4} className={inputCls} />
+            <Field label="Video URL" hint="YouTube link or video ID — leave blank for a text quote">
+              <input name="videoUrl" className={inputCls} placeholder="https://youtu.be/xxxxxxxxxxx" />
+            </Field>
+            <Field label="Text" hint="Used only when no video URL is set">
+              <textarea name="text" rows={3} className={inputCls} />
             </Field>
             <div className="grid grid-cols-2 gap-2">
               <Field label="Rating">
