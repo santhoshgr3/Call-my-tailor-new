@@ -73,7 +73,7 @@ export default async function HomePage() {
               {site.how_it_works.map((s, i) => (
                 <div key={s.step} className="flex items-center gap-2 md:flex-1">
                   <div className="flex items-center gap-3">
-                    <HowIcon step={s.step} className="h-12 w-12 shrink-0" />
+                    <HowIcon step={s.step} className="h-14 w-14 shrink-0" />
                     <div className="leading-tight">
                       <p className="text-[13px] font-extrabold uppercase text-brand-dark">
                         {s.title}
