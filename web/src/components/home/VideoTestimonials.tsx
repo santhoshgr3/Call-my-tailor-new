@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 type VideoTestimonial = {
   id: string;
@@ -15,89 +15,95 @@ function toVideoId(url: string): string {
 }
 
 export function VideoTestimonials({ items }: { items: VideoTestimonial[] }) {
-  const railRef = useRef<HTMLDivElement>(null);
-  const [playingId, setPlayingId] = useState<string | null>(null);
-
   const videos = items.map((t) => ({ ...t, videoId: toVideoId(t.videoUrl) }));
+  const n = videos.length;
+  const [active, setActive] = useState(0);
+  const [playing, setPlaying] = useState(false);
 
-  function scrollBy(dir: -1 | 1) {
-    const rail = railRef.current;
-    if (!rail) return;
-    const card = rail.querySelector<HTMLElement>("[data-card]");
-    const amount = card ? card.offsetWidth + 20 : rail.clientWidth * 0.8;
-    rail.scrollBy({ left: dir * amount, behavior: "smooth" });
+  useEffect(() => {
+    if (n <= 1) return;
+    const t = setInterval(() => {
+      setPlaying(false);
+      setActive((v) => (v + 1) % n);
+    }, 4500);
+    return () => clearInterval(t);
+  }, [n]);
+
+  if (n === 0) return null;
+
+  function go(idx: number) {
+    setPlaying(false);
+    setActive(((idx % n) + n) % n);
   }
 
-  if (videos.length === 0) return null;
+  const prev = videos[(active - 1 + n) % n];
+  const cur = videos[active];
+  const next = videos[(active + 1) % n];
+
+  function Side({ v, onClick }: { v: (typeof videos)[number]; onClick: () => void }) {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        aria-label={`Show video: ${v.name}`}
+        className="relative hidden aspect-[9/13] w-[26%] shrink-0 overflow-hidden rounded-xl sm:block"
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={`https://img.youtube.com/vi/${v.videoId}/hqdefault.jpg`}
+          alt={v.name}
+          className="h-full w-full object-cover"
+        />
+        <span className="absolute inset-0 grid place-items-center bg-white/40">
+          <span className="h-9 w-9 rounded-full bg-white/70" />
+        </span>
+      </button>
+    );
+  }
 
   return (
-    <div className="relative">
-      <div
-        ref={railRef}
-        className="no-scrollbar flex snap-x snap-mandatory gap-5 overflow-x-auto scroll-smooth pb-1"
-      >
-        {videos.map((v) => (
-          <div
-            key={v.id}
-            data-card
-            className="w-[78%] shrink-0 snap-start sm:w-[45%] lg:w-[31%]"
-          >
-            <div className="relative overflow-hidden rounded-lg border border-line bg-black shadow-card">
-              <div className="relative aspect-video w-full">
-                {playingId === v.id ? (
-                  <iframe
-                    src={`https://www.youtube.com/embed/${v.videoId}?autoplay=1&rel=0`}
-                    title={v.name}
-                    className="h-full w-full"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => setPlayingId(v.id)}
-                    className="group relative block h-full w-full"
-                    aria-label={`Play video: ${v.name}`}
-                  >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={`https://img.youtube.com/vi/${v.videoId}/hqdefault.jpg`}
-                      alt={v.name}
-                      className="h-full w-full object-cover"
-                    />
-                    <span className="absolute inset-0 flex items-center justify-center bg-black/25 transition-colors group-hover:bg-black/40">
-                      <span className="grid h-14 w-14 place-items-center rounded-full bg-brand text-xl text-white shadow-lg transition-transform group-hover:scale-110">
-                        ▶
-                      </span>
-                    </span>
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
-        ))}
+    <div className="mx-auto flex max-w-3xl items-center justify-center gap-3">
+      <Side v={prev} onClick={() => go(active - 1)} />
+
+      <div className="w-[92%] shrink-0 sm:w-[42%]">
+        <div className="relative aspect-[9/13] overflow-hidden rounded-xl border border-line bg-black shadow-pop">
+          {playing ? (
+            <iframe
+              src={`https://www.youtube.com/embed/${cur.videoId}?autoplay=1&rel=0`}
+              title={cur.name}
+              className="h-full w-full"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          ) : (
+            <button
+              type="button"
+              onClick={() => setPlaying(true)}
+              className="group relative block h-full w-full"
+              aria-label={`Play video: ${cur.name}`}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={`https://img.youtube.com/vi/${cur.videoId}/hqdefault.jpg`}
+                alt={cur.name}
+                className="h-full w-full object-cover"
+              />
+              <span className="absolute inset-0 flex items-center justify-center bg-black/20 transition-colors group-hover:bg-black/35">
+                <span className="grid h-14 w-14 place-items-center rounded-full bg-white/90 text-xl text-brand shadow-lg transition-transform group-hover:scale-110">
+                  ▶
+                </span>
+              </span>
+            </button>
+          )}
+        </div>
+
+        <div className="relative mx-auto mt-2 w-fit max-w-full rounded-lg bg-soft px-4 py-1.5 text-center shadow-card">
+          <span className="absolute -top-1.5 left-1/2 h-3 w-3 -translate-x-1/2 rotate-45 bg-soft" />
+          <p className="relative truncate text-sm font-bold text-brand-dark">{cur.name}</p>
+        </div>
       </div>
 
-      {videos.length > 1 && (
-        <>
-          <button
-            type="button"
-            aria-label="Previous videos"
-            onClick={() => scrollBy(-1)}
-            className="absolute left-[-14px] top-1/2 hidden -translate-y-1/2 place-items-center rounded-full bg-white text-lg text-brand-dark shadow-card hover:bg-soft sm:grid sm:h-10 sm:w-10"
-          >
-            ‹
-          </button>
-          <button
-            type="button"
-            aria-label="Next videos"
-            onClick={() => scrollBy(1)}
-            className="absolute right-[-14px] top-1/2 hidden -translate-y-1/2 place-items-center rounded-full bg-white text-lg text-brand-dark shadow-card hover:bg-soft sm:grid sm:h-10 sm:w-10"
-          >
-            ›
-          </button>
-        </>
-      )}
+      <Side v={next} onClick={() => go(active + 1)} />
     </div>
   );
 }
