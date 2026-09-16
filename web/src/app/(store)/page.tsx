@@ -270,26 +270,6 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* TESTIMONIALS */}
-      {layout.show_testimonials !== false && testimonials.length > 0 && (
-        <section className="bg-soft py-7">
-          <div className="container-cmt">
-            <h2 className="section-title">Testimonials</h2>
-            <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-              {testimonials.slice(0, 6).map((t) => (
-                <figure key={t.id} className="rounded border border-line bg-white p-5">
-                  <blockquote className="text-sm text-muted">“{t.text}”</blockquote>
-                  <figcaption className="mt-3 text-sm">
-                    <span className="font-bold text-brand-dark">{t.name}</span>
-                    {t.role && <span className="block text-xs text-faint">{t.role}</span>}
-                  </figcaption>
-                </figure>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
       {/* STATS */}
       {layout.show_stats !== false && (site.stats?.length ?? 0) > 0 && (
         <section
@@ -307,7 +287,7 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* VLOG */}
+      {/* TESTIMONIALS (video) */}
       {layout.show_testimonials !== false &&
         (() => {
           const videoTestimonials = testimonials.filter(
@@ -317,7 +297,7 @@ export default async function HomePage() {
           return (
             <section className="py-7">
               <div className="container-cmt">
-                <h2 className="section-title">Vlog</h2>
+                <h2 className="section-title">Testimonials</h2>
                 <div className="mt-5">
                   <VideoTestimonials items={videoTestimonials} />
                 </div>
