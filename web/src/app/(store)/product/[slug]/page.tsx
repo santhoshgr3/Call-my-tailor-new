@@ -4,7 +4,6 @@ import type { Metadata } from "next";
 import { getProductBySlug, getRelatedProducts } from "@/lib/catalog";
 import { pageTitle } from "@/lib/seo";
 import { getSiteConfig } from "@/lib/settings";
-import { Stars } from "@/components/ui/Stars";
 import { ProductGallery } from "@/components/product/ProductGallery";
 import { BuyBox } from "@/components/product/BuyBox";
 import { ProductTabsView } from "@/components/product/ProductTabsView";
@@ -81,25 +80,24 @@ export default async function ProductPage({
 
         <div>
           <h1 className="text-2xl">{p.name}</h1>
-          <div className="mt-2 flex items-center gap-3">
-            <Stars value={p.rating} count={p.ratingCount || undefined} />
-            {p.soldCount > 0 && (
-              <span className="text-xs text-faint">· {p.soldCount} sold</span>
-            )}
-          </div>
 
-          <dl className="mt-4 space-y-1 text-sm">
-            {p.sku && (
-              <div className="flex gap-2">
-                <dt className="text-faint">Product Code:</dt>
-                <dd className="font-semibold">{p.sku}</dd>
-              </div>
-            )}
-            <div className="flex gap-2">
-              <dt className="text-faint">Availability:</dt>
-              <dd className="font-semibold text-green-600">{p.stockStatus}</dd>
-            </div>
-          </dl>
+          {(() => {
+            const KEYS = ["Color", "Fabric Brand", "Material Quality", "Fabric Pattern", "Ideal For"];
+            const rows = KEYS.map((k) => p.specs.find((s) => s.key === k)).filter(
+              (s): s is NonNullable<typeof s> => !!s,
+            );
+            if (rows.length === 0) return null;
+            return (
+              <dl className="mt-4 space-y-1 text-sm">
+                {rows.map((s) => (
+                  <div key={s.key} className="flex gap-2">
+                    <dt className="text-faint">{s.key}:</dt>
+                    <dd className="font-semibold">{s.value}</dd>
+                  </div>
+                ))}
+              </dl>
+            );
+          })()}
 
           {p.shortDescription && (
             <p className="mt-4 text-sm text-muted">{p.shortDescription}</p>

@@ -13,10 +13,15 @@ type Option = {
   values: OptionValue[];
 };
 
-const HOME_VISIT_CHARGE = 200;
+const HOME_VISIT_CHARGE = 0;
 
 function isHomeVisit(label: string) {
   return label.trim().toLowerCase() === "tailor home visit";
+}
+
+function needsSchedule(label: string) {
+  const l = label.trim().toLowerCase();
+  return l.includes("home visit") || l.includes("call") || l.includes("voice") || l.includes("video");
 }
 
 export function BuyBox({
@@ -39,6 +44,7 @@ export function BuyBox({
   const [error, setError] = useState("");
 
   const homeVisitSelected = Object.values(selected).some(isHomeVisit);
+  const scheduleNeeded = Object.values(selected).some(needsSchedule);
 
   const effectivePrice = useMemo(() => {
     if (Object.values(selected).some(isHomeVisit)) return HOME_VISIT_CHARGE;
@@ -73,7 +79,7 @@ export function BuyBox({
               <span className="pb-1 text-xs font-bold uppercase text-faint">Home Visit Charge</span>
             </div>
             <p className="mt-1 text-xs text-faint">
-              Balance payable after fitting &amp; final measurement at your doorstep.
+              ₹300 will be paid for the home visit.
             </p>
           </>
         ) : (
@@ -110,6 +116,23 @@ export function BuyBox({
         </div>
       ))}
 
+      {scheduleNeeded && (
+        <div>
+          <label className="mb-1 block text-xs font-bold uppercase text-faint">
+            Schedule — For Tailor Home Visit / Customization on call
+            <span className="text-brand"> *</span>
+          </label>
+          <div className="flex items-stretch border border-line">
+            <input
+              type="date"
+              min={new Date().toISOString().slice(0, 10)}
+              className="w-full px-3 py-2 text-sm outline-none"
+            />
+            <span className="grid w-11 shrink-0 place-items-center bg-brand text-white">📅</span>
+          </div>
+        </div>
+      )}
+
       <div className="flex items-center gap-3">
         <span className="text-xs font-bold uppercase text-faint">Qty</span>
         <div className="flex items-center border border-line">
@@ -127,10 +150,10 @@ export function BuyBox({
 
       <div className="flex flex-wrap gap-3">
         <button onClick={handleAdd} className="btn-brand flex-1">
-          {added ? "Added to Cart ✓" : "Add to Cart"}
+          {added ? "Added ✓" : "Add to Order"}
         </button>
-        <Link href="/checkout" onClick={handleAdd} className="btn-dark flex-1">
-          Buy Now
+        <Link href="/checkout" onClick={handleAdd} className="btn-outline flex-1">
+          Order Now
         </Link>
       </div>
       <a href={bookingUrl} className="btn-outline w-full">
