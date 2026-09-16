@@ -35,7 +35,7 @@ export default async function HomePage() {
     getSetting<Record<string, boolean>>("home_layout", {}),
     getHomeData().catch(() => EMPTY_HOME),
   ]);
-  const { slides, promos, brands, testimonials, posts, trendingTabs, specThumbs, orderCats } = home;
+  const { slides, promos, brands, testimonials, trendingTabs, specThumbs, orderCats } = home;
   const { best, fresh, rated } = home.rails;
 
   return (
@@ -326,43 +326,6 @@ export default async function HomePage() {
           );
         })()}
 
-      {/* LATEST BLOG */}
-      {layout.show_latest_blog !== false && posts.length > 0 && (
-        <section className="py-7">
-          <div className="container-cmt">
-            <h2 className="section-title">Latest Blog</h2>
-            <div className="mt-5 grid gap-6 md:grid-cols-3">
-              {posts.map((p) => (
-                <article key={p.id} className="overflow-hidden rounded border border-line">
-                  <Link href={`/blog/${p.slug}`}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={p.coverImage || "/img/placeholder.svg"}
-                      alt={p.title}
-                      className="aspect-[16/9] w-full object-cover"
-                    />
-                  </Link>
-                  <div className="p-4">
-                    <Link
-                      href={`/blog/${p.slug}`}
-                      className="line-clamp-2 text-sm font-bold text-brand-dark hover:text-brand"
-                    >
-                      {p.title}
-                    </Link>
-                    <p className="mt-2 line-clamp-3 text-xs text-muted">{p.excerpt}</p>
-                    <Link
-                      href={`/blog/${p.slug}`}
-                      className="mt-3 inline-block text-xs font-bold uppercase text-brand"
-                    >
-                      Read More →
-                    </Link>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
     </div>
   );
 }
