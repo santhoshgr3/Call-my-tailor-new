@@ -24,6 +24,7 @@ export function SiteHeader({
   const [cat, setCat] = useState("");
   const [mobileOpen, setMobileOpen] = useState(false);
   const [collectionOpen, setCollectionOpen] = useState(false);
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
 
   const allCategoryOptions = menu.flatMap((m) => [
     { slug: m.slug, name: m.name, depth: 0, href: m.href },
@@ -40,8 +41,8 @@ export function SiteHeader({
 
   return (
     <header className="border-b border-line">
-      {/* top bar */}
-      <div className="bg-brand text-white">
+      {/* top bar (desktop) */}
+      <div className="hidden bg-brand text-white md:block">
         <div className="container-cmt flex h-9 items-center justify-between text-[12px]">
           <div className="flex items-center gap-2">
             {(site.top_bar ?? []).map((t, i) => (
@@ -55,8 +56,95 @@ export function SiteHeader({
         </div>
       </div>
 
-      {/* main header */}
-      <div className="container-cmt flex items-center gap-6 py-4">
+      {/* top bar (mobile) */}
+      <div className="bg-brand text-white md:hidden">
+        <div className="container-cmt flex h-9 items-center">
+          <Link
+            href={session ? "/account" : "/account/login"}
+            className="flex items-center gap-1 text-sm"
+            aria-label="Account"
+          >
+            <span>👤</span>
+            <span className="text-[10px]">▾</span>
+          </Link>
+        </div>
+      </div>
+
+      {/* logo (mobile) */}
+      <div className="container-cmt flex justify-center py-4 md:hidden">
+        <Link href="/" aria-label={site.brand || "Call My Tailor"}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo.png"
+            alt={site.brand || "Call My Tailor"}
+            width={220}
+            height={78}
+            className="h-16 w-auto"
+          />
+        </Link>
+      </div>
+
+      {/* action bar (mobile) */}
+      <div className="bg-brand md:hidden">
+        <div className="container-cmt flex items-center justify-between py-2.5 text-white">
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setMobileOpen((v) => !v)}
+              className="flex items-center gap-1.5 text-xs font-bold uppercase"
+            >
+              <span className="text-base">☰</span> All Categories
+            </button>
+            <button
+              type="button"
+              aria-label="Search"
+              onClick={() => setMobileSearchOpen((v) => !v)}
+              className="text-base"
+            >
+              🔍
+            </button>
+          </div>
+          <div className="flex items-center gap-4">
+            <button
+              type="button"
+              onClick={() => setDrawerOpen(true)}
+              className="relative"
+              aria-label="Open cart"
+            >
+              🛍
+              <span className="absolute -right-2 -top-2 grid h-4 min-w-4 place-items-center rounded-full bg-brand-dark px-1 text-[9px] font-bold">
+                {count}
+              </span>
+            </button>
+            <button
+              type="button"
+              aria-label="Menu"
+              onClick={() => setMobileOpen((v) => !v)}
+              className="text-lg"
+            >
+              ☰
+            </button>
+          </div>
+        </div>
+        {mobileSearchOpen && (
+          <div className="border-t border-white/20 bg-white">
+            <form onSubmit={submitSearch} className="container-cmt flex py-2">
+              <input
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                placeholder="Search products…"
+                className="flex-1 border border-line px-3 py-2 text-sm outline-none"
+              />
+              <button className="bg-brand px-4 text-white" aria-label="Search">
+                ⌕
+              </button>
+            </form>
+          </div>
+        )}
+      </div>
+
+      {/* main header (desktop) */}
+      <div className="container-cmt hidden items-center gap-6 py-4 md:flex">
         <Link href="/" className="shrink-0" aria-label={site.brand || "Call My Tailor"}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -114,19 +202,11 @@ export function SiteHeader({
           </span>
         </button>
 
-        <button
-          type="button"
-          className="ml-auto text-2xl md:hidden"
-          onClick={() => setMobileOpen((v) => !v)}
-          aria-label="Menu"
-        >
-          ☰
-        </button>
       </div>
 
       {/* nav bar */}
-      <div className="border-t border-line bg-white">
-        <div className="container-cmt hidden items-stretch gap-1 md:flex">
+      <div className="hidden border-t border-line bg-white md:block">
+        <div className="container-cmt flex items-stretch gap-1">
           <div className="group relative">
             <button className="flex h-11 items-center gap-2 bg-brand px-4 text-xs font-bold uppercase text-white">
               ☰ All Categories
@@ -240,7 +320,7 @@ export function SiteHeader({
       </div>
 
       {/* top tags */}
-      <div className="border-t border-line bg-soft">
+      <div className="hidden border-t border-line bg-soft md:block">
         <div className="container-cmt flex items-center gap-3 overflow-x-auto py-2 text-xs no-scrollbar">
           <span className="font-bold uppercase text-brand-dark">Top Tags:</span>
           {(site.top_tags ?? []).map((t) => (
