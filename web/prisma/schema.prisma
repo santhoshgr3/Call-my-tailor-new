@@ -66,6 +66,10 @@ model Product {
   metaTitle       String?
   metaDescription String?
   legacyId        String?           @unique
+  /// comma-separated storefront tags
+  tags            String?
+  /// JSON array of { title, html } extra tabs shown on the product page
+  customTabs      String?
   categories      ProductCategory[]
   images          ProductImage[]
   specs           ProductSpec[]

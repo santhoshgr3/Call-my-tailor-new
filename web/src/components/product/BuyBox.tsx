@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useCart } from "@/components/cart/CartProvider";
+import { useShopLists, COMPARE_MAX } from "@/components/shop/ShopListProvider";
 import { formatINR } from "@/lib/money";
 
 type OptionValue = { id: string; label: string; priceDelta: number };
@@ -60,6 +61,10 @@ export function BuyBox({
   const [added, setAdded] = useState(false);
   const [error, setError] = useState("");
   const [schedule, setSchedule] = useState("");
+  const { wishlist, compare, toggleWish, toggleCompare } = useShopLists();
+  const [listMsg, setListMsg] = useState("");
+  const inWish = wishlist.includes(product.slug);
+  const inCompare = compare.includes(product.slug);
   const [pageUrl, setPageUrl] = useState("");
   useEffect(() => setPageUrl(window.location.href), []);
 
@@ -294,6 +299,60 @@ export function BuyBox({
       </a>
 
       <hr className="border-line" />
+
+      {/* Wish list + compare */}
+      <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-[13px]">
+        <button
+          type="button"
+          onClick={() => setListMsg(toggleWish(product.slug) ? "Added to your wish list." : "Removed from your wish list.")}
+          aria-pressed={inWish}
+          className="flex items-center gap-1.5 text-muted hover:text-brand"
+        >
+          <svg viewBox="0 0 24 24" className={`h-4 w-4 ${inWish ? "fill-brand text-brand" : "fill-none text-brand"}`} stroke="currentColor" strokeWidth="2" aria-hidden>
+            <path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.3 3 5 6.300 5c1.900 0 3.500 1 4.500 2.500h.400C12.200 6 13.800 5 15.700 5 19 5 21.100 8.300 21.600 11.800 19.500 16.400 12 21 12 21z" />
+          </svg>
+          {inWish ? "In your Wish List" : "Add to Wish List"}
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            const r = toggleCompare(product.slug);
+            setListMsg(
+              r === "added"
+                ? "Added to compare."
+                : r === "removed"
+                  ? "Removed from compare."
+                  : `You can compare up to ${COMPARE_MAX} products at a time.`,
+            );
+          }}
+          aria-pressed={inCompare}
+          className="flex items-center gap-1.5 text-muted hover:text-brand"
+        >
+          <svg viewBox="0 0 24 24" className="h-4 w-4 text-[#12358a]" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+            <path d="M4 8h13l-3-3M20 16H7l3 3" />
+          </svg>
+          {inCompare ? "In Compare" : "Compare this Product"}
+        </button>
+        {(wishlist.length > 0 || compare.length > 0) && (
+          <span className="flex gap-4 text-xs">
+            {wishlist.length > 0 && (
+              <Link href="/wishlist" className="text-[#1a5fb4] underline hover:text-brand">
+                View wish list ({wishlist.length})
+              </Link>
+            )}
+            {compare.length > 0 && (
+              <Link href="/compare" className="text-[#1a5fb4] underline hover:text-brand">
+                Compare ({compare.length})
+              </Link>
+            )}
+          </span>
+        )}
+      </div>
+      {listMsg && (
+        <p role="status" className="-mt-2 text-xs text-green-700">
+          {listMsg}
+        </p>
+      )}
 
       {/* Share */}
       <div className="flex flex-wrap items-center gap-1.5">

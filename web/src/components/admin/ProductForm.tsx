@@ -35,6 +35,8 @@ export type ProductInitial = {
   descriptionHtml: string;
   metaTitle: string;
   metaDescription: string;
+  tags: string;
+  customTabs: { title: string; html: string }[];
   isActive: boolean;
   isFeatured: boolean;
   isBestSeller: boolean;
@@ -67,6 +69,7 @@ export function ProductForm({
   const [specs, setSpecs] = useState<SpecRow[]>(initial.specs);
   const [options, setOptions] = useState<OptRow[]>(initial.options);
   const [catIds, setCatIds] = useState<string[]>(initial.categoryIds);
+  const [tabs, setTabs] = useState<{ title: string; html: string }[]>(initial.customTabs);
   const [uploading, setUploading] = useState(false);
 
   const parents = categories.filter((c) => !c.parentId);
@@ -103,6 +106,7 @@ export function ProductForm({
       <input type="hidden" name="specs" value={JSON.stringify(specs)} />
       <input type="hidden" name="options" value={JSON.stringify(options)} />
       <input type="hidden" name="categoryIds" value={JSON.stringify(catIds)} />
+      <input type="hidden" name="customTabs" value={JSON.stringify(tabs)} />
 
       {justCreated && (
         <p className="rounded border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-700">
@@ -169,6 +173,13 @@ export function ProductForm({
                   defaultValue={initial.quantity}
                   className={inputCls}
                 />
+              </Field>
+              <Field
+                label="Tags"
+                hint="Comma-separated, shown as chips under the product (e.g. cream trousers, casual pants fabric). Leave blank to show the categories."
+                className="sm:col-span-2"
+              >
+                <input name="tags" defaultValue={initial.tags} className={inputCls} />
               </Field>
               <Field label="Short description" className="sm:col-span-2">
                 <textarea
@@ -299,6 +310,51 @@ export function ProductForm({
               >
                 + Add specific
               </button>
+            </div>
+          </div>
+
+          {/* Custom tabs */}
+          <div className="rounded-lg border border-line bg-white p-5">
+            <h2 className="font-bold">Custom tabs</h2>
+            <p className="mb-4 mt-1 text-xs text-faint">
+              Extra tabs on the product page next to Description / Specifications / Reviews — for example “Shipping”,
+              “Care instructions” or “Size guide”. HTML is allowed. Up to 6 tabs.
+            </p>
+            <div className="space-y-3">
+              {tabs.map((t, i) => (
+                <div key={i} className="rounded border border-line bg-soft p-3">
+                  <input
+                    value={t.title}
+                    maxLength={40}
+                    onChange={(e) => setTabs((p) => p.map((x, k) => (k === i ? { ...x, title: e.target.value } : x)))}
+                    placeholder="Tab title"
+                    className={inputCls + " mb-2 bg-white"}
+                  />
+                  <textarea
+                    value={t.html}
+                    rows={4}
+                    onChange={(e) => setTabs((p) => p.map((x, k) => (k === i ? { ...x, html: e.target.value } : x)))}
+                    placeholder="Tab content (text or HTML)"
+                    className={inputCls + " bg-white"}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setTabs((p) => p.filter((_, k) => k !== i))}
+                    className="mt-2 text-xs text-brand"
+                  >
+                    Remove tab
+                  </button>
+                </div>
+              ))}
+              {tabs.length < 6 && (
+                <button
+                  type="button"
+                  onClick={() => setTabs((p) => [...p, { title: "", html: "" }])}
+                  className="text-xs font-semibold text-brand"
+                >
+                  + Add tab
+                </button>
+              )}
             </div>
           </div>
 

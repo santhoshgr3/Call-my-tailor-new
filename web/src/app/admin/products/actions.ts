@@ -5,6 +5,7 @@ import { bustStorefrontCache } from "@/lib/cache";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
+import { serializeTags, serializeCustomTabs } from "@/lib/product-extras";
 
 function slugify(s: string) {
   return s
@@ -75,6 +76,8 @@ async function collect(fd: FormData) {
       (description ? `<p>${description.replace(/\n{2,}/g, "</p><p>").replace(/\n/g, "<br/>")}</p>` : ""),
     metaTitle: String(fd.get("metaTitle") || "").trim() || null,
     metaDescription: String(fd.get("metaDescription") || "").trim() || null,
+    tags: serializeTags(String(fd.get("tags") || "")),
+    customTabs: serializeCustomTabs(readJson<unknown>(fd, "customTabs", [])),
     isActive: fd.get("isActive") === "on",
     isFeatured: fd.get("isFeatured") === "on",
     isBestSeller: fd.get("isBestSeller") === "on",
@@ -113,6 +116,8 @@ export async function createProduct(
         descriptionHtml: d.descriptionHtml,
         metaTitle: d.metaTitle,
         metaDescription: d.metaDescription,
+        tags: d.tags,
+        customTabs: d.customTabs,
         isActive: d.isActive,
         isFeatured: d.isFeatured,
         isBestSeller: d.isBestSeller,
@@ -184,6 +189,8 @@ export async function updateProduct(
           descriptionHtml: d.descriptionHtml,
           metaTitle: d.metaTitle,
           metaDescription: d.metaDescription,
+        tags: d.tags,
+        customTabs: d.customTabs,
           isActive: d.isActive,
           isFeatured: d.isFeatured,
           isBestSeller: d.isBestSeller,

@@ -12,6 +12,7 @@ import { ProductTabsView } from "@/components/product/ProductTabsView";
 import { ProductCard } from "@/components/product/ProductCard";
 import { dbStatus } from "@/lib/health";
 import { SetupNotice } from "@/components/SetupNotice";
+import { parseTags, parseCustomTabs } from "@/lib/product-extras";
 
 export async function generateMetadata({
   params,
@@ -55,6 +56,7 @@ export default async function ProductPage({
   const brand = spec("fabric brand", "brand");
   const model = spec("model", "model no", "model number");
   const unit = p.options.some((o) => /cut length|length|meter|metre/i.test(o.label)) ? "Per Meter" : null;
+  const ownTags = parseTags(p.tags);
   const tagCats = p.categories.map((c) => c.category);
 
   return (
@@ -121,6 +123,7 @@ export default async function ProductPage({
               descriptionHtml={p.descriptionHtml || `<p>${p.description ?? p.shortDescription ?? ""}</p>`}
               specs={p.specs.map((s) => ({ key: s.key, value: s.value }))}
               reviews={p.reviews}
+              customTabs={parseCustomTabs(p.customTabs)}
             />
 
             <div className="mt-4">
@@ -156,18 +159,28 @@ export default async function ProductPage({
           </div>
         </div>
 
-        {tagCats.length > 0 && (
+        {(ownTags.length > 0 || tagCats.length > 0) && (
           <div className="mt-8 flex flex-wrap items-center gap-2 text-sm">
             <span className="font-bold text-ink">Tags:</span>
-            {tagCats.map((c) => (
-              <Link
-                key={c.id}
-                href={c.parent ? `/${c.parent.slug}/${c.slug}` : `/${c.slug}`}
-                className="rounded-full bg-[#2d3440] px-3 py-1 text-[13px] font-medium text-white hover:bg-brand"
-              >
-                {c.name.toLowerCase()}
-              </Link>
-            ))}
+            {ownTags.length > 0
+              ? ownTags.map((t) => (
+                  <Link
+                    key={t}
+                    href={`/search?q=${encodeURIComponent(t)}`}
+                    className="rounded-full bg-[#2d3440] px-3 py-1 text-[13px] font-medium text-white hover:bg-brand"
+                  >
+                    {t}
+                  </Link>
+                ))
+              : tagCats.map((c) => (
+                  <Link
+                    key={c.id}
+                    href={c.parent ? `/${c.parent.slug}/${c.slug}` : `/${c.slug}`}
+                    className="rounded-full bg-[#2d3440] px-3 py-1 text-[13px] font-medium text-white hover:bg-brand"
+                  >
+                    {c.name.toLowerCase()}
+                  </Link>
+                ))}
           </div>
         )}
 

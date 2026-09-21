@@ -3,16 +3,16 @@
 import { useEffect, useRef, useState } from "react";
 import { ReviewForm } from "./ReviewForm";
 
-type Tab = "desc" | "specs" | "reviews";
+type Tab = string; // "desc" | "specs" | "reviews" | "c0".."c5" (custom tabs)
 
 const CLAMP_PX = 84;
 
 function Stars({ value }: { value: number }) {
-  const full = Math.round(value);
+  const full = Math.max(0, Math.min(5, Math.round(value)));
   return (
     <span className="text-[15px] leading-none tracking-[2px] text-[#f5a623]" aria-label={`${value.toFixed(1)} out of 5`}>
       {"★".repeat(full)}
-      <span className="text-[#c9c9c9]">{"★".repeat(5 - full)}</span>
+      <span className="text-[#b5b5b5]">{"☆".repeat(5 - full)}</span>
     </span>
   );
 }
@@ -22,10 +22,12 @@ export function ProductTabsView({
   descriptionHtml,
   specs,
   reviews,
+  customTabs = [],
 }: {
   productId: string;
   descriptionHtml: string;
   specs: { key: string; value: string }[];
+  customTabs?: { title: string; html: string }[];
   reviews: { id: string; customerName: string; rating: number; title: string | null; body: string; createdAt: Date }[];
 }) {
   const [tab, setTab] = useState<Tab>("desc");
@@ -45,6 +47,7 @@ export function ProductTabsView({
     { id: "desc", label: "Description" },
     ...(specs.length ? [{ id: "specs" as Tab, label: "Specifications" }] : []),
     { id: "reviews", label: "Reviews" },
+    ...customTabs.map((t, i) => ({ id: `c${i}`, label: t.title })),
   ];
 
   function goReviews(form: boolean) {
@@ -104,6 +107,13 @@ export function ProductTabsView({
               </div>
             ))}
           </dl>
+        )}
+
+        {tab.startsWith("c") && customTabs[Number(tab.slice(1))] && (
+          <div
+            className="prose-cmt text-[15px] leading-6 text-muted [&_p:last-child]:mb-0"
+            dangerouslySetInnerHTML={{ __html: customTabs[Number(tab.slice(1))].html }}
+          />
         )}
 
         {tab === "reviews" && (

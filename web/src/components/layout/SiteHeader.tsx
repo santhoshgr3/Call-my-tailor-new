@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/components/cart/CartProvider";
+import { useShopLists } from "@/components/shop/ShopListProvider";
 import { formatINR } from "@/lib/money";
 import type { MenuNode } from "@/lib/catalog";
 import type { SiteConfig } from "@/lib/settings";
@@ -20,6 +21,7 @@ export function SiteHeader({
 }) {
   const router = useRouter();
   const { count, subtotal, setDrawerOpen } = useCart();
+  const { wishlist, compare } = useShopLists();
   const [q, setQ] = useState("");
   const [cat, setCat] = useState("");
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -119,6 +121,14 @@ export function SiteHeader({
             </button>
           </div>
           <div className="flex items-center gap-4">
+            <Link href="/wishlist" aria-label="Wish list" className="relative">
+              ♡
+              {wishlist.length > 0 && (
+                <span className="absolute -right-2 -top-2 grid h-4 min-w-4 place-items-center rounded-full bg-brand-dark px-1 text-[9px] font-bold">
+                  {wishlist.length}
+                </span>
+              )}
+            </Link>
             <button
               type="button"
               onClick={() => setDrawerOpen(true)}
@@ -197,6 +207,29 @@ export function SiteHeader({
             ⌕
           </button>
         </form>
+
+        <div className="flex items-center gap-4 text-ink">
+          <Link href="/wishlist" aria-label="Wish list" title="Wish list" className="relative hover:text-brand">
+            <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
+              <path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.3 3 5 6.3 5c1.9 0 3.5 1 4.5 2.5h.4C12.2 6 13.8 5 15.7 5 19 5 21.100 8.300 21.600 11.800 19.500 16.400 12 21 12 21z" />
+            </svg>
+            {wishlist.length > 0 && (
+              <span className="absolute -right-2 -top-2 grid h-4 min-w-4 place-items-center rounded-full bg-brand px-1 text-[9px] font-bold text-white">
+                {wishlist.length}
+              </span>
+            )}
+          </Link>
+          <Link href="/compare" aria-label="Compare products" title="Compare" className="relative hover:text-brand">
+            <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
+              <path d="M4 8h14l-3-3M20 16H6l3 3" />
+            </svg>
+            {compare.length > 0 && (
+              <span className="absolute -right-2 -top-2 grid h-4 min-w-4 place-items-center rounded-full bg-brand px-1 text-[9px] font-bold text-white">
+                {compare.length}
+              </span>
+            )}
+          </Link>
+        </div>
 
         <button
           type="button"

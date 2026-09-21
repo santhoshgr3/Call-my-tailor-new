@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "@/components/cart/CartProvider";
+import { ShopListProvider } from "@/components/shop/ShopListProvider";
 import { getSetting } from "@/lib/settings";
 
 const roboto = Roboto({
@@ -34,7 +35,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${roboto.variable} antialiased`}>
-        <CartProvider>{children}</CartProvider>
+        <CartProvider>
+          <ShopListProvider>{children}</ShopListProvider>
+        </CartProvider>
       </body>
     </html>
   );

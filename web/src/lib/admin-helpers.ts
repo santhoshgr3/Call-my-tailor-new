@@ -1,4 +1,5 @@
 import { db } from "./db";
+import { parseCustomTabs } from "@/lib/product-extras";
 import type { ProductInitial } from "@/components/admin/ProductForm";
 
 export async function getCategoriesForForm() {
@@ -21,6 +22,8 @@ export const EMPTY_PRODUCT: ProductInitial = {
   descriptionHtml: "",
   metaTitle: "",
   metaDescription: "",
+  tags: "",
+  customTabs: [],
   isActive: true,
   isFeatured: false,
   isBestSeller: false,
@@ -74,6 +77,8 @@ export async function getProductForForm(id: string): Promise<ProductInitial | nu
     descriptionHtml: p.descriptionHtml ?? "",
     metaTitle: p.metaTitle ?? "",
     metaDescription: p.metaDescription ?? "",
+    tags: p.tags ?? "",
+    customTabs: parseCustomTabs(p.customTabs),
     isActive: p.isActive,
     isFeatured: p.isFeatured,
     isBestSeller: p.isBestSeller,

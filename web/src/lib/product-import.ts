@@ -1,4 +1,5 @@
 import "server-only";
+import { serializeTags } from "@/lib/product-extras";
 import ExcelJS from "exceljs";
 import { Readable } from "node:stream";
 import { db } from "./db";
@@ -30,6 +31,7 @@ const BASE_COLUMNS: ColDef[] = [
   { key: "is_best_seller", header: "Best Seller", width: 11, note: "Yes / No — feeds the Best Sellers rail." },
   { key: "is_new_arrival", header: "New Arrival", width: 11, note: "Yes / No — feeds the New Arrivals rail." },
   { key: "is_trending", header: "Trending", width: 9, note: "Yes / No." },
+  { key: "tags", header: "Tags", width: 30, note: "Comma-separated tags shown under the product, e.g. cream trousers, casual pants fabric." },
   { key: "meta_title", header: "Meta Title", width: 30, note: "SEO title (optional)." },
   { key: "meta_description", header: "Meta Description", width: 36, note: "SEO description (optional)." },
   { key: "specs", header: "Specs", width: 40, note: "Item specifics as  Key: Value | Key: Value  (you can also use the “Spec: …” columns)." },
@@ -237,6 +239,7 @@ export type Norm = {
   isTrending?: boolean;
   metaTitle?: string;
   metaDescription?: string;
+  tags?: string | null;
   specs?: { key: string; value: string }[];
   options?: OptionData[];
 };
@@ -321,6 +324,7 @@ export function normalizeRecord(rec: RawRecord): { data: Norm; errors: string[];
     data.descriptionHtml = toHtml(c.description);
     data.description = stripHtml(c.description);
   }
+  if (c.tags) data.tags = serializeTags(c.tags);
   if (c.meta_title) data.metaTitle = c.meta_title.slice(0, 200);
   if (c.meta_description) data.metaDescription = c.meta_description.slice(0, 400);
 
@@ -591,6 +595,7 @@ export async function applyRecord(rec: RawRecord, ctx: Ctx, opts: ImportOptions)
           shortDescription: data.shortDescription ?? null,
           description: data.description ?? null,
           descriptionHtml: data.descriptionHtml ?? null,
+          tags: data.tags ?? null,
           metaTitle: data.metaTitle ?? null,
           metaDescription: data.metaDescription ?? null,
           isActive: data.isActive ?? true,
@@ -637,6 +642,7 @@ export async function applyRecord(rec: RawRecord, ctx: Ctx, opts: ImportOptions)
       scalar.description = data.description;
       scalar.descriptionHtml = data.descriptionHtml;
     }
+    if (data.tags !== undefined) scalar.tags = data.tags;
     if (data.metaTitle !== undefined) scalar.metaTitle = data.metaTitle;
     if (data.metaDescription !== undefined) scalar.metaDescription = data.metaDescription;
     for (const f of ["isActive", "isFeatured", "isBestSeller", "isNewArrival", "isTrending"] as const) {
@@ -715,6 +721,7 @@ type ExportProduct = {
   isTrending: boolean;
   metaTitle: string | null;
   metaDescription: string | null;
+  tags: string | null;
   categories: { category: { slug: string } }[];
   images: { url: string }[];
   specs: { key: string; value: string }[];
@@ -768,6 +775,7 @@ export async function buildWorkbook(products: ExportProduct[], template: boolean
       is_best_seller: "Yes",
       is_new_arrival: "Yes",
       is_trending: "No",
+      tags: "navy suit, wedding suit, wool blend",
       meta_title: "",
       meta_description: "",
       "spec:Color": "Navy Blue",
@@ -798,6 +806,7 @@ export async function buildWorkbook(products: ExportProduct[], template: boolean
         is_best_seller: yn(p.isBestSeller),
         is_new_arrival: yn(p.isNewArrival),
         is_trending: yn(p.isTrending),
+        tags: p.tags ?? "",
         meta_title: p.metaTitle ?? "",
         meta_description: p.metaDescription ?? "",
       };
