@@ -37,9 +37,21 @@ export default async function AdminLayout({
         </aside>
 
         <main className="min-w-0 flex-1">
-          <div className="border-b border-line bg-white px-5 py-3 md:hidden">
-            <span className="font-extrabold uppercase text-brand-dark">CMT Admin</span>
-          </div>
+          <details className="border-b border-line bg-white md:hidden">
+            <summary className="flex cursor-pointer items-center justify-between px-5 py-3">
+              <span className="font-extrabold uppercase text-brand-dark">CMT Admin</span>
+              <span className="text-xl leading-none">☰</span>
+            </summary>
+            <div className="max-h-[70vh] overflow-y-auto border-t border-line">
+              <AdminNav />
+              <div className="border-t border-line px-5 py-3 text-xs text-faint">
+                <p className="truncate">{admin.email}</p>
+                <form action={logoutAction}>
+                  <button className="mt-1 text-brand hover:underline">Logout</button>
+                </form>
+              </div>
+            </div>
+          </details>
           <div className="p-5 md:p-8">{children}</div>
         </main>
       </div>

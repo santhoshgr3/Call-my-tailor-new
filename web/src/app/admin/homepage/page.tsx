@@ -75,7 +75,7 @@ export default async function AdminHomepage() {
                                 <ImageField name="imageUrl" defaultValue={s.imageUrl} />
                 <input name="headline" defaultValue={s.headline ?? ""} className={inputCls} placeholder="Headline / alt" />
                 <input name="link" defaultValue={s.link ?? ""} className={inputCls} placeholder="Link" />
-                <div className="flex items-center gap-3">
+                <div className="flex flex-wrap items-center gap-3">
                   <input name="sortOrder" type="number" defaultValue={s.sortOrder} className={inputCls + " w-24"} />
                   <label className="flex items-center gap-1 text-sm">
                     <input type="checkbox" name="isActive" defaultChecked={s.isActive} /> Active
@@ -118,7 +118,7 @@ export default async function AdminHomepage() {
                   <input name="buttonLabel" defaultValue={b.buttonLabel ?? ""} className={inputCls} placeholder="Button label" />
                   <input name="link" defaultValue={b.link ?? ""} className={inputCls} placeholder="Link" />
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex flex-wrap items-center gap-3">
                   <input name="position" defaultValue={b.position} className={inputCls + " w-28"} />
                   <input name="sortOrder" type="number" defaultValue={b.sortOrder} className={inputCls + " w-20"} />
                   <label className="flex items-center gap-1 text-sm">
@@ -160,7 +160,7 @@ export default async function AdminHomepage() {
                 <input type="hidden" name="id" value={br.id} />
                                 <input name="name" defaultValue={br.name} className={inputCls} placeholder="Name" />
                 <ImageField name="logoUrl" defaultValue={br.logoUrl} placeholder="Logo URL or upload" />
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <input name="sortOrder" type="number" defaultValue={br.sortOrder} className={inputCls + " w-20"} />
                   <label className="flex items-center gap-1 text-sm">
                     <input type="checkbox" name="isActive" defaultChecked={br.isActive} /> Active
