@@ -10,6 +10,7 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const items = await db.media.findMany({
+    where: { source: "admin" },
     orderBy: { createdAt: "desc" },
     take: 200,
     select: { id: true, filename: true, size: true, createdAt: true },

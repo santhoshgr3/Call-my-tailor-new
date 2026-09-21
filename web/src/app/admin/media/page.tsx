@@ -16,6 +16,7 @@ async function deleteMedia(fd: FormData) {
 
 export default async function AdminMedia() {
   const items = await db.media.findMany({
+    where: { source: "admin" },
     orderBy: { createdAt: "desc" },
     take: 300,
     select: { id: true, filename: true, size: true, createdAt: true },

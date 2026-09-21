@@ -12,9 +12,9 @@ export const PAYMENT_STATUSES = ["unpaid", "paid", "refunded"] as const;
 
 export const BOOKING_STATUSES = [
   "new",
-  "contacted",
-  "scheduled",
-  "completed",
+  "confirmed",
+  "visited",
+  "delivered",
   "cancelled",
 ] as const;
 

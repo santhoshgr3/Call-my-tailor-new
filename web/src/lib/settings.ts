@@ -71,6 +71,7 @@ export type SiteConfig = {
     shipping_fee: number;
     free_shipping_over: number;
   };
+  booking?: Partial<BookingConfig>;
   payments?: {
     cod_enabled?: boolean;
     online_enabled?: boolean;
@@ -210,4 +211,135 @@ export async function getAllSettings(): Promise<Record<string, unknown>> {
 export async function getSiteConfig(): Promise<SiteConfig> {
   const cfg = await getSetting<SiteConfig | null>("site", null);
   return cfg ?? FALLBACK_SITE;
+}
+
+/* ------------------------------------------------------------------ */
+/* Home-visit booking page                                              */
+/* ------------------------------------------------------------------ */
+
+export type BookingCategory = {
+  slug: string;
+  label: string;
+  desc: string;
+  subtitle: string;
+  image: string;
+  banner: string;
+};
+
+export type BookingConfig = {
+  eyebrow: string;
+  title_line1: string;
+  title_accent: string;
+  subtitle: string;
+  body: string;
+  hero_image: string;
+  cta_label: string;
+  stats: { value: string; label: string }[];
+  categories: BookingCategory[];
+  steps: { title: string; sub: string; image: string }[];
+  features: { icon: string; title: string; sub: string }[];
+  select_heading: string;
+  select_intro: string;
+  visit_charge: number;
+  payment_link: string;
+  time_slots: string[];
+  notice: string;
+  form_title: string;
+  form_eyebrow: string;
+  empty_note: string;
+  success_title: string;
+  success_steps: string[];
+};
+
+export const DEFAULT_BOOKING: BookingConfig = {
+  eyebrow: "Premium Home Tailoring Service",
+  title_line1: "Book Your Personal",
+  title_accent: "Tailor at Home",
+  subtitle: "No travel. No hassle. Just perfectly tailored outfits made for you.",
+  body: "Our expert tailors visit your home for measurements, fabric selection, and fittings—making custom clothing easier than ever.",
+  hero_image: "/img/booking/hero-bg.jpeg",
+  cta_label: "Book Home Visit",
+  stats: [
+    { value: "5,485+", label: "Happy Clients" },
+    { value: "15 Yrs", label: "Experience" },
+    { value: "250+", label: "Expert Tailors" },
+    { value: "14,580+", label: "Garments Delivered" },
+  ],
+  categories: [
+    {
+      slug: "mens",
+      label: "Men's Tailoring",
+      desc: "Coat Pant, Kurta Pajama, Pant Shirt and all formal and Party Wear",
+      subtitle: "Suits · Sherwanis · Kurta Sets & More",
+      image: "/img/booking/home-mens.jpg",
+      banner: "/img/booking/banner-mens.jpg",
+    },
+    {
+      slug: "womens",
+      label: "Women's Tailoring",
+      desc: "Salwar Suits, Gowns, Anarkali, Lehengas, Western & Traditional Wear",
+      subtitle: "Salwar · Lehenga · Kurti & More",
+      image: "/img/booking/home-womens.jpg",
+      banner: "/img/booking/banner-womens.jpg",
+    },
+    {
+      slug: "alteration",
+      label: "Alteration & Repair",
+      desc: "Length adjustments, waist and shoulder fitting, sleeve corrections, and all kind of alterations.",
+      subtitle: "Hemming · Fitting · Repairs & More",
+      image: "/img/booking/home-alteration.jpg",
+      banner: "/img/booking/banner-alteration.jpg",
+    },
+  ],
+  steps: [
+    { title: "Select your product", sub: "Or Upload Your Design", image: "/img/booking/process1.png" },
+    { title: "Book your home visit", sub: "And Place Your Order", image: "/img/booking/process2.png" },
+    { title: "Get measured at home", sub: "And Choose Your Fabrics", image: "/img/booking/process3.png" },
+    { title: "Get delivered at home", sub: "After Getting Trial", image: "/img/booking/process4.png" },
+  ],
+  features: [
+    { icon: "🧵", title: "2000+ Fabrics", sub: "For every occasion" },
+    { icon: "✂️", title: "Expert Tailors", sub: "30+ years experience" },
+    { icon: "🎨", title: "Fully Custom", sub: "Designed by you" },
+    { icon: "🧶", title: "Fine Stitching", sub: "Latest techniques" },
+    { icon: "📦", title: "7-Day Delivery", sub: "Guaranteed on-time" },
+    { icon: "🏠", title: "Home Visit", sub: "No travel needed" },
+  ],
+  select_heading: "What are you looking for?",
+  select_intro: "Choose the tailoring service that suits your style and needs.",
+  visit_charge: 200,
+  payment_link: "https://rzp.io/rzp/xejyQeF",
+  time_slots: [
+    "09:00 AM – 11:00 AM",
+    "11:00 AM – 01:00 PM",
+    "02:00 PM – 04:00 PM",
+    "04:00 PM – 06:00 PM",
+    "06:00 PM – 08:00 PM",
+  ],
+  notice:
+    "A {charge} home visit charge will be applied at the time of booking. This amount will be adjusted in your final bill.",
+  form_eyebrow: "Schedule Your Appointment",
+  form_title: "Book a Home Visit",
+  empty_note:
+    "Our tailor will visit your home and help you choose fabrics & styles on the spot. No need to pre-select items!",
+  success_title: "Booking Confirmed!",
+  success_steps: [
+    "Payment received successfully",
+    "Tailor assigned within 2 hours",
+    "Visit on your scheduled date",
+    "Delivery in 7–10 business days",
+  ],
+};
+
+/** Saved booking-page settings merged over the defaults. */
+export function resolveBooking(site: { booking?: Partial<BookingConfig> } | null | undefined): BookingConfig {
+  const b = site?.booking ?? {};
+  const out = { ...DEFAULT_BOOKING } as Record<string, unknown>;
+  for (const [k, v] of Object.entries(b)) {
+    if (v === undefined || v === null) continue;
+    if (Array.isArray(v) && v.length === 0 && k !== "success_steps") continue;
+    if (typeof v === "string" && v === "" && !["payment_link"].includes(k)) continue;
+    out[k] = v;
+  }
+  return out as BookingConfig;
 }

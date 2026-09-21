@@ -255,10 +255,48 @@ model HomeVisitBooking {
   preferredDate String?
   preferredTime String?
   message       String?
-  status        String   @default("new") // new | contacted | scheduled | completed | cancelled
+  status        String   @default("new") // new | confirmed | visited | delivered | cancelled
+  location      String?
+  totalPrice    Int      @default(0)
+  visitCharge   Int      @default(0)
+  paymentStatus String   @default("unpaid") // unpaid | reported | paid | not_required
+  paymentRef    String?
+  designFiles   String? // JSON: [{name,url,type}]
+  items         BookingItem[]
   createdAt     DateTime @default(now())
 
   @@index([status])
+}
+
+model BookingItem {
+  id        String           @id @default(cuid())
+  bookingId String
+  booking   HomeVisitBooking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  productId String?
+  title     String
+  category  String?
+  price     Int              @default(0)
+  qty       Int              @default(1)
+  image     String?
+  hasFabric String           @default("no")
+
+  @@index([bookingId])
+}
+
+model ServiceItem {
+  id          String  @id @default(cuid())
+  legacyId    String? @unique
+  category    String
+  subcategory String
+  title       String
+  stitching   Int     @default(0)
+  fabricFrom  Int     @default(0)
+  badge       String?
+  image       String  @default("")
+  sortOrder   Int     @default(0)
+  isActive    Boolean @default(true)
+
+  @@index([category, isActive])
 }
 
 // ----------------------------- Content / CMS -----------------------------
@@ -359,6 +397,7 @@ model ContactMessage {
 
 model Media {
   id        String   @id @default(cuid())
+  source    String   @default("admin") // admin | customer
   filename  String
   mimeType  String
   size      Int
