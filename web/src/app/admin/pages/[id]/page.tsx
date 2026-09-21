@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { RichTextField } from "@/components/admin/RichTextField";
 import { notFound } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -44,9 +45,10 @@ export default async function EditInfoPage({ params }: { params: Promise<{ id: s
       <form action={savePage} className="space-y-4 rounded-lg border border-line bg-white p-5">
         <input type="hidden" name="id" value={page.id} />
         <Field label="Title"><input name="title" defaultValue={page.title} className={inputCls} required /></Field>
-        <Field label="Content (HTML)">
-          <textarea name="contentHtml" defaultValue={page.contentHtml} rows={20} className={inputCls + " font-mono text-xs"} />
-        </Field>
+        <div>
+          <span className="mb-1 block text-xs font-bold uppercase text-faint">Content</span>
+          <RichTextField name="contentHtml" defaultValue={page.contentHtml} minHeight={360} />
+        </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label="Meta title"><input name="metaTitle" defaultValue={page.metaTitle ?? ""} className={inputCls} /></Field>
           <Field label="Meta description"><input name="metaDescription" defaultValue={page.metaDescription ?? ""} className={inputCls} /></Field>

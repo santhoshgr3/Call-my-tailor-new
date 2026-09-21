@@ -1,7 +1,7 @@
 import { unstable_cache } from "next/cache";
 import { db } from "./db";
 import { PRODUCT_CARD_SELECT, getRail, type ProductCard } from "./catalog";
-import { getSiteConfig } from "./settings";
+import { getSiteConfig, DEFAULT_TRENDING } from "./settings";
 
 export type HomeData = {
   slides: { id: string; imageUrl: string; headline: string | null; link: string | null }[];
@@ -52,13 +52,9 @@ async function loadHomeData(): Promise<HomeData> {
     return [id, ...(kidsByParent.get(id) ?? [])];
   };
 
-  const trendingDefs = [
-    { label: "All", slug: "catalogue" },
-    { label: "Accessories", slug: "accessories" },
-    { label: "Ethnic Wear", slug: "ethnic-wear" },
-    { label: "Kurta", slug: "kurta" },
-    { label: "Suit/Blazer", slug: "suit-blazer" },
-  ];
+  const trendingDefs = site.trending_categories?.length
+    ? site.trending_categories
+    : DEFAULT_TRENDING;
 
   // categories that need a representative thumbnail
   const thumbSlugs = new Set<string>();
@@ -172,7 +168,7 @@ async function loadHomeData(): Promise<HomeData> {
   };
 }
 
-export const getHomeData = unstable_cache(loadHomeData, ["home-data-v1"], {
+export const getHomeData = unstable_cache(loadHomeData, ["home-data-v2"], {
   revalidate: 120,
   tags: ["catalog", "home"],
 });

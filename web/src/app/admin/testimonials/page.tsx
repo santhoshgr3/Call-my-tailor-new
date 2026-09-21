@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/auth";
 import { bustStorefrontCache } from "@/lib/cache";
 import { PageHeader, Card, Field, inputCls, SubmitButton } from "@/components/admin/ui";
+import { ImageField } from "@/components/admin/ImageField";
 
 export const dynamic = "force-dynamic";
 
@@ -49,9 +50,9 @@ export default async function AdminTestimonials() {
         subtitle={`${items.length} testimonials · ${videoCount} with video`}
       />
       <p className="mb-4 rounded border border-line bg-soft p-3 text-xs text-faint">
-        Add a <b>Video URL</b> (a YouTube link or video ID) to a testimonial and the homepage
-        automatically shows the <b>video carousel</b> instead of the text quotes — as long as at
-        least one testimonial has a video set.
+        The homepage <b>Testimonials</b> section is a video carousel. Only active testimonials
+        that have a <b>Video URL</b> (a YouTube link or video ID) appear there. The name is used as
+        the video title for accessibility; the text and image are optional.
       </p>
 
       <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
@@ -72,7 +73,7 @@ export default async function AdminTestimonials() {
                   placeholder="YouTube URL or video ID (e.g. https://youtu.be/xxxxxxxxxxx)"
                 />
                 <div className="grid gap-2 sm:grid-cols-3">
-                  <input name="imageUrl" defaultValue={t.imageUrl ?? ""} className={inputCls} placeholder="Image URL" />
+                  <ImageField name="imageUrl" defaultValue={t.imageUrl ?? ""} placeholder="Image (optional)" compact />
                   <input name="rating" type="number" min={1} max={5} defaultValue={t.rating} className={inputCls} />
                   <input name="sortOrder" type="number" defaultValue={t.sortOrder} className={inputCls} />
                 </div>
@@ -118,7 +119,7 @@ export default async function AdminTestimonials() {
               </Field>
             </div>
             <Field label="Image URL">
-              <input name="imageUrl" className={inputCls} />
+              <ImageField name="imageUrl" />
             </Field>
             <label className="flex items-center gap-2 text-sm">
               <input type="checkbox" name="isActive" defaultChecked className="h-4 w-4" />

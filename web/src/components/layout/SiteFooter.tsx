@@ -76,7 +76,7 @@ export function SiteFooter({ site }: { site: SiteConfig }) {
           ) : (
             <div className="rounded bg-white p-2">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/logo.png" alt="Call My Tailor" width={200} height={71} className="h-10 w-auto" />
+              <img src={site.logo || "/logo.png"} alt="Call My Tailor" width={200} height={71} className="h-10 w-auto" />
             </div>
           )}
         </div>

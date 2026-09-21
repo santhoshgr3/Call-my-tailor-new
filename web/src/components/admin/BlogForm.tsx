@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { ImageField } from "./ImageField";
+import { RichTextField } from "./RichTextField";
 import { inputCls, Field, SubmitButton } from "./ui";
 import { saveBlogPost, deleteBlogPost } from "@/app/admin/blog/actions";
 
@@ -37,19 +39,15 @@ export function BlogForm({ post }: { post?: Post }) {
           <input name="subtitle" defaultValue={post?.subtitle ?? ""} className={inputCls} />
         </Field>
         <Field label="Cover image URL">
-          <input name="coverImage" defaultValue={post?.coverImage ?? ""} className={inputCls} />
+          <ImageField name="coverImage" defaultValue={post?.coverImage ?? ""} />
         </Field>
         <Field label="Excerpt">
           <textarea name="excerpt" defaultValue={post?.excerpt ?? ""} rows={2} className={inputCls} />
         </Field>
-        <Field label="Content (HTML)" hint="Paste or write HTML. Use <h2>, <p>, <ul>, <img> etc.">
-          <textarea
-            name="contentHtml"
-            defaultValue={post?.contentHtml ?? ""}
-            rows={16}
-            className={inputCls + " font-mono text-xs"}
-          />
-        </Field>
+        <div>
+          <span className="mb-1 block text-xs font-bold uppercase text-faint">Content</span>
+          <RichTextField name="contentHtml" defaultValue={post?.contentHtml ?? ""} minHeight={320} />
+        </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label="Meta title">
             <input name="metaTitle" defaultValue={post?.metaTitle ?? ""} className={inputCls} />

@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getProductBySlug, getRelatedProducts } from "@/lib/catalog";
 import { pageTitle } from "@/lib/seo";
-import { getSiteConfig } from "@/lib/settings";
+import { getSiteConfig, DEFAULT_HOME_VISIT } from "@/lib/settings";
 import { ProductGallery } from "@/components/product/ProductGallery";
 import { BuyBox } from "@/components/product/BuyBox";
 import { ProductTabsView } from "@/components/product/ProductTabsView";
@@ -125,6 +125,7 @@ export default async function ProductPage({
               })),
             }))}
             bookingUrl={site.booking_url || "/book-visit"}
+            homeVisit={site.home_visit ?? DEFAULT_HOME_VISIT}
           />
         </div>
       </div>

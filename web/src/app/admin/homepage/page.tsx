@@ -1,6 +1,8 @@
 import { db } from "@/lib/db";
 import { getSetting } from "@/lib/settings";
 import { PageHeader, Card, inputCls, SubmitButton } from "@/components/admin/ui";
+import { ImageField } from "@/components/admin/ImageField";
+import { HomepageTabs } from "@/components/admin/HomepageTabs";
 import {
   saveSlide,
   deleteSlide,
@@ -25,7 +27,7 @@ const SECTION_LABELS: Record<string, string> = {
   show_fabric_brands: "Fabric brands",
   show_testimonials: "Testimonials",
   show_stats: "Stats counter",
-  show_latest_blog: "Latest blog",
+  show_latest_blog: "Latest blog (off by default)",
 };
 
 export default async function AdminHomepage() {
@@ -39,6 +41,7 @@ export default async function AdminHomepage() {
   return (
     <div className="space-y-8">
       <PageHeader title="Homepage" subtitle="Manage hero, banners, brands and section visibility" />
+      <HomepageTabs />
 
       {/* Section toggles */}
       <Card>
@@ -49,7 +52,7 @@ export default async function AdminHomepage() {
               <input
                 type="checkbox"
                 name={k}
-                defaultChecked={layout[k] !== false}
+                defaultChecked={k === "show_latest_blog" ? layout[k] === true : layout[k] !== false}
                 className="h-4 w-4"
               />
               {SECTION_LABELS[k]}
@@ -69,11 +72,7 @@ export default async function AdminHomepage() {
             <Card key={s.id}>
               <form action={saveSlide} className="space-y-2">
                 <input type="hidden" name="id" value={s.id} />
-                {s.imageUrl && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={s.imageUrl} alt="" className="h-24 w-full rounded object-cover" />
-                )}
-                <input name="imageUrl" defaultValue={s.imageUrl} className={inputCls} placeholder="Image URL" />
+                                <ImageField name="imageUrl" defaultValue={s.imageUrl} />
                 <input name="headline" defaultValue={s.headline ?? ""} className={inputCls} placeholder="Headline / alt" />
                 <input name="link" defaultValue={s.link ?? ""} className={inputCls} placeholder="Link" />
                 <div className="flex items-center gap-3">
@@ -93,7 +92,7 @@ export default async function AdminHomepage() {
           <Card>
             <form action={saveSlide} className="space-y-2">
               <p className="text-sm font-bold">Add slide</p>
-              <input name="imageUrl" required className={inputCls} placeholder="Image URL" />
+              <ImageField name="imageUrl" />
               <input name="headline" className={inputCls} placeholder="Headline / alt" />
               <input name="link" className={inputCls} placeholder="Link" />
               <input name="sortOrder" type="number" defaultValue={slides.length} className={inputCls + " w-24"} />
@@ -112,11 +111,7 @@ export default async function AdminHomepage() {
             <Card key={b.id}>
               <form action={saveBanner} className="space-y-2">
                 <input type="hidden" name="id" value={b.id} />
-                {b.imageUrl && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={b.imageUrl} alt="" className="h-24 w-full rounded object-cover" />
-                )}
-                <input name="imageUrl" defaultValue={b.imageUrl} className={inputCls} placeholder="Image URL" />
+                                <ImageField name="imageUrl" defaultValue={b.imageUrl} />
                 <input name="title" defaultValue={b.title ?? ""} className={inputCls} placeholder="Title" />
                 <input name="subtitle" defaultValue={b.subtitle ?? ""} className={inputCls} placeholder="Subtitle" />
                 <div className="grid grid-cols-2 gap-2">
@@ -141,7 +136,7 @@ export default async function AdminHomepage() {
           <Card>
             <form action={saveBanner} className="space-y-2">
               <p className="text-sm font-bold">Add banner</p>
-              <input name="imageUrl" required className={inputCls} placeholder="Image URL" />
+              <ImageField name="imageUrl" />
               <input name="title" className={inputCls} placeholder="Title" />
               <input name="subtitle" className={inputCls} placeholder="Subtitle" />
               <input name="buttonLabel" className={inputCls} placeholder="Button label" />
@@ -163,12 +158,8 @@ export default async function AdminHomepage() {
             <Card key={br.id}>
               <form action={saveBrand} className="space-y-2">
                 <input type="hidden" name="id" value={br.id} />
-                {br.logoUrl && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={br.logoUrl} alt="" className="h-12 w-auto object-contain" />
-                )}
-                <input name="name" defaultValue={br.name} className={inputCls} placeholder="Name" />
-                <input name="logoUrl" defaultValue={br.logoUrl} className={inputCls} placeholder="Logo URL" />
+                                <input name="name" defaultValue={br.name} className={inputCls} placeholder="Name" />
+                <ImageField name="logoUrl" defaultValue={br.logoUrl} placeholder="Logo URL or upload" />
                 <div className="flex items-center gap-2">
                   <input name="sortOrder" type="number" defaultValue={br.sortOrder} className={inputCls + " w-20"} />
                   <label className="flex items-center gap-1 text-sm">
@@ -187,7 +178,7 @@ export default async function AdminHomepage() {
             <form action={saveBrand} className="space-y-2">
               <p className="text-sm font-bold">Add brand</p>
               <input name="name" className={inputCls} placeholder="Name" />
-              <input name="logoUrl" required className={inputCls} placeholder="Logo URL" />
+              <ImageField name="logoUrl" placeholder="Logo URL or upload" />
               <input name="sortOrder" type="number" defaultValue={brands.length} className={inputCls + " w-20"} />
               <input type="hidden" name="isActive" value="on" />
               <SubmitButton>Add brand</SubmitButton>

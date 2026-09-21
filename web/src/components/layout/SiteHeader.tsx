@@ -26,6 +26,14 @@ export function SiteHeader({
   const [collectionOpen, setCollectionOpen] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
 
+  const logoSrc = site.logo || "/logo.png";
+  const headerLinks = site.header_links?.length
+    ? site.header_links
+    : [
+        { label: "Book Home Visit", href: "/book-visit" },
+        { label: "Blog", href: "/blog" },
+      ];
+
   const allCategoryOptions = menu.flatMap((m) => [
     { slug: m.slug, name: m.name, depth: 0, href: m.href },
     ...m.children.map((c) => ({ slug: c.slug, name: c.name, depth: 1, href: c.href })),
@@ -75,7 +83,7 @@ export function SiteHeader({
         <Link href="/" aria-label={site.brand || "Call My Tailor"}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/logo.png"
+            src={logoSrc}
             alt={site.brand || "Call My Tailor"}
             width={220}
             height={78}
@@ -148,7 +156,7 @@ export function SiteHeader({
         <Link href="/" className="shrink-0" aria-label={site.brand || "Call My Tailor"}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/logo.png"
+            src={logoSrc}
             alt={site.brand || "Call My Tailor"}
             width={200}
             height={71}
@@ -279,18 +287,15 @@ export function SiteHeader({
             )}
           </div>
 
-          <a
-            href="/book-visit"
-            className="flex h-11 items-center px-4 text-xs font-bold uppercase text-brand-dark hover:text-brand"
-          >
-            Book Home Visit
-          </a>
-          <Link
-            href="/blog"
-            className="flex h-11 items-center px-4 text-xs font-bold uppercase text-brand-dark hover:text-brand"
-          >
-            Blog
-          </Link>
+          {headerLinks.map((l) => (
+            <a
+              key={l.href + l.label}
+              href={l.href}
+              className="flex h-11 items-center px-4 text-xs font-bold uppercase text-brand-dark hover:text-brand"
+            >
+              {l.label}
+            </a>
+          ))}
 
           <div className="ml-auto flex items-center gap-3 text-xs">
             {session ? (
@@ -368,15 +373,15 @@ export function SiteHeader({
                 </div>
               </details>
             ))}
-            <a
-              href="/book-visit"
-              className="block border-b border-line px-4 py-3 text-sm font-semibold"
-            >
-              Book Home Visit
-            </a>
-            <Link href="/blog" className="block border-b border-line px-4 py-3 text-sm font-semibold">
-              Blog
-            </Link>
+            {headerLinks.map((l) => (
+              <a
+                key={l.href + l.label}
+                href={l.href}
+                className="block border-b border-line px-4 py-3 text-sm font-semibold"
+              >
+                {l.label}
+              </a>
+            ))}
             {session ? (
               <Link href="/account" className="block px-4 py-3 text-sm font-semibold text-brand">
                 My Account

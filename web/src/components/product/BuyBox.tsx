@@ -13,12 +13,6 @@ type Option = {
   values: OptionValue[];
 };
 
-const HOME_VISIT_CHARGE = 0;
-
-function isHomeVisit(label: string) {
-  return label.trim().toLowerCase() === "tailor home visit";
-}
-
 function needsSchedule(label: string) {
   const l = label.trim().toLowerCase();
   return l.includes("home visit") || l.includes("call") || l.includes("voice") || l.includes("video");
@@ -29,12 +23,16 @@ export function BuyBox({
   oldPrice,
   options,
   bookingUrl,
+  homeVisit,
 }: {
   product: { productId: string; slug: string; name: string; price: number; image: string };
   oldPrice?: number | null;
   options: Option[];
   bookingUrl: string;
+  homeVisit: { option_label: string; display_price: number; note: string };
 }) {
+  const isHomeVisit = (label: string) =>
+    label.trim().toLowerCase() === homeVisit.option_label.trim().toLowerCase();
   const { add } = useCart();
   const [qty, setQty] = useState(1);
   const [selected, setSelected] = useState<Record<string, string>>(() =>
@@ -42,31 +40,42 @@ export function BuyBox({
   );
   const [added, setAdded] = useState(false);
   const [error, setError] = useState("");
+  const [schedule, setSchedule] = useState("");
 
   const homeVisitSelected = Object.values(selected).some(isHomeVisit);
   const scheduleNeeded = Object.values(selected).some(needsSchedule);
 
   const effectivePrice = useMemo(() => {
-    if (Object.values(selected).some(isHomeVisit)) return HOME_VISIT_CHARGE;
+    if (Object.values(selected).some(isHomeVisit)) return homeVisit.display_price;
     let delta = 0;
     for (const o of options) {
       const v = o.values.find((x) => x.label === selected[o.label]);
       if (v) delta += v.priceDelta;
     }
     return Math.max(0, product.price + delta);
-  }, [options, selected, product.price]);
+  }, [options, selected, product.price, homeVisit]);
 
-  function handleAdd() {
+  function handleAdd(): boolean {
     for (const o of options) {
       if (o.required && !selected[o.label]) {
         setError(`Please choose ${o.label}`);
-        return;
+        return false;
       }
     }
+    if (scheduleNeeded && !schedule) {
+      setError("Please choose a schedule date for the home visit / call");
+      return false;
+    }
     setError("");
-    add({ ...product, price: effectivePrice, qty, options: selected });
+    add({
+      ...product,
+      price: effectivePrice,
+      qty,
+      options: scheduleNeeded ? { ...selected, Schedule: schedule } : selected,
+    });
     setAdded(true);
     setTimeout(() => setAdded(false), 1600);
+    return true;
   }
 
   return (
@@ -75,11 +84,11 @@ export function BuyBox({
         {homeVisitSelected ? (
           <>
             <div className="flex items-end gap-3">
-              <span className="text-3xl font-extrabold text-brand">{formatINR(HOME_VISIT_CHARGE)}</span>
+              <span className="text-3xl font-extrabold text-brand">{formatINR(homeVisit.display_price)}</span>
               <span className="pb-1 text-xs font-bold uppercase text-faint">Home Visit Charge</span>
             </div>
             <p className="mt-1 text-xs text-faint">
-              ₹300 will be paid for the home visit.
+              {homeVisit.note}
             </p>
           </>
         ) : (
@@ -124,7 +133,9 @@ export function BuyBox({
           </label>
           <div className="flex items-stretch border border-line">
             <input
-              type="date"
+              type="date" suppressHydrationWarning
+              value={schedule}
+              onChange={(e) => setSchedule(e.target.value)}
               min={new Date().toISOString().slice(0, 10)}
               className="w-full px-3 py-2 text-sm outline-none"
             />
@@ -152,7 +163,13 @@ export function BuyBox({
         <button onClick={handleAdd} className="btn-brand flex-1">
           {added ? "Added ✓" : "Add to Order"}
         </button>
-        <Link href="/checkout" onClick={handleAdd} className="btn-outline flex-1">
+        <Link
+          href="/checkout"
+          onClick={(e) => {
+            if (!handleAdd()) e.preventDefault();
+          }}
+          className="btn-outline flex-1"
+        >
           Order Now
         </Link>
       </div>

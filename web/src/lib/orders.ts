@@ -1,4 +1,5 @@
 import { db } from "./db";
+import { getSiteConfig, DEFAULT_HOME_VISIT } from "./settings";
 
 export type IncomingItem = {
   productId: string;
@@ -21,6 +22,8 @@ export async function priceCart(items: IncomingItem[]) {
     },
   });
   const map = new Map(products.map((p) => [p.id, p]));
+  const hv = (await getSiteConfig()).home_visit ?? DEFAULT_HOME_VISIT;
+  const hvLabel = hv.option_label.trim().toLowerCase();
 
   const lines = items
     .map((i) => {
@@ -37,7 +40,10 @@ export async function priceCart(items: IncomingItem[]) {
         if (val) delta += val.priceDelta;
       }
 
-      const unitPrice = Math.max(0, p.price + delta);
+      // Same rule the product page shows: choosing the home-visit option replaces the
+      // garment price with the configured home-visit amount.
+      const homeVisit = Object.values(selected).some((v) => v.trim().toLowerCase() === hvLabel);
+      const unitPrice = homeVisit ? Math.max(0, hv.display_price) : Math.max(0, p.price + delta);
       return {
         productId: p.id,
         name: p.name,

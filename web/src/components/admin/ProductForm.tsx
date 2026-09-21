@@ -3,6 +3,7 @@
 import { useActionState, useState } from "react";
 import Link from "next/link";
 import { inputCls, Field, SubmitButton } from "./ui";
+import { uploadImage } from "./ImageField";
 import {
   createProduct,
   updateProduct,
@@ -73,12 +74,11 @@ export function ProductForm({
     setUploading(true);
     try {
       for (const file of Array.from(files)) {
-        const fd = new FormData();
-        fd.append("file", file);
-        const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
-        const data = await res.json();
-        if (res.ok && data.url) {
-          setImages((prev) => [...prev, { url: data.url, alt: initial.name }]);
+        try {
+          const url = await uploadImage(file);
+          setImages((prev) => [...prev, { url, alt: initial.name }]);
+        } catch {
+          /* skip files that fail to upload */
         }
       }
     } finally {

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { inputCls, Field, SubmitButton } from "./ui";
+import { ImageField } from "./ImageField";
 import { createCategory, updateCategory, deleteCategory } from "@/app/admin/categories/actions";
 
 type Cat = { id: string; name: string; parentId: string | null };
@@ -59,7 +60,7 @@ export function CategoryForm({
             />
           </Field>
           <Field label="Image URL">
-            <input name="image" defaultValue={category?.image ?? ""} className={inputCls} />
+            <ImageField name="image" defaultValue={category?.image ?? ""} />
           </Field>
         </div>
         <Field label="Description">

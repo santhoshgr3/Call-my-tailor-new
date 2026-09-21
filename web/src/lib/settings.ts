@@ -32,7 +32,7 @@ export type SiteConfig = {
   newsletter_heading?: string;
   copyright?: string;
   why_choose_us: { icon: string; title: string; text: string }[];
-  how_it_works: { step: number; title: string; text: string }[];
+  how_it_works: { step: number; title: string; text: string; icon?: string }[];
   stats: { value: string; label: string }[];
   section_titles?: string[];
   product_rails?: string[];
@@ -43,6 +43,49 @@ export type SiteConfig = {
     button: string;
     link: string;
   } | null;
+  logo?: string;
+  backgrounds?: {
+    why_choose?: string;
+    made?: string;
+    stats?: string;
+    fabric?: string;
+  };
+  header_links?: { label: string; href: string }[];
+  titles?: {
+    how_it_works?: string;
+    specialization?: string;
+    order_by_category?: string;
+    why_choose_us?: string;
+    trending?: string;
+    fabric_brands?: string;
+    testimonials?: string;
+    blog?: string;
+  };
+  trending_categories?: { label: string; slug: string }[];
+  home_visit?: {
+    option_label: string;
+    display_price: number;
+    note: string;
+  };
+};
+
+export const DEFAULT_HEADER_LINKS = [
+  { label: "Book Home Visit", href: "/book-visit" },
+  { label: "Blog", href: "/blog" },
+];
+
+export const DEFAULT_TRENDING = [
+  { label: "All", slug: "catalogue" },
+  { label: "Accessories", slug: "accessories" },
+  { label: "Ethnic Wear", slug: "ethnic-wear" },
+  { label: "Kurta", slug: "kurta" },
+  { label: "Suit/Blazer", slug: "suit-blazer" },
+];
+
+export const DEFAULT_HOME_VISIT = {
+  option_label: "Tailor Home Visit",
+  display_price: 0,
+  note: "₹300 will be paid for the home visit.",
 };
 
 /** Used when the DB is unreachable (e.g. during `next build` before the

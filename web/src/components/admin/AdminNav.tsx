@@ -6,7 +6,10 @@ import { usePathname } from "next/navigation";
 const GROUPS: { title: string; items: { href: string; label: string }[] }[] = [
   {
     title: "Overview",
-    items: [{ href: "/admin", label: "Dashboard" }],
+    items: [
+      { href: "/admin", label: "Dashboard" },
+      { href: "/account/profile", label: "My account & password" },
+    ],
   },
   {
     title: "Catalog",
@@ -32,6 +35,8 @@ const GROUPS: { title: string; items: { href: string; label: string }[] }[] = [
       { href: "/admin/blog", label: "Blog" },
       { href: "/admin/testimonials", label: "Testimonials" },
       { href: "/admin/pages", label: "Info Pages" },
+      { href: "/admin/footer", label: "Footer" },
+      { href: "/admin/media", label: "Media Library" },
       { href: "/admin/settings", label: "Site Settings" },
     ],
   },

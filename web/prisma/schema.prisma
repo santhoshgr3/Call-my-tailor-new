@@ -356,3 +356,12 @@ model ContactMessage {
   status    String   @default("new")
   createdAt DateTime @default(now())
 }
+
+model Media {
+  id        String   @id @default(cuid())
+  filename  String
+  mimeType  String
+  size      Int
+  data      Bytes
+  createdAt DateTime @default(now())
+}

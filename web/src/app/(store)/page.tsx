@@ -37,13 +37,16 @@ export default async function HomePage() {
   ]);
   const { slides, promos, brands, testimonials, trendingTabs, specThumbs, orderCats } = home;
   const { best, fresh, rated } = home.rails;
+  const T = site.titles ?? {};
+  const BG = site.backgrounds ?? {};
+  const showHero = layout.show_hero !== false;
 
   return (
     <div>
       {/* HERO + PROMOS */}
       <section className="container-cmt py-5">
-        <div className="grid gap-4 lg:grid-cols-[1fr_360px]">
-          <HeroCarousel slides={slides} />
+        <div className={showHero ? "grid gap-4 lg:grid-cols-[1fr_360px]" : "grid gap-4"}>
+          {showHero && <HeroCarousel slides={slides} />}
           <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-1 lg:grid-rows-2 lg:gap-4">
             {promos.map((b) => (
               <a
@@ -69,13 +72,18 @@ export default async function HomePage() {
         <section className="py-7">
           <div className="container-cmt">
             <h2 className="section-title section-title--left">
-              {site.section_titles?.[0] || "How It Work"}
+              {T.how_it_works || site.section_titles?.[0] || "How It Work"}
             </h2>
             <div className="mt-5 flex flex-col items-stretch gap-6 rounded-lg bg-soft px-5 py-5 md:flex-row md:items-center md:justify-between md:gap-2">
               {site.how_it_works.map((s, i) => (
                 <div key={s.step} className="flex items-center gap-2 md:flex-1">
                   <div className="flex items-center gap-3">
-                    <HowIcon step={s.step} className="h-14 w-14 shrink-0" />
+                    {s.icon ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={s.icon} alt="" className="h-14 w-14 shrink-0 object-contain" />
+                    ) : (
+                      <HowIcon step={s.step} className="h-14 w-14 shrink-0" />
+                    )}
                     <div className="leading-tight">
                       <p className="text-[13px] font-extrabold uppercase text-brand-dark">
                         {s.title}
@@ -100,7 +108,7 @@ export default async function HomePage() {
         <section className="py-7">
           <div className="container-cmt">
             <h2 className="section-title section-title--left">
-              {site.section_titles?.[1] || "Our Specialization"}
+              {T.specialization || site.section_titles?.[1] || "Our Specialization"}
             </h2>
             {(() => {
               const spanClass = [
@@ -146,7 +154,7 @@ export default async function HomePage() {
             <div className="rounded-lg bg-soft p-4">
               <div className="section-head">
                 <h2 className="text-brand-dark">
-                  {site.section_titles?.[2] || "Order by Category"}
+                  {T.order_by_category || site.section_titles?.[2] || "Order by Category"}
                 </h2>
                 <div className="flex items-center gap-2 text-lg text-faint">
                   <span>‹</span>
@@ -199,11 +207,13 @@ export default async function HomePage() {
       {layout.show_why_choose_us !== false && (site.why_choose_us?.length ?? 0) > 0 && (
         <section
           className="relative bg-cover bg-center py-10 text-white"
-          style={{ backgroundImage: "url(/whychoose-bg.jpg)" }}
+          style={{ backgroundImage: `url(${BG.why_choose || "/whychoose-bg.jpg"})` }}
         >
           <div className="absolute inset-0 bg-black/45" />
           <div className="container-cmt relative">
-            <h2 className="mb-10 text-center text-3xl font-bold text-white">Why Choose Us</h2>
+            <h2 className="mb-10 text-center text-3xl font-bold text-white">
+              {T.why_choose_us || "Why Choose Us"}
+            </h2>
             <div className="grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
               {site.why_choose_us.map((w, i) => (
                 <div key={i} className="text-center">
@@ -225,7 +235,7 @@ export default async function HomePage() {
         <section className="py-7">
           <div className="container-cmt">
             <ProductTabs
-              heading={site.section_titles?.[3] || "Trending Items"}
+              heading={T.trending || site.section_titles?.[3] || "Trending Items"}
               tabs={trendingTabs}
             />
           </div>
@@ -236,7 +246,7 @@ export default async function HomePage() {
       {layout.show_made_cta !== false && site.made_cta && (
         <section
           className="relative bg-cover bg-center"
-          style={{ backgroundImage: "url(/made-bg.jpg)" }}
+          style={{ backgroundImage: `url(${BG.made || "/made-bg.jpg"})` }}
         >
           <div className="absolute inset-0 bg-black/55" />
           <div className="container-cmt relative flex flex-col items-start gap-6 py-10 md:flex-row md:items-center md:justify-between">
@@ -263,9 +273,9 @@ export default async function HomePage() {
         <section className="py-7">
           <div className="container-cmt">
             <h2 className="mb-4 text-2xl font-bold uppercase text-brand-dark">
-              Our Fabric&apos;s Branded
+              {T.fabric_brands || "Our Fabric's Branded"}
             </h2>
-            <BrandStrip brands={brands} />
+            <BrandStrip brands={brands} bg={BG.fabric} />
           </div>
         </section>
       )}
@@ -274,7 +284,7 @@ export default async function HomePage() {
       {layout.show_stats !== false && (site.stats?.length ?? 0) > 0 && (
         <section
           className="relative bg-cover bg-fixed bg-center py-9"
-          style={{ backgroundImage: "url(/stats-bg.jpg)" }}
+          style={{ backgroundImage: `url(${BG.stats || "/stats-bg.jpg"})` }}
         >
           <div className="absolute inset-0 bg-black/55" />
           <div className="container-cmt relative grid grid-cols-2 gap-4 lg:grid-cols-4">
@@ -297,7 +307,7 @@ export default async function HomePage() {
           return (
             <section className="py-7">
               <div className="container-cmt">
-                <h2 className="section-title">Testimonials</h2>
+                <h2 className="section-title">{T.testimonials || "Testimonials"}</h2>
                 <div className="mt-5">
                   <VideoTestimonials items={videoTestimonials} />
                 </div>
@@ -306,6 +316,43 @@ export default async function HomePage() {
           );
         })()}
 
+      {/* LATEST BLOG (opt-in from Admin → Homepage) */}
+      {layout.show_latest_blog === true && home.posts.length > 0 && (
+        <section className="py-7">
+          <div className="container-cmt">
+            <h2 className="section-title">{T.blog || "Latest Blog"}</h2>
+            <div className="mt-5 grid gap-6 md:grid-cols-3">
+              {home.posts.map((p) => (
+                <article key={p.id} className="overflow-hidden rounded border border-line">
+                  <Link href={`/blog/${p.slug}`}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={p.coverImage || "/img/placeholder.svg"}
+                      alt={p.title}
+                      className="aspect-[16/9] w-full object-cover"
+                    />
+                  </Link>
+                  <div className="p-4">
+                    <Link
+                      href={`/blog/${p.slug}`}
+                      className="line-clamp-2 text-sm font-bold text-brand-dark hover:text-brand"
+                    >
+                      {p.title}
+                    </Link>
+                    <p className="mt-2 line-clamp-3 text-xs text-muted">{p.excerpt}</p>
+                    <Link
+                      href={`/blog/${p.slug}`}
+                      className="mt-3 inline-block text-xs font-bold uppercase text-brand"
+                    >
+                      Read More →
+                    </Link>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
     </div>
   );
 }

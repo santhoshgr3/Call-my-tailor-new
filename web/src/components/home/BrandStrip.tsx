@@ -4,8 +4,10 @@ import { useRef } from "react";
 
 export function BrandStrip({
   brands,
+  bg,
 }: {
   brands: { id: string; name: string; logoUrl: string }[];
+  bg?: string;
 }) {
   const railRef = useRef<HTMLDivElement>(null);
 
@@ -17,7 +19,7 @@ export function BrandStrip({
     <div className="relative overflow-hidden rounded">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src="/fabric-bg.jpg"
+        src={bg || "/fabric-bg.jpg"}
         alt="Our fabric brands"
         className="h-[220px] w-full object-cover sm:h-[280px] md:h-[340px]"
       />
