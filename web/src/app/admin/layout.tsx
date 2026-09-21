@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { requireAdmin } from "@/lib/auth";
 import { AdminNav } from "@/components/admin/AdminNav";
+import { AdminConfirm } from "@/components/admin/AdminConfirm";
 import { logoutAction } from "@/lib/auth-actions";
 
 export const metadata: Metadata = {
@@ -36,6 +37,7 @@ export default async function AdminLayout({
           </div>
         </aside>
 
+        <AdminConfirm />
         <main className="min-w-0 flex-1">
           <details className="border-b border-line bg-white md:hidden">
             <summary className="flex cursor-pointer items-center justify-between px-5 py-3">

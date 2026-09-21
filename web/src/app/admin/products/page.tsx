@@ -4,7 +4,8 @@ import type { Prisma } from "@prisma/client";
 import { formatINR } from "@/lib/money";
 import { PageHeader, LinkButton, StatusPill } from "@/components/admin/ui";
 import { Pagination } from "@/components/catalog/Pagination";
-import { quickToggle, deleteProduct } from "./actions";
+import { quickToggle, deleteProduct, bulkProducts } from "./actions";
+import { ProductBulkBar, SelectAll } from "@/components/admin/ProductBulkBar";
 
 export const dynamic = "force-dynamic";
 const PER = 20;
@@ -19,7 +20,11 @@ export default async function AdminProducts({
   const q = (sp.q || "").trim();
 
   const where: Prisma.ProductWhereInput = {};
-  if (q) where.OR = [{ name: { contains: q } }, { sku: { contains: q } }];
+  if (q)
+    where.OR = [
+      { name: { contains: q, mode: "insensitive" } },
+      { sku: { contains: q, mode: "insensitive" } },
+    ];
   if (sp.status === "active") where.isActive = true;
   if (sp.status === "inactive") where.isActive = false;
   if (sp.status === "no-image") where.hasImage = false;
@@ -50,7 +55,14 @@ export default async function AdminProducts({
       <PageHeader
         title="Products"
         subtitle={`${total} products`}
-        action={<LinkButton href="/admin/products/new" variant="brand">+ New product</LinkButton>}
+        action={
+          <div className="flex flex-wrap gap-2">
+            <LinkButton href="/admin/products/import">Import / Export (Excel)</LinkButton>
+            <LinkButton href="/admin/products/new" variant="brand">
+              + New product
+            </LinkButton>
+          </div>
+        }
       />
 
       <form className="mb-4 flex flex-wrap gap-2" action="/admin/products">
@@ -77,10 +89,15 @@ export default async function AdminProducts({
         <button className="btn-outline !py-2 !text-[11px]">Filter</button>
       </form>
 
+      <ProductBulkBar action={bulkProducts} categories={cats} />
+
       <div className="overflow-x-auto rounded-lg border border-line bg-white">
         <table className="w-full min-w-[820px] text-sm">
           <thead className="bg-soft text-left text-xs uppercase text-faint">
             <tr>
+              <th className="w-8 px-3 py-2">
+                <SelectAll />
+              </th>
               <th className="px-3 py-2">Product</th>
               <th className="px-3 py-2">SKU</th>
               <th className="px-3 py-2">Price</th>
@@ -93,6 +110,9 @@ export default async function AdminProducts({
           <tbody>
             {items.map((p) => (
               <tr key={p.id} className="border-t border-line align-middle">
+                <td className="px-3 py-2">
+                  <input type="checkbox" name="ids" value={p.id} form="bulk-form" className="h-4 w-4" />
+                </td>
                 <td className="px-3 py-2">
                   <div className="flex items-center gap-2">
                     {/* eslint-disable-next-line @next/next/no-img-element */}

@@ -4,6 +4,8 @@ import type { Metadata } from "next";
 import { getProductBySlug, getRelatedProducts } from "@/lib/catalog";
 import { pageTitle } from "@/lib/seo";
 import { getSiteConfig, DEFAULT_HOME_VISIT } from "@/lib/settings";
+import { getPlugins } from "@/lib/plugins";
+import { ProductJsonLd } from "@/components/plugins/PluginScripts";
 import { ProductGallery } from "@/components/product/ProductGallery";
 import { BuyBox } from "@/components/product/BuyBox";
 import { ProductTabsView } from "@/components/product/ProductTabsView";
@@ -39,7 +41,9 @@ export default async function ProductPage({
   const p = await getProductBySlug(slug);
   if (!p || !p.isActive) notFound();
 
-  const site = await getSiteConfig();
+  const [site, plugins] = await Promise.all([getSiteConfig(), getPlugins()]);
+  const seoPlugin = plugins["structured-data"];
+  const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
   const categoryIds = p.categories.map((c) => c.categoryId);
   const related = await getRelatedProducts(p.id, categoryIds, 10);
 
@@ -48,6 +52,22 @@ export default async function ProductPage({
 
   return (
     <div className="container-cmt py-8">
+      {seoPlugin.enabled && seoPlugin.config.product_schema !== false && (
+        <ProductJsonLd
+          baseUrl={baseUrl}
+          product={{
+            slug: p.slug,
+            name: p.name,
+            description: p.shortDescription || p.description,
+            sku: p.sku,
+            price: p.price,
+            inStock: !/out of stock/i.test(p.stockStatus),
+            images: p.images.map((i) => i.url),
+            rating: p.rating,
+            ratingCount: p.ratingCount,
+          }}
+        />
+      )}
       <nav className="mb-5 text-xs text-faint">
         <Link href="/" className="hover:text-brand">
           Home

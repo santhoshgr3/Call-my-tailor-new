@@ -42,6 +42,10 @@ const GROUPS: { title: string; items: { href: string; label: string }[] }[] = [
     ],
   },
   {
+    title: "Extensions",
+    items: [{ href: "/admin/plugins", label: "Plugins" }],
+  },
+  {
     title: "Inbox",
     items: [
       { href: "/admin/messages", label: "Contact Messages" },

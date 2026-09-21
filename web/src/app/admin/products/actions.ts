@@ -251,3 +251,66 @@ export async function quickToggle(fd: FormData) {
   bustStorefrontCache();
   revalidatePath("/admin/products");
 }
+
+/** Apply one action to many selected products at once. */
+export async function bulkProducts(fd: FormData) {
+  await requireAdmin();
+  const ids = fd.getAll("ids").map(String).filter(Boolean).slice(0, 500);
+  const action = String(fd.get("bulk_action") || "");
+  if (!ids.length || !action) return;
+  const where = { id: { in: ids } };
+
+  const flags: Record<string, [string, boolean]> = {
+    activate: ["isActive", true],
+    deactivate: ["isActive", false],
+    feature_on: ["isFeatured", true],
+    feature_off: ["isFeatured", false],
+    best_on: ["isBestSeller", true],
+    best_off: ["isBestSeller", false],
+    new_on: ["isNewArrival", true],
+    new_off: ["isNewArrival", false],
+    trend_on: ["isTrending", true],
+    trend_off: ["isTrending", false],
+  };
+
+  if (flags[action]) {
+    const [field, value] = flags[action];
+    await db.product.updateMany({ where, data: { [field]: value } });
+  } else if (action === "delete") {
+    await db.product.deleteMany({ where });
+  } else if (action === "category_add" || action === "category_remove") {
+    const slug = String(fd.get("category") || "");
+    const cat = slug ? await db.category.findUnique({ where: { slug }, select: { id: true } }) : null;
+    if (cat) {
+      if (action === "category_add") {
+        await db.productCategory.createMany({
+          data: ids.map((productId) => ({ productId, categoryId: cat.id })),
+          skipDuplicates: true,
+        });
+      } else {
+        await db.productCategory.deleteMany({ where: { categoryId: cat.id, productId: { in: ids } } });
+      }
+    }
+  } else if (action === "price_pct" || action === "price_add") {
+    const amount = Number(fd.get("amount"));
+    if (Number.isFinite(amount) && amount !== 0) {
+      const rows = await db.product.findMany({ where, select: { id: true, price: true } });
+      await db.$transaction(
+        rows.map((r) =>
+          db.product.update({
+            where: { id: r.id },
+            data: {
+              price: Math.max(
+                0,
+                Math.round(action === "price_pct" ? r.price * (1 + amount / 100) : r.price + amount),
+              ),
+            },
+          }),
+        ),
+      );
+    }
+  }
+
+  bustStorefrontCache();
+  revalidatePath("/admin/products");
+}
