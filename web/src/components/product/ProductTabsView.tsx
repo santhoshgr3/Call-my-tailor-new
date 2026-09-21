@@ -1,7 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ReviewForm } from "./ReviewForm";
+
+type Tab = "desc" | "specs" | "reviews";
+
+const CLAMP_PX = 84;
+
+function Stars({ value }: { value: number }) {
+  const full = Math.round(value);
+  return (
+    <span className="text-[15px] leading-none tracking-[2px] text-[#f5a623]" aria-label={`${value.toFixed(1)} out of 5`}>
+      {"★".repeat(full)}
+      <span className="text-[#c9c9c9]">{"★".repeat(5 - full)}</span>
+    </span>
+  );
+}
 
 export function ProductTabsView({
   productId,
@@ -14,80 +28,129 @@ export function ProductTabsView({
   specs: { key: string; value: string }[];
   reviews: { id: string; customerName: string; rating: number; title: string | null; body: string; createdAt: Date }[];
 }) {
-  const [tab, setTab] = useState<"desc" | "reviews">("desc");
+  const [tab, setTab] = useState<Tab>("desc");
+  const [open, setOpen] = useState(false);
+  const [long, setLong] = useState(false);
+  const descRef = useRef<HTMLDivElement>(null);
+  const [showForm, setShowForm] = useState(false);
+
+  useEffect(() => {
+    const el = descRef.current;
+    if (el) setLong(el.scrollHeight > CLAMP_PX + 8);
+  }, [descriptionHtml, tab]);
+
+  const avg = reviews.length ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length : 0;
+
+  const tabs: { id: Tab; label: string }[] = [
+    { id: "desc", label: "Description" },
+    ...(specs.length ? [{ id: "specs" as Tab, label: "Specifications" }] : []),
+    { id: "reviews", label: "Reviews" },
+  ];
+
+  function goReviews(form: boolean) {
+    setTab("reviews");
+    setShowForm(form);
+  }
 
   return (
-    <div className="mt-10">
-      <div className="flex gap-1 border-b border-line">
-        <button
-          onClick={() => setTab("desc")}
-          className={`-mb-px border-b-2 px-4 py-2 text-xs font-bold uppercase ${
-            tab === "desc" ? "border-brand text-brand" : "border-transparent text-faint"
-          }`}
-        >
-          Description
-        </button>
-        <button
-          onClick={() => setTab("reviews")}
-          className={`-mb-px border-b-2 px-4 py-2 text-xs font-bold uppercase ${
-            tab === "reviews" ? "border-brand text-brand" : "border-transparent text-faint"
-          }`}
-        >
-          Reviews ({reviews.length})
-        </button>
+    <div>
+      <div role="tablist" className="flex flex-wrap gap-x-6 gap-y-1">
+        {tabs.map((t) => (
+          <button
+            key={t.id}
+            role="tab"
+            aria-selected={tab === t.id}
+            onClick={() => setTab(t.id)}
+            className={`-mb-px border-b px-0.5 pb-2 text-[15px] font-semibold uppercase tracking-wide transition-colors ${
+              tab === t.id ? "border-brand text-ink" : "border-transparent text-[#8a8a8a] hover:text-ink"
+            }`}
+          >
+            {t.label}
+          </button>
+        ))}
       </div>
 
-      {tab === "desc" && (
-        <div className="py-6">
-          {specs.length > 0 && (
-            <>
-              <h3 className="mb-3 text-base font-bold">Item Specifics</h3>
-              <table className="mb-6 w-full max-w-xl border border-line text-sm">
-                <tbody>
-                  {specs.map((s) => (
-                    <tr key={s.key} className="border-b border-line last:border-0">
-                      <td className="w-1/3 bg-soft px-3 py-2 font-semibold">{s.key}</td>
-                      <td className="px-3 py-2">{s.value}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </>
-          )}
-          <div
-            className="prose-cmt max-w-none text-sm text-muted"
-            dangerouslySetInnerHTML={{ __html: descriptionHtml }}
-          />
-        </div>
-      )}
+      <div className="pt-4">
+        {tab === "desc" && (
+          <div className="relative">
+            <div
+              ref={descRef}
+              style={!open && long ? { maxHeight: CLAMP_PX } : undefined}
+              className="prose-cmt overflow-hidden text-[15px] leading-6 text-muted [&_p:last-child]:mb-0"
+              dangerouslySetInnerHTML={{ __html: descriptionHtml }}
+            />
+            {long && !open && (
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-white to-transparent" />
+            )}
+            {long && (
+              <div className={open ? "mt-2" : "absolute inset-x-0 bottom-0 flex justify-center"}>
+                <button
+                  onClick={() => setOpen((o) => !o)}
+                  className="rounded-sm bg-[#12358a] px-2.5 py-1 text-xs font-semibold text-white hover:bg-[#0d2867]"
+                >
+                  {open ? "⌃ Show Less" : "⌄ Show More"}
+                </button>
+              </div>
+            )}
+          </div>
+        )}
 
-      {tab === "reviews" && (
-        <div className="py-6">
-          {reviews.length === 0 ? (
-            <p className="text-sm text-faint">No reviews yet. Be the first to review this product.</p>
-          ) : (
-            <ul className="space-y-4">
-              {reviews.map((r) => (
-                <li key={r.id} className="border-b border-line pb-4">
-                  <div className="flex items-center gap-2">
-                    <span className="text-amber-400">
-                      {"★".repeat(r.rating)}
-                      <span className="text-line">{"★".repeat(5 - r.rating)}</span>
-                    </span>
-                    <span className="text-sm font-bold">{r.customerName}</span>
-                    <span className="text-xs text-faint">
-                      {new Date(r.createdAt).toLocaleDateString("en-IN")}
-                    </span>
-                  </div>
-                  {r.title && <p className="mt-1 text-sm font-semibold">{r.title}</p>}
-                  <p className="mt-1 text-sm text-muted">{r.body}</p>
-                </li>
-              ))}
-            </ul>
-          )}
-          <ReviewForm productId={productId} />
-        </div>
-      )}
+        {tab === "specs" && (
+          <dl className="grid grid-cols-[minmax(110px,170px)_1fr] border-t border-line text-sm">
+            {specs.map((s) => (
+              <div key={s.key} className="contents">
+                <dt className="border-b border-line bg-soft px-3 py-2.5 font-semibold text-ink">{s.key}</dt>
+                <dd className="border-b border-line px-3 py-2.5 text-muted">{s.value}</dd>
+              </div>
+            ))}
+          </dl>
+        )}
+
+        {tab === "reviews" && (
+          <div>
+            {reviews.length === 0 ? (
+              <p className="text-sm text-faint">No reviews yet. Be the first to review this product.</p>
+            ) : (
+              <ul className="max-h-80 space-y-4 overflow-y-auto pr-2">
+                {reviews.map((r) => (
+                  <li key={r.id} className="border-b border-line pb-4 last:border-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Stars value={r.rating} />
+                      <span className="text-sm font-bold">{r.customerName}</span>
+                      <span className="text-xs text-faint">
+                        {new Date(r.createdAt).toLocaleDateString("en-IN")}
+                      </span>
+                    </div>
+                    {r.title && <p className="mt-1 text-sm font-semibold">{r.title}</p>}
+                    <p className="mt-1 text-sm text-muted">{r.body}</p>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <div className="mt-4">
+              {showForm || reviews.length === 0 ? (
+                <ReviewForm productId={productId} />
+              ) : (
+                <button onClick={() => setShowForm(true)} className="text-sm font-semibold text-brand hover:underline">
+                  Write a review
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* rating row */}
+      <div className="mt-3 flex flex-wrap items-center gap-2 text-[13px]">
+        <Stars value={avg} />
+        <button onClick={() => goReviews(false)} className="text-[#1a5fb4] underline hover:text-brand">
+          {reviews.length} review{reviews.length === 1 ? "" : "s"}
+        </button>
+        <span className="text-faint">-</span>
+        <button onClick={() => goReviews(true)} className="text-[#1a5fb4] underline hover:text-brand">
+          Write a review
+        </button>
+      </div>
     </div>
   );
 }
