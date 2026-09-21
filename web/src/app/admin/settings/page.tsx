@@ -49,6 +49,21 @@ export default async function AdminSettings() {
             Category menus are built automatically from Admin → Categories.
           </p>
           <div className="space-y-5">
+            <div className="grid gap-4 sm:grid-cols-3">
+              <Field label="“All categories” button">
+                <input name="nav_all_categories_label" defaultValue={site.nav?.all_categories_label ?? "All Categories"} className={inputCls} />
+              </Field>
+              <Field label="Home link">
+                <input name="nav_home_label" defaultValue={site.nav?.home_label ?? "Home"} className={inputCls} />
+              </Field>
+              <Field label="Collection menu">
+                <input name="nav_collection_label" defaultValue={site.nav?.collection_label ?? "Collection"} className={inputCls} />
+              </Field>
+              <label className="flex items-center gap-2 text-sm sm:col-span-3">
+                <input type="checkbox" name="nav_show_collection" defaultChecked={site.nav?.show_collection !== false} className="h-4 w-4" />
+                Show the Collection mega-menu
+              </label>
+            </div>
             <div>
               <span className="mb-1 block text-xs font-bold uppercase text-faint">
                 Top bar messages

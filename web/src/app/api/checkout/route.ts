@@ -33,7 +33,16 @@ export async function POST(req: Request) {
   const userId = await getSessionUserId();
   const orderNumber = await nextOrderNumber();
 
-  const wantsOnline = d.paymentMethod === "razorpay" && isRazorpayEnabled();
+  const pay = (await getSiteConfig()).payments ?? {};
+  const codOk = pay.cod_enabled !== false;
+  const onlineOk = pay.online_enabled !== false && (await isRazorpayEnabled());
+  if (d.paymentMethod === "cod" && !codOk) {
+    return NextResponse.json({ error: "Cash on delivery is not available." }, { status: 400 });
+  }
+  if (d.paymentMethod === "razorpay" && !onlineOk && !codOk) {
+    return NextResponse.json({ error: "Online payment is currently unavailable." }, { status: 400 });
+  }
+  const wantsOnline = d.paymentMethod === "razorpay" && onlineOk;
 
   const order = await db.order.create({
     data: {
@@ -91,13 +100,25 @@ export async function POST(req: Request) {
         orderNumber: order.orderNumber,
         total,
         razorpay: {
-          keyId: razorpayKeyId(),
+          keyId: await razorpayKeyId(),
           orderId: rzp.id,
           amount: rzp.amount,
           currency: rzp.currency,
         },
       });
     } catch (e) {
+      if (!codOk) {
+        // no offline fallback allowed: undo the order and report the failure
+        await db.orderItem.deleteMany({ where: { orderId: order.id } });
+        await db.order.delete({ where: { id: order.id } });
+        if (coupon) {
+          await db.coupon.update({ where: { code: coupon.code }, data: { usedCount: { decrement: 1 } } });
+        }
+        return NextResponse.json(
+          { error: "Online payment could not be started. Please try again." },
+          { status: 502 },
+        );
+      }
       // fall back to COD-style pending order if Razorpay call fails
       await db.order.update({
         where: { id: order.id },

@@ -44,6 +44,12 @@ export async function saveGeneralSettings(fd: FormData) {
       hours: str(fd, "c_hours"),
       people: cleanRows(jsonField(fd, "c_people", []), ["role", "name"] as const),
     },
+    nav: {
+      all_categories_label: str(fd, "nav_all_categories_label") || "All Categories",
+      home_label: str(fd, "nav_home_label") || "Home",
+      collection_label: str(fd, "nav_collection_label") || "Collection",
+      show_collection: fd.get("nav_show_collection") === "on",
+    },
     store: {
       shipping_fee: Number.isFinite(fee) ? Math.max(0, fee) : 199,
       free_shipping_over: Number.isFinite(freeOver) ? Math.max(0, freeOver) : 4999,

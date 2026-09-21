@@ -1,15 +1,37 @@
 import "server-only";
 import crypto from "node:crypto";
+import { db } from "./db";
 
-const KEY_ID = process.env.RAZORPAY_KEY_ID || "";
-const KEY_SECRET = process.env.RAZORPAY_KEY_SECRET || "";
+type Config = { keyId: string; keySecret: string };
 
-export function isRazorpayEnabled() {
-  return Boolean(KEY_ID && KEY_SECRET);
+/**
+ * Razorpay credentials: saved from Admin → Payments (Setting row "razorpay"),
+ * falling back to the RAZORPAY_* environment variables.
+ * The secret is only ever read on the server and is never sent to the browser.
+ */
+export async function getRazorpayConfig(): Promise<Config> {
+  try {
+    const row = await db.setting.findUnique({ where: { key: "razorpay" } });
+    if (row) {
+      const v = JSON.parse(row.value) as { key_id?: string; key_secret?: string };
+      if (v.key_id && v.key_secret) return { keyId: v.key_id, keySecret: v.key_secret };
+    }
+  } catch {
+    /* fall back to env */
+  }
+  return {
+    keyId: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || process.env.RAZORPAY_KEY_ID || "",
+    keySecret: process.env.RAZORPAY_KEY_SECRET || "",
+  };
 }
 
-export function razorpayKeyId() {
-  return process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || KEY_ID;
+export async function isRazorpayEnabled() {
+  const c = await getRazorpayConfig();
+  return Boolean(c.keyId && c.keySecret);
+}
+
+export async function razorpayKeyId() {
+  return (await getRazorpayConfig()).keyId;
 }
 
 type RzpOrder = { id: string; amount: number; currency: string; status: string };
@@ -18,8 +40,9 @@ export async function createRazorpayOrder(
   amountRupees: number,
   receipt: string,
 ): Promise<RzpOrder> {
-  if (!isRazorpayEnabled()) throw new Error("Razorpay is not configured");
-  const auth = Buffer.from(`${KEY_ID}:${KEY_SECRET}`).toString("base64");
+  const { keyId, keySecret } = await getRazorpayConfig();
+  if (!keyId || !keySecret) throw new Error("Razorpay is not configured");
+  const auth = Buffer.from(`${keyId}:${keySecret}`).toString("base64");
   const res = await fetch("https://api.razorpay.com/v1/orders", {
     method: "POST",
     headers: {
@@ -40,14 +63,15 @@ export async function createRazorpayOrder(
   return (await res.json()) as RzpOrder;
 }
 
-export function verifyRazorpaySignature(
+export async function verifyRazorpaySignature(
   razorpayOrderId: string,
   razorpayPaymentId: string,
   signature: string,
-): boolean {
-  if (!KEY_SECRET) return false;
+): Promise<boolean> {
+  const { keySecret } = await getRazorpayConfig();
+  if (!keySecret) return false;
   const expected = crypto
-    .createHmac("sha256", KEY_SECRET)
+    .createHmac("sha256", keySecret)
     .update(`${razorpayOrderId}|${razorpayPaymentId}`)
     .digest("hex");
   try {

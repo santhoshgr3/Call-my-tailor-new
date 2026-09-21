@@ -24,7 +24,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Order mismatch" }, { status: 400 });
   }
 
-  const ok = verifyRazorpaySignature(
+  const ok = await verifyRazorpaySignature(
     razorpay_order_id,
     razorpay_payment_id,
     razorpay_signature,

@@ -71,6 +71,16 @@ export type SiteConfig = {
     shipping_fee: number;
     free_shipping_over: number;
   };
+  payments?: {
+    cod_enabled?: boolean;
+    online_enabled?: boolean;
+  };
+  nav?: {
+    all_categories_label?: string;
+    home_label?: string;
+    collection_label?: string;
+    show_collection?: boolean;
+  };
   page_text?: {
     book_visit_title?: string;
     book_visit_intro?: string;
@@ -82,6 +92,13 @@ export type SiteConfig = {
     newsletter_subtext?: string;
     gallery_heading?: string;
   };
+};
+
+export const DEFAULT_NAV = {
+  all_categories_label: "All Categories",
+  home_label: "Home",
+  collection_label: "Collection",
+  show_collection: true,
 };
 
 export const DEFAULT_STORE = { shipping_fee: 199, free_shipping_over: 4999 };

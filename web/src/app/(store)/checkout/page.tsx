@@ -32,7 +32,8 @@ export default async function CheckoutPage() {
           pincode: address?.pincode ?? "",
         }}
         loggedIn={!!user}
-        razorpayEnabled={isRazorpayEnabled()}
+        razorpayEnabled={(await isRazorpayEnabled()) && site.payments?.online_enabled !== false}
+        codEnabled={site.payments?.cod_enabled !== false}
         store={site.store ?? DEFAULT_STORE}
       />
     </div>

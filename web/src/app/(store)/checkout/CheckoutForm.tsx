@@ -44,17 +44,21 @@ export function CheckoutForm({
   defaults,
   loggedIn,
   razorpayEnabled,
+  codEnabled,
   store,
 }: {
   defaults: Defaults;
   loggedIn: boolean;
   razorpayEnabled: boolean;
+  codEnabled: boolean;
   store: { shipping_fee: number; free_shipping_over: number };
 }) {
   const router = useRouter();
   const { lines, subtotal, clear, ready } = useCart();
   const [form, setForm] = useState<Defaults>(defaults);
-  const [payment, setPayment] = useState<"cod" | "razorpay">("cod");
+  const [payment, setPayment] = useState<"cod" | "razorpay">(
+    codEnabled || !razorpayEnabled ? "cod" : "razorpay",
+  );
   const [coupon, setCoupon] = useState("");
   const [notes, setNotes] = useState("");
   const [busy, setBusy] = useState(false);
@@ -259,15 +263,17 @@ export function CheckoutForm({
         <section>
           <h2 className="mb-3 text-sm font-bold uppercase">Payment</h2>
           <div className="space-y-2 text-sm">
-            <label className="flex items-center gap-2">
-              <input
-                type="radio"
-                name="pay"
-                checked={payment === "cod"}
-                onChange={() => setPayment("cod")}
-              />
-              Cash / Pay on delivery (or after home trial)
-            </label>
+            {codEnabled && (
+              <label className="flex items-center gap-2">
+                <input
+                  type="radio"
+                  name="pay"
+                  checked={payment === "cod"}
+                  onChange={() => setPayment("cod")}
+                />
+                Cash / Pay on delivery (or after home trial)
+              </label>
+            )}
             <label
               className={`flex items-center gap-2 ${razorpayEnabled ? "" : "text-faint"}`}
             >
@@ -279,7 +285,7 @@ export function CheckoutForm({
                 onChange={() => setPayment("razorpay")}
               />
               Pay online with Razorpay
-              {!razorpayEnabled && " (set RAZORPAY_KEY_ID in .env to enable)"}
+              {!razorpayEnabled && " (currently unavailable)"}
             </label>
           </div>
         </section>

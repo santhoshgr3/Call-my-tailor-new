@@ -26,6 +26,12 @@ export function SiteHeader({
   const [collectionOpen, setCollectionOpen] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
 
+  const nav = {
+    all_categories_label: site.nav?.all_categories_label || "All Categories",
+    home_label: site.nav?.home_label || "Home",
+    collection_label: site.nav?.collection_label || "Collection",
+    show_collection: site.nav?.show_collection !== false,
+  };
   const logoSrc = site.logo || "/logo.png";
   const headerLinks = site.header_links?.length
     ? site.header_links
@@ -101,7 +107,7 @@ export function SiteHeader({
               onClick={() => setMobileOpen((v) => !v)}
               className="flex items-center gap-1.5 text-xs font-bold uppercase"
             >
-              <span className="text-base">☰</span> All Categories
+              <span className="text-base">☰</span> {nav.all_categories_label}
             </button>
             <button
               type="button"
@@ -217,7 +223,7 @@ export function SiteHeader({
         <div className="container-cmt flex items-stretch gap-1">
           <div className="group relative">
             <button className="flex h-11 items-center gap-2 bg-brand px-4 text-xs font-bold uppercase text-white">
-              ☰ All Categories
+              ☰ {nav.all_categories_label}
             </button>
             <div className="invisible absolute left-0 top-full z-40 w-64 border border-line bg-white opacity-0 shadow-pop transition group-hover:visible group-hover:opacity-100">
               {menu.map((m) => (
@@ -251,16 +257,17 @@ export function SiteHeader({
             href="/"
             className="flex h-11 items-center px-4 text-xs font-bold uppercase text-brand"
           >
-            Home
+            {nav.home_label}
           </Link>
 
+          {nav.show_collection && (
           <div
             className="relative"
             onMouseEnter={() => setCollectionOpen(true)}
             onMouseLeave={() => setCollectionOpen(false)}
           >
             <button className="flex h-11 items-center gap-1 px-4 text-xs font-bold uppercase text-brand-dark hover:text-brand">
-              Collection ▾
+              {nav.collection_label} ▾
             </button>
             {collectionOpen && (
               <div className="absolute left-0 top-full z-40 grid w-[640px] grid-cols-3 gap-x-4 gap-y-1 border border-line bg-white p-5 shadow-pop">
@@ -286,6 +293,7 @@ export function SiteHeader({
               </div>
             )}
           </div>
+          )}
 
           {headerLinks.map((l) => (
             <a
@@ -354,7 +362,7 @@ export function SiteHeader({
           </form>
           <nav className="max-h-[70vh] overflow-y-auto">
             <Link href="/" className="block border-b border-line px-4 py-3 text-sm font-semibold">
-              Home
+              {nav.home_label}
             </Link>
             {menu.map((m) => (
               <details key={m.id} className="border-b border-line">
