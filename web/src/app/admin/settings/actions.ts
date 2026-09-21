@@ -19,6 +19,8 @@ export async function saveGeneralSettings(fd: FormData) {
   }
 
   const displayPrice = Number(str(fd, "hv_price"));
+  const fee = Number(str(fd, "shipping_fee"));
+  const freeOver = Number(str(fd, "free_shipping_over"));
 
   await patchSite({
     brand: str(fd, "brand") || site.brand,
@@ -41,6 +43,21 @@ export async function saveGeneralSettings(fd: FormData) {
       alt_email: str(fd, "c_alt_email") || undefined,
       hours: str(fd, "c_hours"),
       people: cleanRows(jsonField(fd, "c_people", []), ["role", "name"] as const),
+    },
+    store: {
+      shipping_fee: Number.isFinite(fee) ? Math.max(0, fee) : 199,
+      free_shipping_over: Number.isFinite(freeOver) ? Math.max(0, freeOver) : 4999,
+    },
+    page_text: {
+      book_visit_title: str(fd, "pt_book_visit_title"),
+      book_visit_intro: str(fd, "pt_book_visit_intro"),
+      book_visit_help_heading: str(fd, "pt_book_visit_help_heading"),
+      contact_address_heading: str(fd, "pt_contact_address_heading"),
+      contact_quick_heading: str(fd, "pt_contact_quick_heading"),
+      contact_hours_heading: str(fd, "pt_contact_hours_heading"),
+      contact_form_heading: str(fd, "pt_contact_form_heading"),
+      newsletter_subtext: str(fd, "pt_newsletter_subtext"),
+      gallery_heading: str(fd, "pt_gallery_heading"),
     },
     home_visit: {
       option_label: str(fd, "hv_label") || DEFAULT_HOME_VISIT.option_label,

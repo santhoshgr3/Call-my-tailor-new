@@ -82,9 +82,12 @@ export async function applyCoupon(code: string, subtotal: number) {
   return { discount, coupon: { code: c.code } };
 }
 
-export function shippingFor(subtotal: number) {
+export function shippingFor(
+  subtotal: number,
+  store: { shipping_fee: number; free_shipping_over: number },
+) {
   if (subtotal === 0) return 0;
-  return subtotal >= 4999 ? 0 : 199;
+  return subtotal >= store.free_shipping_over ? 0 : store.shipping_fee;
 }
 
 export async function nextOrderNumber() {

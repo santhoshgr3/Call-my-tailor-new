@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { SiteConfig } from "@/lib/settings";
+import { DEFAULT_PAGE_TEXT, type SiteConfig } from "@/lib/settings";
 import { NewsletterForm } from "./NewsletterForm";
 import { SocialIcons } from "./SocialIcons";
 
@@ -39,7 +39,7 @@ export function SiteFooter({ site }: { site: SiteConfig }) {
                 {site.newsletter_heading || "Signup For Newsletter"}
               </h4>
               <p className="text-sm text-white/50">
-                We&apos;ll never share your email address with a third-party.
+                {site.page_text?.newsletter_subtext || DEFAULT_PAGE_TEXT.newsletter_subtext}
               </p>
             </div>
           </div>
@@ -94,7 +94,7 @@ export function SiteFooter({ site }: { site: SiteConfig }) {
         {gallery.length > 0 && (
           <div>
             <h5 className="relative mb-4 pb-2 text-sm font-bold uppercase text-white after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-8 after:bg-brand">
-              Instagram Gallery
+              {site.page_text?.gallery_heading || DEFAULT_PAGE_TEXT.gallery_heading}
             </h5>
             <div className="grid grid-cols-3 gap-1.5">
               {gallery.slice(0, 5).map((g, i) => (

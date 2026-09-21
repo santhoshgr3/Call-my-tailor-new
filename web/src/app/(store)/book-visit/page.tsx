@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getSiteConfig } from "@/lib/settings";
+import { getSiteConfig, DEFAULT_PAGE_TEXT } from "@/lib/settings";
 import { db } from "@/lib/db";
 import { BookVisitForm } from "./BookVisitForm";
 
@@ -11,6 +11,7 @@ export const metadata: Metadata = {
 
 export default async function BookVisitPage() {
   const site = await getSiteConfig();
+  const T = { ...DEFAULT_PAGE_TEXT, ...(site.page_text ?? {}) };
   const cats = await db.category
     .findMany({
       where: { parentId: null, isActive: true },
@@ -23,11 +24,9 @@ export default async function BookVisitPage() {
     <div className="container-cmt py-10">
       <div className="grid gap-10 lg:grid-cols-[1fr_360px]">
         <div>
-          <h1 className="text-3xl">Book a Free Home Visit</h1>
+          <h1 className="text-3xl">{T.book_visit_title || DEFAULT_PAGE_TEXT.book_visit_title}</h1>
           <p className="mt-3 max-w-2xl text-sm text-muted">
-            Why go anywhere? Our expert tailor visits your home or office at a convenient time,
-            takes precise measurements and brings fabric swatches from 2000+ options. Fill the form
-            and our team will confirm your slot.
+            {T.book_visit_intro || DEFAULT_PAGE_TEXT.book_visit_intro}
           </p>
           <div className="mt-6">
             <BookVisitForm categories={cats} />
@@ -35,7 +34,9 @@ export default async function BookVisitPage() {
         </div>
 
         <aside className="h-fit rounded border border-line bg-soft p-6 text-sm">
-          <h2 className="mb-3 text-sm font-bold uppercase">Need help now?</h2>
+          <h2 className="mb-3 text-sm font-bold uppercase">
+            {T.book_visit_help_heading || DEFAULT_PAGE_TEXT.book_visit_help_heading}
+          </h2>
           <p className="text-muted">
             Call us at{" "}
             <a href={`tel:${site.contact?.phone_raw}`} className="font-semibold text-brand">

@@ -67,6 +67,36 @@ export type SiteConfig = {
     display_price: number;
     note: string;
   };
+  store?: {
+    shipping_fee: number;
+    free_shipping_over: number;
+  };
+  page_text?: {
+    book_visit_title?: string;
+    book_visit_intro?: string;
+    book_visit_help_heading?: string;
+    contact_address_heading?: string;
+    contact_quick_heading?: string;
+    contact_hours_heading?: string;
+    contact_form_heading?: string;
+    newsletter_subtext?: string;
+    gallery_heading?: string;
+  };
+};
+
+export const DEFAULT_STORE = { shipping_fee: 199, free_shipping_over: 4999 };
+
+export const DEFAULT_PAGE_TEXT = {
+  book_visit_title: "Book a Free Home Visit",
+  book_visit_intro:
+    "Why go anywhere? Our expert tailor visits your home or office at a convenient time, takes precise measurements and brings fabric swatches from 2000+ options. Fill the form and our team will confirm your slot.",
+  book_visit_help_heading: "Need help now?",
+  contact_address_heading: "Visit Our Store",
+  contact_quick_heading: "24/7 Quick Contact",
+  contact_hours_heading: "Working Hours",
+  contact_form_heading: "Send us a message",
+  newsletter_subtext: "We'll never share your email address with a third-party.",
+  gallery_heading: "Instagram Gallery",
 };
 
 export const DEFAULT_HEADER_LINKS = [

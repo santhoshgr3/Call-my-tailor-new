@@ -55,7 +55,10 @@ async function collect(fd: FormData) {
   const specs = readJson<ParsedSpec[]>(fd, "specs", []).filter((s) => s.key);
   const options = readJson<ParsedOption[]>(fd, "options", []).filter((o) => o.label);
   const categoryIds = readJson<string[]>(fd, "categoryIds", []);
-  const description = String(fd.get("description") || "").trim();
+  const htmlIn = String(fd.get("descriptionHtml") || "").trim();
+  const description = htmlIn
+    ? htmlIn.replace(/<[^>]+>/g, " ").replace(/&nbsp;/g, " ").replace(/s+/g, " ").trim()
+    : String(fd.get("description") || "").trim();
 
   return {
     name,
@@ -68,7 +71,7 @@ async function collect(fd: FormData) {
     shortDescription: String(fd.get("shortDescription") || "").trim() || null,
     description,
     descriptionHtml:
-      String(fd.get("descriptionHtml") || "").trim() ||
+      htmlIn ||
       (description ? `<p>${description.replace(/\n{2,}/g, "</p><p>").replace(/\n/g, "<br/>")}</p>` : ""),
     metaTitle: String(fd.get("metaTitle") || "").trim() || null,
     metaDescription: String(fd.get("metaDescription") || "").trim() || null,

@@ -1,4 +1,4 @@
-import { getSetting, getSiteConfig, DEFAULT_HOME_VISIT } from "@/lib/settings";
+import { getSetting, getSiteConfig, DEFAULT_HOME_VISIT, DEFAULT_STORE, DEFAULT_PAGE_TEXT } from "@/lib/settings";
 import { PageHeader, Card, Field, inputCls, SubmitButton } from "@/components/admin/ui";
 import { ImageField } from "@/components/admin/ImageField";
 import { Repeater, StringList } from "@/components/admin/Repeater";
@@ -15,6 +15,8 @@ export default async function AdminSettings() {
     default_description: "",
   });
   const hv = site.home_visit ?? DEFAULT_HOME_VISIT;
+  const store = site.store ?? DEFAULT_STORE;
+  const pt = { ...DEFAULT_PAGE_TEXT, ...(site.page_text ?? {}) };
 
   return (
     <div className="max-w-3xl">
@@ -149,6 +151,53 @@ export default async function AdminSettings() {
             </Field>
             <Field label="Note under the price" className="sm:col-span-2">
               <input name="hv_note" defaultValue={hv.note} className={inputCls} />
+            </Field>
+          </div>
+        </Card>
+
+        <Card>
+          <h2 className="mb-1 font-bold">Shipping</h2>
+          <p className="mb-4 text-xs text-faint">Used in the cart, at checkout and when the order is placed.</p>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="Shipping fee (₹)">
+              <input name="shipping_fee" type="number" min={0} defaultValue={store.shipping_fee} className={inputCls} />
+            </Field>
+            <Field label="Free shipping on orders of (₹) or more">
+              <input name="free_shipping_over" type="number" min={0} defaultValue={store.free_shipping_over} className={inputCls} />
+            </Field>
+          </div>
+        </Card>
+
+        <Card>
+          <h2 className="mb-1 font-bold">Page text</h2>
+          <p className="mb-4 text-xs text-faint">Headings and intro copy on the Book Visit and Contact pages and in the footer.</p>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="Book Visit — title" className="sm:col-span-2">
+              <input name="pt_book_visit_title" defaultValue={pt.book_visit_title} className={inputCls} />
+            </Field>
+            <Field label="Book Visit — intro" className="sm:col-span-2">
+              <textarea name="pt_book_visit_intro" rows={3} defaultValue={pt.book_visit_intro} className={inputCls} />
+            </Field>
+            <Field label="Book Visit — sidebar heading">
+              <input name="pt_book_visit_help_heading" defaultValue={pt.book_visit_help_heading} className={inputCls} />
+            </Field>
+            <Field label="Contact — address heading">
+              <input name="pt_contact_address_heading" defaultValue={pt.contact_address_heading} className={inputCls} />
+            </Field>
+            <Field label="Contact — phone/email heading">
+              <input name="pt_contact_quick_heading" defaultValue={pt.contact_quick_heading} className={inputCls} />
+            </Field>
+            <Field label="Contact — hours heading">
+              <input name="pt_contact_hours_heading" defaultValue={pt.contact_hours_heading} className={inputCls} />
+            </Field>
+            <Field label="Contact — form heading">
+              <input name="pt_contact_form_heading" defaultValue={pt.contact_form_heading} className={inputCls} />
+            </Field>
+            <Field label="Footer — newsletter sub-text">
+              <input name="pt_newsletter_subtext" defaultValue={pt.newsletter_subtext} className={inputCls} />
+            </Field>
+            <Field label="Footer — gallery heading">
+              <input name="pt_gallery_heading" defaultValue={pt.gallery_heading} className={inputCls} />
             </Field>
           </div>
         </Card>

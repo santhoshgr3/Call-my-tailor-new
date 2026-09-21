@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { getSessionUserId } from "@/lib/auth";
 import { checkoutSchema } from "@/lib/validation";
 import { priceCart, applyCoupon, shippingFor, nextOrderNumber } from "@/lib/orders";
+import { getSiteConfig, DEFAULT_STORE } from "@/lib/settings";
 import { isRazorpayEnabled, razorpayKeyId, createRazorpayOrder } from "@/lib/razorpay";
 
 export async function POST(req: Request) {
@@ -25,7 +26,8 @@ export async function POST(req: Request) {
   }
 
   const { discount, coupon } = await applyCoupon(d.couponCode || "", subtotal);
-  const shipping = shippingFor(subtotal - discount);
+  const store = (await getSiteConfig()).store ?? DEFAULT_STORE;
+  const shipping = shippingFor(subtotal - discount, store);
   const total = Math.max(0, subtotal - discount + shipping);
 
   const userId = await getSessionUserId();

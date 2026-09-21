@@ -4,7 +4,11 @@ import Link from "next/link";
 import { useCart } from "@/components/cart/CartProvider";
 import { formatINR } from "@/lib/money";
 
-export function CartView() {
+export function CartView({
+  store,
+}: {
+  store: { shipping_fee: number; free_shipping_over: number };
+}) {
   const { lines, subtotal, setQty, remove, ready } = useCart();
 
   if (!ready) return <p className="text-sm text-faint">Loading…</p>;
@@ -20,7 +24,8 @@ export function CartView() {
     );
   }
 
-  const shipping = subtotal >= 4999 || subtotal === 0 ? 0 : 199;
+  const shipping =
+    subtotal >= store.free_shipping_over || subtotal === 0 ? 0 : store.shipping_fee;
 
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_320px]">

@@ -4,6 +4,7 @@ import { useActionState, useState } from "react";
 import Link from "next/link";
 import { inputCls, Field, SubmitButton } from "./ui";
 import { uploadImage } from "./ImageField";
+import { RichTextField } from "./RichTextField";
 import {
   createProduct,
   updateProduct,
@@ -31,6 +32,7 @@ export type ProductInitial = {
   quantity: number;
   shortDescription: string;
   description: string;
+  descriptionHtml: string;
   metaTitle: string;
   metaDescription: string;
   isActive: boolean;
@@ -176,14 +178,19 @@ export function ProductForm({
                   className={inputCls}
                 />
               </Field>
-              <Field label="Full description" className="sm:col-span-2">
-                <textarea
-                  name="description"
-                  defaultValue={initial.description}
-                  rows={6}
-                  className={inputCls}
+              <div className="sm:col-span-2">
+                <span className="mb-1 block text-xs font-bold uppercase text-faint">
+                  Full description
+                </span>
+                <RichTextField
+                  name="descriptionHtml"
+                  defaultValue={
+                    initial.descriptionHtml ||
+                    (initial.description ? `<p>${initial.description}</p>` : "")
+                  }
+                  minHeight={200}
                 />
-              </Field>
+              </div>
             </div>
           </div>
 

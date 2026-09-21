@@ -44,10 +44,12 @@ export function CheckoutForm({
   defaults,
   loggedIn,
   razorpayEnabled,
+  store,
 }: {
   defaults: Defaults;
   loggedIn: boolean;
   razorpayEnabled: boolean;
+  store: { shipping_fee: number; free_shipping_over: number };
 }) {
   const router = useRouter();
   const { lines, subtotal, clear, ready } = useCart();
@@ -58,7 +60,8 @@ export function CheckoutForm({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
-  const shipping = subtotal >= 4999 || subtotal === 0 ? 0 : 199;
+  const shipping =
+    subtotal >= store.free_shipping_over || subtotal === 0 ? 0 : store.shipping_fee;
   const total = subtotal + shipping;
 
   function set<K extends keyof Defaults>(k: K, v: string) {
