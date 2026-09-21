@@ -270,7 +270,7 @@ export function SiteHeader({
               {nav.collection_label} ▾
             </button>
             {collectionOpen && (
-              <div className="absolute left-0 top-full z-40 grid w-[640px] grid-cols-3 gap-x-4 gap-y-1 border border-line bg-white p-5 shadow-pop">
+              <div className="absolute left-0 top-full z-40 grid w-[860px] max-w-[calc(100vw-2rem)] grid-flow-row grid-cols-4 items-start gap-x-6 gap-y-3 border border-line bg-white p-5 shadow-pop">
                 {menu.map((m) => (
                   <div key={m.id} className="mb-2">
                     <Link
