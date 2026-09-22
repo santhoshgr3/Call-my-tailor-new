@@ -84,6 +84,11 @@ export function BuyBox({
   const homeVisitSelected = Object.values(selected).some(isHomeVisit);
   const scheduleNeeded = Object.values(selected).some(needsSchedule);
   const inStock = !/out of stock/i.test(stock);
+  const scheduleLabel = homeVisitSelected
+    ? "Home Visit Schedule"
+    : Object.values(selected).some((v) => v.trim().toLowerCase().includes("call"))
+      ? "Call Schedule"
+      : "Schedule";
 
   const effectivePrice = useMemo(() => {
     if (Object.values(selected).some(isHomeVisit)) return homeVisit.display_price;
@@ -188,10 +193,10 @@ export function BuyBox({
       </div>
       {homeVisitSelected && <p className="-mt-2 text-xs text-faint">{homeVisit.note}</p>}
 
-      {/* Options as chips — the size chart is hidden once a home visit is chosen, since
-          measurements are then taken at the customer's home instead. */}
+      {/* Options as chips — the size chart is hidden once a home visit or call is chosen,
+          since sizing is then handled during that visit / call instead. */}
       {options
-        .filter((o) => !(homeVisitSelected && isSizeOption(o.label)))
+        .filter((o) => !(scheduleNeeded && isSizeOption(o.label)))
         .map((o) => (
         <div key={o.id} className="flex flex-wrap items-center gap-x-4 gap-y-2">
           <span className="text-[15px] font-bold text-ink">
@@ -226,7 +231,7 @@ export function BuyBox({
       {scheduleNeeded && (
         <div>
           <label className="mb-1 block text-xs font-bold uppercase text-faint">
-            Home Visit Schedule
+            {scheduleLabel}
             <span className="text-brand"> *</span>
           </label>
           <div
