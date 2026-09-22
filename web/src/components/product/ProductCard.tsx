@@ -1,14 +1,11 @@
 import Link from "next/link";
 import { formatINR } from "@/lib/money";
-import { Stars } from "@/components/ui/Stars";
 import type { ProductCard as TCard } from "@/lib/catalog";
 import { AddToCartButton } from "./AddToCartButton";
 
 export function ProductCard({ p, compact = false }: { p: TCard; compact?: boolean }) {
   const img = p.images[0]?.url || "/img/placeholder.svg";
   const hover = p.images[1]?.url;
-  const available = Math.max(0, 10 - (p.soldCount ?? 0));
-  const pct = Math.max(4, Math.min(100, Math.round((available / 10) * 100)));
   return (
     <div className="group relative flex flex-col border border-line bg-white transition-shadow hover:shadow-pop">
       {p.isNewArrival && (
@@ -75,23 +72,12 @@ export function ProductCard({ p, compact = false }: { p: TCard; compact?: boolea
         >
           {p.name}
         </Link>
-        {!compact && <Stars value={p.rating} count={p.ratingCount || undefined} />}
         <div className="flex items-center gap-2">
           <span className="text-[15px] font-bold text-brand">{formatINR(p.price)}</span>
           {p.oldPrice ? (
             <span className="text-xs text-faint line-through">{formatINR(p.oldPrice)}</span>
           ) : null}
         </div>
-        {!compact && (
-          <div className="mt-auto pt-1">
-            <div className="h-1.5 w-full overflow-hidden rounded-full bg-line">
-              <div className="h-full rounded-full bg-brand" style={{ width: `${pct}%` }} />
-            </div>
-            <p className="mt-1 text-[10px] text-faint">
-              Available: {available} / Sold: {p.soldCount ?? 0}
-            </p>
-          </div>
-        )}
       </div>
     </div>
   );

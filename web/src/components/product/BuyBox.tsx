@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useCart } from "@/components/cart/CartProvider";
 import { useShopLists, COMPARE_MAX } from "@/components/shop/ShopListProvider";
@@ -17,6 +17,18 @@ type Option = {
 function needsSchedule(label: string) {
   const l = label.trim().toLowerCase();
   return l.includes("home visit") || l.includes("call") || l.includes("voice") || l.includes("video");
+}
+
+function isSizeOption(label: string) {
+  return label.trim().toLowerCase().includes("size");
+}
+
+/** Local "now", rounded down to the minute, as a datetime-local input value. */
+function nowLocal() {
+  const d = new Date();
+  d.setSeconds(0, 0);
+  d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+  return d.toISOString().slice(0, 16);
 }
 
 const SHARE = [
@@ -67,6 +79,7 @@ export function BuyBox({
   const inCompare = compare.includes(product.slug);
   const [pageUrl, setPageUrl] = useState("");
   useEffect(() => setPageUrl(window.location.href), []);
+  const scheduleRef = useRef<HTMLInputElement>(null);
 
   const homeVisitSelected = Object.values(selected).some(isHomeVisit);
   const scheduleNeeded = Object.values(selected).some(needsSchedule);
@@ -91,7 +104,7 @@ export function BuyBox({
       }
     }
     if (scheduleNeeded && !schedule) {
-      setError("Please choose a schedule date for the home visit / call");
+      setError("Please choose a date and time for the home visit / call");
       return false;
     }
     setError("");
@@ -175,8 +188,11 @@ export function BuyBox({
       </div>
       {homeVisitSelected && <p className="-mt-2 text-xs text-faint">{homeVisit.note}</p>}
 
-      {/* Options as chips */}
-      {options.map((o) => (
+      {/* Options as chips — the size chart is hidden once a home visit is chosen, since
+          measurements are then taken at the customer's home instead. */}
+      {options
+        .filter((o) => !(homeVisitSelected && isSizeOption(o.label)))
+        .map((o) => (
         <div key={o.id} className="flex flex-wrap items-center gap-x-4 gap-y-2">
           <span className="text-[15px] font-bold text-ink">
             {o.label}
@@ -210,16 +226,21 @@ export function BuyBox({
       {scheduleNeeded && (
         <div>
           <label className="mb-1 block text-xs font-bold uppercase text-faint">
-            Schedule — For Tailor Home Visit / Customization on call
+            Home Visit Schedule
             <span className="text-brand"> *</span>
           </label>
-          <div className="flex max-w-md items-stretch border border-line">
+          <div
+            className="flex max-w-md cursor-pointer items-stretch border border-line"
+            onClick={() => scheduleRef.current?.showPicker?.()}
+          >
             <input
-              type="date" suppressHydrationWarning
+              ref={scheduleRef}
+              type="datetime-local"
+              suppressHydrationWarning
               value={schedule}
               onChange={(e) => setSchedule(e.target.value)}
-              min={new Date().toISOString().slice(0, 10)}
-              className="w-full px-3 py-2 text-sm outline-none"
+              min={nowLocal()}
+              className="w-full cursor-pointer px-3 py-2 text-sm outline-none"
             />
             <span className="grid w-11 shrink-0 place-items-center bg-brand text-white">📅</span>
           </div>
@@ -266,36 +287,24 @@ export function BuyBox({
           <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current" aria-hidden>
             <path d="M7 18a2 2 0 100 4 2 2 0 000-4zm10 0a2 2 0 100 4 2 2 0 000-4zM1 2v2h2l3.6 7.6-1.4 2.4A2 2 0 007 17h12v-2H7.4l1.1-2h7.5a2 2 0 001.75-1l3.6-6.5A1 1 0 0020.5 4H5.2l-.9-2H1z" />
           </svg>
-          {added ? "Added ✓" : "Add to cart"}
+          {added ? "Added ✓" : "Add to Order"}
         </button>
-
-        <Link
-          href="/checkout"
-          onClick={(e) => {
-            if (!inStock || !handleAdd()) e.preventDefault();
-          }}
-          className="flex h-[46px] shrink-0 items-center justify-center gap-1.5 bg-[#4cae4c] px-4 text-xs font-bold uppercase tracking-wide text-white transition-colors hover:bg-[#3f9a3f] sm:px-6"
-        >
-          <span aria-hidden className="grid h-4 w-4 place-items-center rounded-full border border-white text-[10px] leading-none">
-            ₹
-          </span>
-          Buy now
-        </Link>
 
         <a
           href={enquiry}
           target="_blank"
           rel="noopener noreferrer"
-          aria-label="Ask a question on WhatsApp"
-          title="Ask a question"
-          className="grid h-[46px] w-[46px] shrink-0 place-items-center bg-brand text-lg font-bold text-white transition-colors hover:bg-brand-hover sm:w-[56px]"
+          className="flex h-[46px] shrink-0 items-center justify-center gap-1.5 bg-[#4cae4c] px-4 text-xs font-bold uppercase tracking-wide text-white transition-colors hover:bg-[#3f9a3f] sm:px-6"
         >
-          ?
+          <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current" aria-hidden>
+            <path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18.2c-1.5 0-2.9-.4-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1112 20.2z" />
+          </svg>
+          Ask Expert
         </a>
       </div>
 
       <a href={bookingUrl} className="btn-outline w-full">
-        Book Visit &amp; Order Now
+        Book Now
       </a>
 
       <hr className="border-line" />

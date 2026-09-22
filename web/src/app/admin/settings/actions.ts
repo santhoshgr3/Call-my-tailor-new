@@ -67,7 +67,7 @@ export async function saveGeneralSettings(fd: FormData) {
     },
     home_visit: {
       option_label: str(fd, "hv_label") || DEFAULT_HOME_VISIT.option_label,
-      display_price: Number.isFinite(displayPrice) ? Math.max(0, displayPrice) : 0,
+      display_price: Number.isFinite(displayPrice) ? Math.max(0, displayPrice) : DEFAULT_HOME_VISIT.display_price,
       note: str(fd, "hv_note"),
     },
   });

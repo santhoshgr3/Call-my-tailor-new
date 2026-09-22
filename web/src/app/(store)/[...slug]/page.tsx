@@ -108,7 +108,7 @@ async function CategoryView({
   const q = (sp.q as string) || "";
   const manufacturer = (sp.mfr as string) || "";
   const weaveOnly = sp.weave === "1";
-  const cols = [2, 3, 4, 5].includes(Number(sp.cols)) ? Number(sp.cols) : 3;
+  const cols = [2, 3, 4, 5].includes(Number(sp.cols)) ? Number(sp.cols) : 4;
 
   const [result, facets] = await Promise.all([
     getCategoryProducts({

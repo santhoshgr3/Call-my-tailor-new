@@ -132,7 +132,7 @@ export const DEFAULT_TRENDING = [
 
 export const DEFAULT_HOME_VISIT = {
   option_label: "Tailor Home Visit",
-  display_price: 0,
+  display_price: 300,
   note: "₹300 will be paid for the home visit.",
 };
 
