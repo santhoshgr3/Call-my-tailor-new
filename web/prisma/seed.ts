@@ -192,7 +192,7 @@ async function main() {
               sortOrder: 1,
               values: {
                 create: [
-                  { label: "Custom (measured at home)", sortOrder: 0 },
+                  { label: "I will provide my Body Size", sortOrder: 0 },
                   ...["36", "38", "40", "42", "44", "46", "48"].map((s, i) => ({
                     label: s,
                     sortOrder: i + 1,

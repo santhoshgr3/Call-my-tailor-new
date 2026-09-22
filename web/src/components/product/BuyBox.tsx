@@ -308,9 +308,21 @@ export function BuyBox({
         </a>
       </div>
 
-      <a href={bookingUrl} className="btn-outline w-full">
-        Book Now
-      </a>
+      {scheduleNeeded ? (
+        <a href={bookingUrl} className="btn-outline w-full">
+          Book Now
+        </a>
+      ) : (
+        <Link
+          href="/checkout"
+          onClick={(e) => {
+            if (!inStock || !handleAdd()) e.preventDefault();
+          }}
+          className="btn-outline w-full"
+        >
+          Order Now
+        </Link>
+      )}
 
       <hr className="border-line" />
 
