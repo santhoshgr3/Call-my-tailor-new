@@ -25,7 +25,7 @@ const BASE_COLUMNS: ColDef[] = [
   { key: "short_description", header: "Short Description", width: 34, note: "One or two lines shown under the title." },
   { key: "description", header: "Description", width: 50, note: "Full description. Plain text or HTML (<p>, <ul>, <b> …)." },
   { key: "categories", header: "Categories", width: 28, note: "Category slugs or names separated by ; or | — e.g. formal-suit; casual-suit." },
-  { key: "images", header: "Images", width: 50, note: "Image URLs separated by | or ; (the first is the main image). Use /media/… links for uploaded images." },
+  { key: "images", header: "Images", width: 50, note: "Image links or Media Library file names, separated by | or ; (the first is the main image). e.g. navy-suit-1.jpg | navy-suit-2.jpg" },
   { key: "is_active", header: "Active", width: 9, note: "Yes / No. Inactive products are hidden from the shop." },
   { key: "is_featured", header: "Featured", width: 9, note: "Yes / No." },
   { key: "is_best_seller", header: "Best Seller", width: 11, note: "Yes / No — feeds the Best Sellers rail." },
@@ -268,6 +268,10 @@ function toBool(v: string | undefined): boolean | undefined | "bad" {
 }
 
 /** Split on separators that are not inside parentheses. */
+/** Marks an image cell value that is a Media Library file name, resolved in planRecord. */
+const FILE_PREFIX = "file:";
+const mediaKey = (name: string) => name.trim().replace(/\.[A-Za-z0-9]{2,5}$/, "").toLowerCase();
+
 function splitTop(s: string, seps: RegExp): string[] {
   const out: string[] = [];
   let depth = 0;
@@ -348,7 +352,8 @@ export function normalizeRecord(rec: RawRecord): { data: Norm; errors: string[];
     const good: string[] = [];
     for (const u of urls) {
       if (/^https?:\/\//i.test(u) || u.startsWith("/")) good.push(u);
-      else warnings.push(`Image “${u.slice(0, 40)}” is not a link — skipped.`);
+      else if (/^[^/\\:]+$/.test(u)) good.push(FILE_PREFIX + u); // a Media Library file name
+      else warnings.push(`Image “${u.slice(0, 40)}” is not a link or file name — skipped.`);
     }
     if (good.length) data.images = good;
   }
@@ -400,6 +405,8 @@ export type Ctx = {
   categories: CatRow[];
   bySku: Map<string, ExistingRow[]>;
   bySlug: Map<string, ExistingRow>;
+  /** Media Library images by file name (no extension, lower-case) -> /media/<id> */
+  media: Map<string, string>;
 };
 
 export async function buildCtx(records: RawRecord[]): Promise<Ctx> {
@@ -432,7 +439,26 @@ export async function buildCtx(records: RawRecord[]): Promise<Ctx> {
     bySlug.set(e.slug, e);
     if (e.sku) bySku.set(e.sku, [...(bySku.get(e.sku) ?? []), e]);
   }
-  return { categories, bySku, bySlug };
+  // Media Library files referenced by bare name in the Images column
+  const media = new Map<string, string>();
+  const wanted = new Set<string>();
+  for (const r of records) {
+    for (const u of splitTop(r.cells.images ?? "", /[|;\n]/)) {
+      if (/^[^/\\:]+$/.test(u)) wanted.add(mediaKey(u));
+    }
+  }
+  if (wanted.size) {
+    const rows = await db.media.findMany({
+      where: { source: "admin" },
+      select: { id: true, filename: true },
+      orderBy: { createdAt: "desc" },
+    });
+    for (const m of rows) {
+      const k = mediaKey(m.filename);
+      if (wanted.has(k) && !media.has(k)) media.set(k, `/media/${m.id}`);
+    }
+  }
+  return { categories, bySku, bySlug, media };
 }
 
 function findExisting(data: Norm, ctx: Ctx): { row?: ExistingRow; error?: string } {
@@ -489,6 +515,20 @@ export type RowResult = {
 /** Validate one record and decide what would happen — no writes. */
 export function planRecord(rec: RawRecord, ctx: Ctx, opts: ImportOptions) {
   const { data, errors, warnings } = normalizeRecord(rec);
+  if (data.images) {
+    const resolved: string[] = [];
+    for (const u of data.images) {
+      if (!u.startsWith(FILE_PREFIX)) {
+        resolved.push(u);
+        continue;
+      }
+      const name = u.slice(FILE_PREFIX.length);
+      const hit = ctx.media.get(mediaKey(name));
+      if (hit) resolved.push(hit);
+      else warnings.push(`Image “${name.slice(0, 40)}” was not found in the Media Library — skipped.`);
+    }
+    data.images = resolved.length ? resolved : undefined;
+  }
   const found = findExisting(data, ctx);
   if (found.error) errors.push(found.error);
 
@@ -769,7 +809,7 @@ export async function buildWorkbook(products: ExportProduct[], template: boolean
       short_description: "Tailored 3-piece suit in premium fabric.",
       description: "<p>Premium navy suit stitched to your measurements.</p>",
       categories: "formal-suit; party-suits",
-      images: "https://example.com/suit-front.jpg | https://example.com/suit-back.jpg",
+      images: "navy-suit-front.jpg | navy-suit-back.jpg",
       is_active: "Yes",
       is_featured: "No",
       is_best_seller: "Yes",

@@ -47,7 +47,11 @@ export default function ImportProductsPage() {
             <li>You always see a preview first; nothing is saved until you confirm.</li>
             <li>Existing products are matched by SKU, then slug.</li>
             <li>Blank cells are left unchanged when updating.</li>
-            <li>Images are web links (or /media/… links from the Media Library).</li>
+            <li>
+              Images: first upload your photos in <b>Media Library</b> (you can select many at once), then type
+              the file names in the Images column, e.g. <code>navy-suit-1.jpg | navy-suit-2.jpg</code>. Web links
+              also work. The first image is the main one.
+            </li>
           </ul>
         </Card>
       </div>
