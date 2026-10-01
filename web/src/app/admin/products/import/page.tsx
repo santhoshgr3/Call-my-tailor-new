@@ -48,9 +48,9 @@ export default function ImportProductsPage() {
             <li>Existing products are matched by SKU, then slug.</li>
             <li>Blank cells are left unchanged when updating.</li>
             <li>
-              Images: first upload your photos in <b>Media Library</b> (you can select many at once), then type
-              the file names in the Images column, e.g. <code>navy-suit-1.jpg | navy-suit-2.jpg</code>. Web links
-              also work. The first image is the main one.
+              Images: leave the Images column blank — after you upload your Excel file, the preview screen lets
+              you click <b>Pick images</b> on each row and select photos from the Media Library (you can upload
+              more from there too). Typing file names or web links in the Images column also still works.
             </li>
           </ul>
         </Card>

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { importChunk } from "@/app/admin/products/import/actions";
+import { MediaPicker } from "./MediaPicker";
 
 type Row = {
   row: number;
@@ -25,6 +26,14 @@ type Preview = {
   opts: Opts;
 };
 
+/** Split an Images cell into individual entries (file names or links), trimmed. */
+function splitImages(raw: string | undefined): string[] {
+  return (raw ?? "")
+    .split(/[|;\n]/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
 const BADGE: Record<Row["action"], string> = {
   create: "bg-green-100 text-green-700",
   update: "bg-blue-100 text-blue-700",
@@ -43,6 +52,21 @@ export function ProductImporter() {
   const [filter, setFilter] = useState<"all" | Row["action"]>("all");
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
   const [results, setResults] = useState<Row[] | null>(null);
+  const [pickerRow, setPickerRow] = useState<number | null>(null);
+
+  /** Replace a row's Images cell with the image URLs picked from the Media Library. */
+  function setRowImages(row: number, urls: string[]) {
+    setPreview((p) =>
+      p
+        ? {
+            ...p,
+            records: p.records.map((r) =>
+              r.row === row ? { ...r, cells: { ...r.cells, images: urls.join(" | ") } } : r,
+            ),
+          }
+        : p,
+    );
+  }
 
   async function readFile() {
     if (!file) return;
@@ -191,6 +215,7 @@ export function ProductImporter() {
                 <th className="px-3 py-2">Product</th>
                 <th className="px-3 py-2">SKU</th>
                 <th className="px-3 py-2">Price</th>
+                <th className="px-3 py-2">Images</th>
                 <th className="px-3 py-2">Notes</th>
               </tr>
             </thead>
@@ -209,6 +234,33 @@ export function ProductImporter() {
                   </td>
                   <td className="px-3 py-2">{r.sku || "—"}</td>
                   <td className="px-3 py-2">{r.price != null ? `₹${r.price.toLocaleString("en-IN")}` : "—"}</td>
+                  <td className="px-3 py-2">
+                    {(() => {
+                      const rec = preview.records.find((x) => x.row === r.row);
+                      const entries = splitImages(rec?.cells.images);
+                      const urls = entries.filter((e) => /^https?:\/\//i.test(e) || e.startsWith("/"));
+                      return (
+                        <div className="flex flex-wrap items-center gap-1">
+                          {urls.slice(0, 4).map((u, i) => (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img key={i} src={u} alt="" className="h-8 w-8 rounded border border-line object-cover" />
+                          ))}
+                          {entries.length > urls.length && (
+                            <span className="text-faint" title={entries.filter((e) => !urls.includes(e)).join(", ")}>
+                              +{entries.length - urls.length} by name
+                            </span>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => setPickerRow(r.row)}
+                            className="rounded border border-line bg-white px-2 py-1 text-[11px] font-semibold hover:border-brand hover:text-brand"
+                          >
+                            {entries.length ? "Change" : "Pick images"}
+                          </button>
+                        </div>
+                      );
+                    })()}
+                  </td>
                   <td className="px-3 py-2">
                     {r.errors.map((e, i) => (
                       <p key={i} className="text-red-600">{e}</p>
@@ -256,6 +308,19 @@ export function ProductImporter() {
             Cancel
           </button>
         </div>
+
+        {pickerRow != null && (
+          <MediaPicker
+            initial={splitImages(preview.records.find((x) => x.row === pickerRow)?.cells.images).filter(
+              (e) => /^https?:\/\//i.test(e) || e.startsWith("/"),
+            )}
+            onClose={() => setPickerRow(null)}
+            onConfirm={(urls) => {
+              setRowImages(pickerRow, urls);
+              setPickerRow(null);
+            }}
+          />
+        )}
       </div>
     );
   }
