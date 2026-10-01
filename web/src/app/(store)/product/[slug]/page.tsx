@@ -56,6 +56,12 @@ export default async function ProductPage({
   const brand = spec("fabric brand", "brand");
   const model = spec("model", "model no", "model number");
   const unit = p.options.some((o) => /cut length|length|meter|metre/i.test(o.label)) ? "Per Meter" : null;
+  // The Specifications tab shows at most 5 rows. "Fabric Brand" is dropped first since
+  // it's already shown in the brand badge next to the price, and "Weather Type" is dropped
+  // as it's rarely useful; any further overflow is trimmed from the end.
+  const visibleSpecs = p.specs
+    .filter((s) => !["fabric brand", "brand", "weather type"].includes(s.key.trim().toLowerCase()))
+    .slice(0, 5);
   const ownTags = parseTags(p.tags);
   const tagCats = p.categories.map((c) => c.category);
 
@@ -115,7 +121,7 @@ export default async function ProductPage({
             <ProductTabsView
               productId={p.id}
               descriptionHtml={p.descriptionHtml || `<p>${p.description ?? p.shortDescription ?? ""}</p>`}
-              specs={p.specs.map((s) => ({ key: s.key, value: s.value }))}
+              specs={visibleSpecs.map((s) => ({ key: s.key, value: s.value }))}
               reviews={p.reviews}
               customTabs={parseCustomTabs(p.customTabs)}
             />
