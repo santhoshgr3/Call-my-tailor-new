@@ -80,9 +80,9 @@ export default async function HomePage() {
                   <div className="flex items-center gap-3">
                     {s.icon ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={s.icon} alt="" className="h-14 w-14 shrink-0 object-contain" />
+                      <img src={s.icon} alt="" className="hidden h-14 w-14 shrink-0 object-contain md:block" />
                     ) : (
-                      <HowIcon step={s.step} className="h-14 w-14 shrink-0" />
+                      <HowIcon step={s.step} className="hidden h-14 w-14 shrink-0 md:block" />
                     )}
                     <div className="leading-tight">
                       <p className="text-[13px] font-extrabold uppercase text-brand-dark">
