@@ -30,7 +30,7 @@ export function ProductTabsView({
   customTabs?: { title: string; html: string }[];
   reviews: { id: string; customerName: string; rating: number; title: string | null; body: string; createdAt: Date }[];
 }) {
-  const [tab, setTab] = useState<Tab>("desc");
+  const [tab, setTab] = useState<Tab>(specs.length ? "specs" : "desc");
   const [open, setOpen] = useState(false);
   const [long, setLong] = useState(false);
   const descRef = useRef<HTMLDivElement>(null);
@@ -44,8 +44,8 @@ export function ProductTabsView({
   const avg = reviews.length ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length : 0;
 
   const tabs: { id: Tab; label: string }[] = [
-    { id: "desc", label: "Description" },
     ...(specs.length ? [{ id: "specs" as Tab, label: "Specifications" }] : []),
+    { id: "desc", label: "Description" },
     { id: "reviews", label: "Reviews" },
     ...customTabs.map((t, i) => ({ id: `c${i}`, label: t.title })),
   ];

@@ -78,14 +78,6 @@ export default async function ProductPage({
         />
       )}
 
-      {/* Title bar */}
-      <div className="border-b border-line bg-gradient-to-b from-white to-[#ececec]">
-        <div className="container-cmt pt-5">
-          <h1 className="pb-3 text-[22px] font-bold leading-snug text-ink sm:text-[30px]">{p.name}</h1>
-          <span className="block h-[2px] w-[120px] bg-brand" />
-        </div>
-      </div>
-
       <div className="container-cmt py-6">
         <nav className="mb-5 text-xs text-faint">
           <Link href="/" className="hover:text-brand">
@@ -118,6 +110,8 @@ export default async function ProductPage({
           <ProductGallery images={p.images} name={p.name} badge={p.isNewArrival ? "New" : undefined} />
 
           <div className="min-w-0">
+            <h1 className="mb-3 text-[22px] font-bold leading-snug text-ink sm:text-[26px]">{p.name}</h1>
+            <span className="mb-5 block h-[2px] w-[120px] bg-brand" />
             <ProductTabsView
               productId={p.id}
               descriptionHtml={p.descriptionHtml || `<p>${p.description ?? p.shortDescription ?? ""}</p>`}
