@@ -211,18 +211,18 @@ export default async function HomePage() {
         >
           <div className="absolute inset-0 bg-black/45" />
           <div className="container-cmt relative">
-            <h2 className="mb-10 text-center text-3xl font-bold text-white">
+            <h2 className="mb-6 text-center text-2xl font-bold text-white sm:mb-10 sm:text-3xl">
               {T.why_choose_us || "Why Choose Us"}
             </h2>
-            <div className="grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-2 gap-x-4 gap-y-7 sm:gap-x-8 sm:gap-y-10 lg:grid-cols-3">
               {site.why_choose_us.map((w, i) => (
                 <div key={i} className="text-center">
                   {w.icon && (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={w.icon} alt="" className="mx-auto h-[70px] w-[70px] object-contain" />
+                    <img src={w.icon} alt="" className="mx-auto h-[56px] w-[56px] object-contain sm:h-[70px] sm:w-[70px]" />
                   )}
-                  <h3 className="mt-3 text-lg font-semibold text-white">{w.title}</h3>
-                  <p className="mt-1 text-[13px] leading-snug text-white/85">{w.text}</p>
+                  <h3 className="mt-2 text-[15px] font-semibold text-white sm:mt-3 sm:text-lg">{w.title}</h3>
+                  <p className="mt-1 text-[12px] leading-snug text-white/85 sm:text-[13px]">{w.text}</p>
                 </div>
               ))}
             </div>

@@ -29,70 +29,67 @@ export function CartView({
 
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
-      <div className="overflow-x-auto">
-        <table className="w-full min-w-[560px] border border-line text-sm">
-          <thead className="bg-soft text-left text-xs uppercase text-faint">
-            <tr>
-              <th className="px-3 py-2">Product</th>
-              <th className="px-3 py-2">Price</th>
-              <th className="px-3 py-2">Qty</th>
-              <th className="px-3 py-2 text-right">Total</th>
-              <th />
-            </tr>
-          </thead>
-          <tbody>
-            {lines.map((l) => (
-              <tr key={l.key} className="border-t border-line align-top">
-                <td className="px-3 py-3">
-                  <div className="flex gap-3">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={l.image}
-                      alt={l.name}
-                      className="h-20 w-16 shrink-0 rounded object-cover"
-                    />
-                    <div>
-                      <Link
-                        href={`/product/${l.slug}`}
-                        className="font-semibold hover:text-brand"
-                      >
-                        {l.name}
-                      </Link>
-                      {Object.entries(l.options).map(([k, v]) => (
-                        <p key={k} className="text-xs text-faint">
-                          {k}: {v}
-                        </p>
-                      ))}
-                    </div>
-                  </div>
-                </td>
-                <td className="px-3 py-3">{formatINR(l.price)}</td>
-                <td className="px-3 py-3">
-                  <div className="flex w-fit items-center border border-line">
-                    <button className="px-2 py-1" onClick={() => setQty(l.key, l.qty - 1)}>
-                      −
-                    </button>
-                    <span className="w-8 text-center">{l.qty}</span>
-                    <button className="px-2 py-1" onClick={() => setQty(l.key, l.qty + 1)}>
-                      +
-                    </button>
-                  </div>
-                </td>
-                <td className="px-3 py-3 text-right font-semibold text-brand">
-                  {formatINR(l.price * l.qty)}
-                </td>
-                <td className="px-3 py-3 text-right">
-                  <button
-                    onClick={() => remove(l.key)}
-                    className="text-xs text-faint hover:text-brand"
-                  >
-                    ✕
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="min-w-0 border border-line text-sm">
+        <div className="hidden bg-soft px-3 py-2 text-xs font-bold uppercase text-faint sm:grid sm:grid-cols-[1fr_90px_110px_100px_28px] sm:gap-3">
+          <span>Product</span>
+          <span>Price</span>
+          <span>Qty</span>
+          <span className="text-right">Total</span>
+          <span />
+        </div>
+        {lines.map((l) => (
+          <div
+            key={l.key}
+            className="relative grid gap-3 border-t border-line p-3 first:border-t-0 sm:grid-cols-[1fr_90px_110px_100px_28px] sm:items-start sm:border-t-0 sm:border-b sm:last:border-b-0"
+          >
+            <div className="flex min-w-0 gap-3 pr-6 sm:pr-0">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={l.image} alt={l.name} className="h-20 w-16 shrink-0 rounded object-cover" />
+              <div className="min-w-0">
+                <Link href={`/product/${l.slug}`} className="font-semibold hover:text-brand">
+                  {l.name}
+                </Link>
+                {Object.entries(l.options).map(([k, v]) => (
+                  <p key={k} className="break-words text-xs text-faint">
+                    {k}: {v}
+                  </p>
+                ))}
+                <p className="mt-1 text-sm sm:hidden">{formatINR(l.price)}</p>
+              </div>
+            </div>
+            <div className="hidden sm:block">{formatINR(l.price)}</div>
+            <div className="flex items-center justify-between sm:block">
+              <div className="flex w-fit items-center border border-line">
+                <button
+                  aria-label="Decrease quantity"
+                  className="px-3 py-1.5 sm:px-2 sm:py-1"
+                  onClick={() => setQty(l.key, l.qty - 1)}
+                >
+                  −
+                </button>
+                <span className="w-8 text-center">{l.qty}</span>
+                <button
+                  aria-label="Increase quantity"
+                  className="px-3 py-1.5 sm:px-2 sm:py-1"
+                  onClick={() => setQty(l.key, l.qty + 1)}
+                >
+                  +
+                </button>
+              </div>
+              <span className="font-semibold text-brand sm:hidden">{formatINR(l.price * l.qty)}</span>
+            </div>
+            <div className="hidden text-right font-semibold text-brand sm:block">
+              {formatINR(l.price * l.qty)}
+            </div>
+            <button
+              onClick={() => remove(l.key)}
+              aria-label={`Remove ${l.name}`}
+              className="absolute right-2 top-2 p-1 text-faint hover:text-brand sm:static sm:text-right"
+            >
+              ✕
+            </button>
+          </div>
+        ))}
       </div>
 
       <aside className="h-fit rounded border border-line p-5 text-sm">

@@ -134,7 +134,7 @@ async function CategoryView({
     if (q) params.set("q", q);
     if (manufacturer) params.set("mfr", manufacturer);
     if (weaveOnly) params.set("weave", "1");
-    if (cols !== 3) params.set("cols", String(cols));
+    if (cols !== 4) params.set("cols", String(cols));
     if (p > 1) params.set("page", String(p));
     const qs = params.toString();
     return qs ? `${basePath}?${qs}` : basePath;
@@ -149,7 +149,7 @@ async function CategoryView({
     if (q) params.set("q", q);
     if (manufacturer) params.set("mfr", manufacturer);
     if (weaveOnly) params.set("weave", "1");
-    if (c !== 3) params.set("cols", String(c));
+    if (c !== 4) params.set("cols", String(c));
     const qs = params.toString();
     return qs ? `${basePath}?${qs}` : basePath;
   };
@@ -185,8 +185,16 @@ async function CategoryView({
       {cat.description && <p className="mb-4 max-w-3xl text-sm text-muted">{cat.description}</p>}
 
       <div className="grid gap-6 lg:grid-cols-[220px_1fr]">
-        {/* sidebar */}
-        <aside className="space-y-5">
+        {/* sidebar — collapsed behind a "Filters" button on phones so products come first */}
+        <input type="checkbox" id="filters-toggle" className="peer hidden" />
+        <label
+          htmlFor="filters-toggle"
+          className="flex cursor-pointer items-center justify-between border border-line bg-soft px-4 py-2.5 text-xs font-bold uppercase tracking-wide peer-checked:border-brand peer-checked:text-brand lg:hidden"
+        >
+          <span>☰ Filter &amp; Search</span>
+          <span aria-hidden>▾</span>
+        </label>
+        <aside className="hidden space-y-5 peer-checked:block lg:block">
           <h3 className="border-b-2 border-brand pb-2 text-sm font-bold uppercase">Shop By</h3>
 
           {cat.children.length > 0 && (
@@ -311,9 +319,9 @@ async function CategoryView({
         </aside>
 
         {/* products */}
-        <div>
+        <div className="min-w-0">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border border-line bg-soft px-3 py-2">
-            <div className="flex items-center gap-3">
+            <div className="hidden items-center gap-3 sm:flex">
               <span className="text-xs font-bold uppercase text-faint">Grid View:</span>
               <div className="flex items-center gap-1">
                 {[2, 3, 4, 5].map((c) => (

@@ -99,7 +99,7 @@ export function ProductTabsView({
         )}
 
         {tab === "specs" && (
-          <dl className="grid grid-cols-[minmax(110px,170px)_1fr] border-t border-line text-sm">
+          <dl className="grid grid-cols-[100px_1fr] sm:grid-cols-[minmax(110px,170px)_1fr] border-t border-line text-sm">
             {specs.map((s) => (
               <div key={s.key} className="contents">
                 <dt className="border-b border-line bg-soft px-3 py-2.5 font-semibold text-ink">{s.key}</dt>
