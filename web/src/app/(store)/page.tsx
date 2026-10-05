@@ -74,21 +74,21 @@ export default async function HomePage() {
             <h2 className="section-title section-title--left">
               {T.how_it_works || site.section_titles?.[0] || "How It Work"}
             </h2>
-            <div className="mt-5 flex flex-col items-stretch gap-6 rounded-lg bg-soft px-5 py-5 md:flex-row md:items-center md:justify-between md:gap-2">
+            <div className="mt-5 grid grid-cols-2 gap-x-3 gap-y-6 rounded-lg bg-soft px-3 py-6 sm:px-5 md:flex md:flex-row md:items-center md:justify-between md:gap-2 md:py-5">
               {site.how_it_works.map((s, i) => (
-                <div key={s.step} className="flex items-center gap-2 md:flex-1">
-                  <div className="flex items-center gap-3">
+                <div key={s.step} className="flex items-start gap-2 md:flex-1 md:items-center">
+                  <div className="flex w-full flex-col items-center gap-2 text-center md:w-auto md:flex-row md:gap-3 md:text-left">
                     {s.icon ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={s.icon} alt="" className="hidden h-14 w-14 shrink-0 object-contain md:block" />
+                      <img src={s.icon} alt="" className="h-12 w-auto shrink-0 object-contain md:h-14 md:w-14" />
                     ) : (
-                      <HowIcon step={s.step} className="hidden h-14 w-14 shrink-0 md:block" />
+                      <HowIcon step={s.step} className="h-12 w-12 shrink-0 md:h-14 md:w-14" />
                     )}
                     <div className="leading-tight">
-                      <p className="text-[13px] font-extrabold uppercase text-brand-dark">
+                      <p className="text-[12px] font-extrabold uppercase text-brand-dark md:text-[13px]">
                         {s.title}
                       </p>
-                      <p className="text-[13px] uppercase text-ink/80">{s.text}</p>
+                      <p className="mt-0.5 text-[11px] uppercase text-ink/80 md:text-[13px]">{s.text}</p>
                     </div>
                   </div>
                   {i < site.how_it_works.length - 1 && (
