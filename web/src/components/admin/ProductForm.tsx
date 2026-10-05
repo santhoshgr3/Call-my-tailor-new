@@ -5,6 +5,7 @@ import Link from "next/link";
 import { inputCls, Field, SubmitButton } from "./ui";
 import { uploadImage } from "./ImageField";
 import { RichTextField } from "./RichTextField";
+import { RelatedPicker } from "./RelatedPicker";
 import {
   createProduct,
   updateProduct,
@@ -37,6 +38,7 @@ export type ProductInitial = {
   metaDescription: string;
   tags: string;
   customTabs: { title: string; html: string }[];
+  relatedIds: string[];
   isActive: boolean;
   isFeatured: boolean;
   isBestSeller: boolean;
@@ -70,6 +72,7 @@ export function ProductForm({
   const [options, setOptions] = useState<OptRow[]>(initial.options);
   const [catIds, setCatIds] = useState<string[]>(initial.categoryIds);
   const [tabs, setTabs] = useState<{ title: string; html: string }[]>(initial.customTabs);
+  const [related, setRelated] = useState<string[]>(initial.relatedIds);
   const [uploading, setUploading] = useState(false);
 
   const parents = categories.filter((c) => !c.parentId);
@@ -107,6 +110,7 @@ export function ProductForm({
       <input type="hidden" name="options" value={JSON.stringify(options)} />
       <input type="hidden" name="categoryIds" value={JSON.stringify(catIds)} />
       <input type="hidden" name="customTabs" value={JSON.stringify(tabs)} />
+      <input type="hidden" name="relatedIds" value={JSON.stringify(related)} />
 
       {justCreated && (
         <p className="rounded border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-700">
@@ -311,6 +315,16 @@ export function ProductForm({
                 + Add specific
               </button>
             </div>
+          </div>
+
+          {/* Related products */}
+          <div className="rounded-lg border border-line bg-white p-5">
+            <h2 className="font-bold">Related products</h2>
+            <p className="mb-4 mt-1 text-xs text-faint">
+              Products shown in the “Related Products” row on this product&apos;s page. Leave empty to show products
+              from the same category automatically.
+            </p>
+            <RelatedPicker selectedIds={related} onChange={setRelated} excludeId={initial.id} />
           </div>
 
           {/* Custom tabs */}

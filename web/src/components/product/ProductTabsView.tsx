@@ -41,19 +41,12 @@ export function ProductTabsView({
     if (el) setLong(el.scrollHeight > CLAMP_PX + 8);
   }, [descriptionHtml, tab]);
 
-  const avg = reviews.length ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length : 0;
-
   const tabs: { id: Tab; label: string }[] = [
     ...(specs.length ? [{ id: "specs" as Tab, label: "Specifications" }] : []),
     { id: "desc", label: "Description" },
     { id: "reviews", label: "Reviews" },
     ...customTabs.map((t, i) => ({ id: `c${i}`, label: t.title })),
   ];
-
-  function goReviews(form: boolean) {
-    setTab("reviews");
-    setShowForm(form);
-  }
 
   return (
     <div>
@@ -150,17 +143,6 @@ export function ProductTabsView({
         )}
       </div>
 
-      {/* rating row */}
-      <div className="mt-3 flex flex-wrap items-center gap-2 text-[13px]">
-        <Stars value={avg} />
-        <button onClick={() => goReviews(false)} className="text-[#1a5fb4] underline hover:text-brand">
-          {reviews.length} review{reviews.length === 1 ? "" : "s"}
-        </button>
-        <span className="text-faint">-</span>
-        <button onClick={() => goReviews(true)} className="text-[#1a5fb4] underline hover:text-brand">
-          Write a review
-        </button>
-      </div>
     </div>
   );
 }

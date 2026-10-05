@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/components/cart/CartProvider";
 import { useShopLists } from "@/components/shop/ShopListProvider";
+import { BagIcon } from "@/components/ui/BagIcon";
 import { formatINR } from "@/lib/money";
 import type { MenuNode } from "@/lib/catalog";
 import type { SiteConfig } from "@/lib/settings";
@@ -135,7 +136,7 @@ export function SiteHeader({
               className="relative"
               aria-label="Open cart"
             >
-              🛍
+              <BagIcon className="h-5 w-5" />
               <span className="absolute -right-2 -top-2 grid h-4 min-w-4 place-items-center rounded-full bg-brand-dark px-1 text-[9px] font-bold">
                 {count}
               </span>
@@ -238,7 +239,7 @@ export function SiteHeader({
           aria-label="Open cart"
         >
           <span className="relative grid h-10 w-10 place-items-center rounded-full bg-brand text-white">
-            🛍
+            <BagIcon className="h-5 w-5" />
             <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-brand-dark px-1 text-[10px] font-bold">
               {count}
             </span>

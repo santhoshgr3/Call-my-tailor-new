@@ -26,9 +26,10 @@ async function prepare(file: File): Promise<File> {
   return file;
 }
 
-export async function uploadImage(file: File): Promise<string> {
+export async function uploadImage(file: File, folder = ""): Promise<string> {
   const body = new FormData();
   body.append("file", await prepare(file));
+  if (folder) body.append("folder", folder);
   const res = await fetch("/api/admin/upload", { method: "POST", body });
   const data = await res.json().catch(() => ({}));
   if (!res.ok || !data.url) throw new Error(data.error || "Upload failed");

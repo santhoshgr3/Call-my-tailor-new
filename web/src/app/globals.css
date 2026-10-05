@@ -131,7 +131,7 @@
 
 .section-title {
   text-align: center;
-  font-size: 26px;
+  font-size: 22px;
   text-transform: uppercase;
   letter-spacing: 0.03em;
   margin-bottom: 6px;
@@ -174,7 +174,7 @@
   background: var(--color-brand);
 }
 .section-head h2 {
-  font-size: 24px;
+  font-size: 20px;
   text-transform: uppercase;
   letter-spacing: 0.03em;
 }

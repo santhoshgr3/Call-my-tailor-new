@@ -19,21 +19,24 @@ export function MediaPicker({
   onConfirm: (urls: string[]) => void;
 }) {
   const [lib, setLib] = useState<LibItem[] | null>(null);
+  const [folders, setFolders] = useState<string[]>([]);
+  const [folder, setFolder] = useState<string | null>(null); // null = all images
   const [selected, setSelected] = useState<string[]>(initial);
   const [q, setQ] = useState("");
   const [uploading, setUploading] = useState(false);
   const [err, setErr] = useState("");
 
-  async function load() {
-    const res = await fetch("/api/admin/media");
-    const data = await res.json().catch(() => ({ items: [] }));
+  async function load(f: string | null = folder) {
+    const res = await fetch(f === null ? "/api/admin/media" : `/api/admin/media?folder=${encodeURIComponent(f)}`);
+    const data = await res.json().catch(() => ({ items: [], folders: [] }));
     setLib(data.items ?? []);
+    setFolders(data.folders ?? []);
   }
 
   useEffect(() => {
-    load();
+    load(folder);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [folder]);
 
   async function onFiles(files: FileList | null) {
     if (!files?.length) return;
@@ -43,13 +46,13 @@ export function MediaPicker({
       const urls: string[] = [];
       for (const f of Array.from(files)) {
         try {
-          urls.push(await uploadImage(f));
+          urls.push(await uploadImage(f, folder ?? ""));
         } catch (e) {
           setErr(e instanceof Error ? e.message : "Upload failed");
         }
       }
       setSelected((s) => [...s, ...urls]);
-      await load();
+      await load(folder);
     } finally {
       setUploading(false);
     }
@@ -100,6 +103,22 @@ export function MediaPicker({
           </label>
           <span className="text-xs text-faint">{selected.length} selected</span>
         </div>
+        {folders.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 border-b border-line px-3 py-2">
+            {[{ id: null as string | null, label: "All images" }, ...folders.map((f) => ({ id: f as string | null, label: "📁 " + f })), { id: "" as string | null, label: "No folder" }].map((t) => (
+              <button
+                key={String(t.id)}
+                type="button"
+                onClick={() => setFolder(t.id)}
+                className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${
+                  folder === t.id ? "border-brand bg-brand text-white" : "border-line bg-white hover:border-brand"
+                }`}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+        )}
         {err && <p className="px-3 pt-2 text-xs text-brand">{err}</p>}
 
         <div className="flex-1 overflow-y-auto p-3">

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { uploadImage } from "./ImageField";
 
-export function MediaUploader() {
+export function MediaUploader({ folder = "" }: { folder?: string }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState("");
@@ -16,7 +16,7 @@ export function MediaUploader() {
     let ok = 0;
     for (const f of Array.from(files)) {
       try {
-        await uploadImage(f);
+        await uploadImage(f, folder);
         ok++;
       } catch (e) {
         setMsg(`${f.name}: ${e instanceof Error ? e.message : "failed"}`);
@@ -45,7 +45,9 @@ export function MediaUploader() {
           }}
         />
       </label>
-      <span className="text-xs text-faint">JPG, PNG, WebP, GIF or AVIF. Large photos are resized automatically.</span>
+      <span className="text-xs text-faint">
+        {folder ? `Uploads go into the “${folder}” folder. ` : ""}JPG, PNG, WebP, GIF or AVIF. Large photos are resized automatically.
+      </span>
       {msg && <span className="text-xs text-brand-dark">{msg}</span>}
     </div>
   );

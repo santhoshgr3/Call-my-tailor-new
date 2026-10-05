@@ -46,3 +46,18 @@ export function serializeCustomTabs(v: unknown): string | null {
   const tabs = cleanCustomTabs(v);
   return tabs.length ? JSON.stringify(tabs) : null;
 }
+
+/** JSON array of product ids -> clean string[] (max 20). */
+export function parseIds(raw: string | null | undefined): string[] {
+  try {
+    const v = JSON.parse(raw || "[]");
+    return Array.isArray(v) ? v.filter((x): x is string => typeof x === "string" && /^[a-z0-9]{10,40}$/i.test(x)).slice(0, 20) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function serializeIds(v: unknown): string | null {
+  const ids = Array.isArray(v) ? v.filter((x): x is string => typeof x === "string" && /^[a-z0-9]{10,40}$/i.test(x)).slice(0, 20) : [];
+  return ids.length ? JSON.stringify(Array.from(new Set(ids))) : null;
+}

@@ -33,8 +33,8 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
-      <body className={`${roboto.variable} antialiased`}>
+    <html lang="en" className={roboto.variable}>
+      <body className="antialiased">
         <CartProvider>
           <ShopListProvider>{children}</ShopListProvider>
         </CartProvider>

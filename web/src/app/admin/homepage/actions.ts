@@ -99,7 +99,7 @@ export async function saveLayout(fd: FormData) {
     "show_fabric_brands",
     "show_testimonials",
     "show_stats",
-    "show_latest_blog",
+    "show_vlogs",
   ];
   const layout: Record<string, boolean> = {};
   for (const k of keys) layout[k] = fd.get(k) === "on";

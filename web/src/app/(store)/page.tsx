@@ -8,9 +8,10 @@ import { HeroCarousel } from "@/components/home/HeroCarousel";
 import { ProductTabs } from "@/components/home/ProductTabs";
 import { StatCounter } from "@/components/home/StatCounter";
 import { HowIcon, StepArrow } from "@/components/home/HowIcons";
-import { ThreadRing } from "@/components/home/ThreadRing";
 import { BrandStrip } from "@/components/home/BrandStrip";
 import { VideoTestimonials } from "@/components/home/VideoTestimonials";
+import { VlogGrid } from "@/components/home/VlogGrid";
+import { db } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
@@ -30,10 +31,13 @@ export default async function HomePage() {
   const status = await dbStatus();
   if (status !== "ok") return <SetupNotice status={status} />;
 
-  const [site, layout, home] = await Promise.all([
+  const [site, layout, home, vlogs] = await Promise.all([
     getSiteConfig(),
     getSetting<Record<string, boolean>>("home_layout", {}),
     getHomeData().catch(() => EMPTY_HOME),
+    db.vlog
+      .findMany({ where: { isActive: true }, orderBy: [{ sortOrder: "asc" }, { title: "asc" }], take: 12 })
+      .catch(() => []),
   ]);
   const { slides, promos, brands, testimonials, trendingTabs, specThumbs, orderCats } = home;
   const { best, fresh, rated } = home.rails;
@@ -125,7 +129,7 @@ export default async function HomePage() {
                       href={`/${s.slug}`}
                       className={`group relative block overflow-hidden rounded ${
                         spanClass[i] ?? ""
-                      } ${i === 0 || i === 3 ? "min-h-[360px]" : "min-h-[220px]"}`}
+                      } ${i === 0 || i === 3 ? "min-h-[400px] md:min-h-[500px]" : "min-h-[260px] md:min-h-[242px]"}`}
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
@@ -168,14 +172,13 @@ export default async function HomePage() {
                     href={`/${o.slug}`}
                     className="group w-[44%] shrink-0 border border-line bg-white text-center sm:w-[31%] md:w-[23%] lg:w-[13.6%]"
                   >
-                    <span className="relative block aspect-square w-full">
+                    <span className="relative block aspect-[3/4] w-full overflow-hidden bg-soft">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={o.image}
                         alt={o.label}
-                        className="h-full w-full object-contain object-center p-1 transition-transform duration-500 group-hover:scale-105"
+                        className="h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
                       />
-                      <ThreadRing />
                     </span>
                     <span className="block border-t border-line bg-soft px-1 py-2 text-[12px] font-semibold uppercase text-ink group-hover:text-brand">
                       {o.label}
@@ -211,7 +214,7 @@ export default async function HomePage() {
         >
           <div className="absolute inset-0 bg-black/45" />
           <div className="container-cmt relative">
-            <h2 className="mb-6 text-center text-2xl font-bold text-white sm:mb-10 sm:text-3xl">
+            <h2 className="mb-6 text-center text-xl font-bold text-white sm:mb-10 sm:text-2xl">
               {T.why_choose_us || "Why Choose Us"}
             </h2>
             <div className="grid grid-cols-2 gap-x-4 gap-y-7 sm:gap-x-8 sm:gap-y-10 lg:grid-cols-3">
@@ -316,39 +319,13 @@ export default async function HomePage() {
           );
         })()}
 
-      {/* LATEST BLOG (opt-in from Admin → Homepage) */}
-      {layout.show_latest_blog === true && home.posts.length > 0 && (
+      {/* VLOGS (YouTube) */}
+      {layout.show_vlogs !== false && vlogs.length > 0 && (
         <section className="py-7">
           <div className="container-cmt">
-            <h2 className="section-title">{T.blog || "Latest Blog"}</h2>
-            <div className="mt-5 grid gap-6 md:grid-cols-3">
-              {home.posts.map((p) => (
-                <article key={p.id} className="overflow-hidden rounded border border-line">
-                  <Link href={`/blog/${p.slug}`}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={p.coverImage || "/img/placeholder.svg"}
-                      alt={p.title}
-                      className="aspect-[16/9] w-full object-cover"
-                    />
-                  </Link>
-                  <div className="p-4">
-                    <Link
-                      href={`/blog/${p.slug}`}
-                      className="line-clamp-2 text-sm font-bold text-brand-dark hover:text-brand"
-                    >
-                      {p.title}
-                    </Link>
-                    <p className="mt-2 line-clamp-3 text-xs text-muted">{p.excerpt}</p>
-                    <Link
-                      href={`/blog/${p.slug}`}
-                      className="mt-3 inline-block text-xs font-bold uppercase text-brand"
-                    >
-                      Read More →
-                    </Link>
-                  </div>
-                </article>
-              ))}
+            <h2 className="section-title">{T.vlog || "Vlogs"}</h2>
+            <div className="mt-5">
+              <VlogGrid items={vlogs} />
             </div>
           </div>
         </section>

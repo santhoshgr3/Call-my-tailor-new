@@ -21,6 +21,32 @@ export default async function AdminFooter() {
       />
       <form action={saveFooter} className="space-y-6">
         <Card>
+          <h2 className="mb-3 font-bold">WhatsApp channel banner</h2>
+          <p className="mb-3 text-xs text-faint">
+            The dark “Join Our WhatsApp Channel” bar shown above the newsletter signup. Paste your channel link
+            (https://whatsapp.com/channel/…); if left empty the button opens a WhatsApp chat with your number.
+          </p>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <label className="flex items-center gap-2 text-sm sm:col-span-2">
+              <input type="checkbox" name="wc_enabled" defaultChecked={site.whatsapp_channel?.enabled !== false} className="h-4 w-4" />
+              Show the banner
+            </label>
+            <Field label="Heading">
+              <input name="wc_heading" defaultValue={site.whatsapp_channel?.heading ?? ""} placeholder="Join Our Whatsapp Channel" className={inputCls} />
+            </Field>
+            <Field label="Button label">
+              <input name="wc_button" defaultValue={site.whatsapp_channel?.button ?? ""} placeholder="Follow Us" className={inputCls} />
+            </Field>
+            <Field label="Sub text" className="sm:col-span-2">
+              <input name="wc_text" defaultValue={site.whatsapp_channel?.text ?? ""} placeholder="We will share you latest collection and update" className={inputCls} />
+            </Field>
+            <Field label="Channel link" className="sm:col-span-2">
+              <input name="wc_url" defaultValue={site.whatsapp_channel?.url ?? ""} placeholder="https://whatsapp.com/channel/…" className={inputCls} />
+            </Field>
+          </div>
+        </Card>
+
+        <Card>
           <h2 className="mb-3 font-bold">Newsletter &amp; video</h2>
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label="Newsletter heading">

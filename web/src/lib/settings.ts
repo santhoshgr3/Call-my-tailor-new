@@ -30,6 +30,8 @@ export type SiteConfig = {
   footer_gallery_more?: { image: string; href: string } | null;
   footer_tags?: { text: string; href: string }[];
   newsletter_heading?: string;
+  /** "Join our WhatsApp channel" banner above the newsletter bar */
+  whatsapp_channel?: { enabled?: boolean; heading?: string; text?: string; button?: string; url?: string };
   copyright?: string;
   why_choose_us: { icon: string; title: string; text: string }[];
   how_it_works: { step: number; title: string; text: string; icon?: string }[];
@@ -60,6 +62,7 @@ export type SiteConfig = {
     fabric_brands?: string;
     testimonials?: string;
     blog?: string;
+    vlog?: string;
   };
   trending_categories?: { label: string; slug: string }[];
   home_visit?: {

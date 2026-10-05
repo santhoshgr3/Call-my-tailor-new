@@ -48,6 +48,7 @@ export function BuyBox({
   sku,
   model,
   brand,
+  brandLogo,
   unit,
   whatsapp,
 }: {
@@ -60,6 +61,7 @@ export function BuyBox({
   sku?: string | null;
   model?: string | null;
   brand?: string | null;
+  brandLogo?: string | null;
   unit?: string | null;
   whatsapp?: string;
 }) {
@@ -68,7 +70,10 @@ export function BuyBox({
   const { add } = useCart();
   const [qty, setQty] = useState(1);
   const [selected, setSelected] = useState<Record<string, string>>(() =>
-    Object.fromEntries(options.map((o) => [o.label, o.values[0]?.label ?? ""])),
+    // "Customization Method" starts unselected so the customer chooses (no pre-selected home visit)
+    Object.fromEntries(
+      options.map((o) => [o.label, /customization method/i.test(o.label) ? "" : (o.values[0]?.label ?? "")]),
+    ),
   );
   const [added, setAdded] = useState(false);
   const [error, setError] = useState("");
@@ -185,8 +190,16 @@ export function BuyBox({
 
         {brand && (
           <div className="col-span-2 mt-3 justify-self-start sm:col-span-1 sm:mt-0 sm:justify-self-end">
-            <span className="flex min-h-[52px] min-w-[72px] items-center justify-center border border-line bg-white px-3 text-center text-[11px] font-bold uppercase tracking-wide text-brand-dark">
-              {brand}
+            <span
+              title={brand}
+              className="flex min-h-[52px] min-w-[72px] items-center justify-center border border-line bg-white px-2 py-1 text-center text-[11px] font-bold uppercase tracking-wide text-brand-dark"
+            >
+              {brandLogo ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={brandLogo} alt={brand} className="max-h-11 w-auto max-w-[110px] object-contain" />
+              ) : (
+                brand
+              )}
             </span>
           </div>
         )}

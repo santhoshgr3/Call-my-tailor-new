@@ -29,6 +29,39 @@ export function SiteFooter({ site }: { site: SiteConfig }) {
 
   return (
     <footer className="mt-16 bg-brand-dark text-white/80">
+      {/* WhatsApp channel banner */}
+      {site.whatsapp_channel?.enabled !== false && (
+        <div className="border-b border-white/10 bg-[#2b2b2b]">
+          <div className="container-cmt flex flex-col items-center justify-between gap-4 py-6 text-center sm:flex-row sm:text-left">
+            <div className="flex flex-col items-center gap-4 sm:flex-row">
+              <svg viewBox="0 0 24 24" className="h-14 w-14 shrink-0 text-white" fill="none" stroke="currentColor" strokeWidth="1.4" aria-hidden>
+                <path d="M12 3a9 9 0 00-7.7 13.6L3 21l4.5-1.2A9 9 0 1012 3z" strokeLinejoin="round" />
+                <path d="M8.8 8.2c.3-.6.8-.5 1-.3l.9 1.5c.1.3 0 .5-.2.7l-.5.6c.6 1.1 1.4 1.9 2.6 2.5l.6-.6c.2-.2.5-.3.7-.1l1.4.8c.3.2.3.7 0 1.1-.6.8-1.5 1-2.6.6-2.2-.8-4-2.5-4.9-4.7-.2-.6.2-1.600 1-2.100z" fill="currentColor" stroke="none" />
+              </svg>
+              <div>
+                <h4 className="text-2xl font-bold text-white">
+                  {site.whatsapp_channel?.heading || "Join Our Whatsapp Channel"}
+                </h4>
+                <p className="mt-0.5 text-base text-white/80">
+                  {site.whatsapp_channel?.text || "We will share you latest collection and update"}
+                </p>
+              </div>
+            </div>
+            <a
+              href={
+                site.whatsapp_channel?.url ||
+                `https://api.whatsapp.com/send?phone=${(site.contact?.whatsapp || "918882222900").replace(/\D/g, "")}`
+              }
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex min-w-[170px] items-center justify-center bg-brand px-8 py-3 text-lg font-bold text-white transition-colors hover:bg-brand-hover"
+            >
+              {site.whatsapp_channel?.button || "Follow Us"}
+            </a>
+          </div>
+        </div>
+      )}
+
       {/* newsletter */}
       <div className="border-b border-white/10">
         <div className="container-cmt flex flex-col items-center justify-between gap-5 py-6 lg:flex-row">

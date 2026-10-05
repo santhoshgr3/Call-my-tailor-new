@@ -35,6 +35,8 @@ const GROUPS: { title: string; items: { href: string; label: string }[] }[] = [
       { href: "/admin/homepage", label: "Homepage" },
       { href: "/admin/blog", label: "Blog" },
       { href: "/admin/testimonials", label: "Testimonials" },
+      { href: "/admin/vlogs", label: "Vlogs" },
+      { href: "/admin/gallery", label: "Gallery" },
       { href: "/admin/pages", label: "Info Pages" },
       { href: "/admin/footer", label: "Footer" },
       { href: "/admin/media", label: "Media Library" },

@@ -24,6 +24,13 @@ export async function saveFooter(fd: FormData) {
 
   await patchSite({
     newsletter_heading: str(fd, "newsletter_heading"),
+    whatsapp_channel: {
+      enabled: fd.get("wc_enabled") === "on",
+      heading: str(fd, "wc_heading"),
+      text: str(fd, "wc_text"),
+      button: str(fd, "wc_button"),
+      url: /^https?:\/\//.test(str(fd, "wc_url")) ? str(fd, "wc_url") : "",
+    },
     footer_video: str(fd, "footer_video") || null,
     footer_columns: columns,
     footer_gallery: gallery,

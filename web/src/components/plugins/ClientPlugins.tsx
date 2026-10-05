@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { BagIcon } from "@/components/ui/BagIcon";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCart } from "@/components/cart/CartProvider";
@@ -293,8 +294,8 @@ export function MobileBottomBar({
         {searchLabel}
       </Link>
       <button onClick={() => setDrawerOpen(true)} className={`${item} relative text-muted`}>
-        <span className="relative text-lg leading-none">
-          🛍
+        <span className="relative block text-lg leading-none">
+          <BagIcon className="mx-auto h-5 w-5" />
           {count > 0 && (
             <span className="absolute -right-3 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-brand px-1 text-[9px] font-bold text-white">
               {count}

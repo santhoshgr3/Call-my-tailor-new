@@ -24,9 +24,11 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "File too large (max 4MB)" }, { status: 400 });
   }
 
+  const folder = String(form.get("folder") || "").trim().slice(0, 40);
   const data = Buffer.from(await file.arrayBuffer());
   const media = await db.media.create({
     data: {
+      folder,
       filename: (file.name || "upload").slice(0, 120),
       mimeType: file.type,
       size: data.length,

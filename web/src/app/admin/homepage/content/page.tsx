@@ -56,8 +56,8 @@ export default async function HomepageContent() {
             <Field label="Testimonials">
               <input name="t_testimonials" defaultValue={T.testimonials ?? ""} placeholder="Testimonials" className={inputCls} />
             </Field>
-            <Field label="Latest blog">
-              <input name="t_blog" defaultValue={T.blog ?? ""} placeholder="Latest Blog" className={inputCls} />
+            <Field label="Vlogs">
+              <input name="t_vlog" defaultValue={T.vlog ?? ""} placeholder="Vlogs" className={inputCls} />
             </Field>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">

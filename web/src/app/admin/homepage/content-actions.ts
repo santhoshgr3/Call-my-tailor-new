@@ -17,7 +17,7 @@ export async function saveTitlesAndBackgrounds(fd: FormData) {
       trending: str(fd, "t_trending"),
       fabric_brands: str(fd, "t_fabric_brands"),
       testimonials: str(fd, "t_testimonials"),
-      blog: str(fd, "t_blog"),
+      vlog: str(fd, "t_vlog"),
     },
     backgrounds: {
       why_choose: str(fd, "bg_why_choose"),

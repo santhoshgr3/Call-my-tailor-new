@@ -70,6 +70,8 @@ model Product {
   tags            String?
   /// JSON array of { title, html } extra tabs shown on the product page
   customTabs      String?
+  /// JSON array of product ids chosen as "related products" (empty = automatic)
+  relatedIds      String?
   categories      ProductCategory[]
   images          ProductImage[]
   specs           ProductSpec[]
@@ -402,9 +404,32 @@ model ContactMessage {
 model Media {
   id        String   @id @default(cuid())
   source    String   @default("admin") // admin | customer
+  folder    String   @default("")      // media-library folder ("" = no folder)
   filename  String
   mimeType  String
   size      Int
   data      Bytes
   createdAt DateTime @default(now())
+}
+
+// ----------------------------- Vlogs & Gallery -----------------------------
+
+model Vlog {
+  id        String  @id @default(cuid())
+  title     String
+  videoUrl  String // YouTube link or video id
+  sortOrder Int     @default(0)
+  isActive  Boolean @default(true)
+}
+
+model GalleryItem {
+  id        String   @id @default(cuid())
+  imageUrl  String
+  category  String   @default("")
+  caption   String?
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@index([category])
 }

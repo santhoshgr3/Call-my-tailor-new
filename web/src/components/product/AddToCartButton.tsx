@@ -14,7 +14,7 @@ type Props = {
   qty?: number;
   options?: Record<string, string>;
   className?: string;
-  label?: string;
+  label?: React.ReactNode;
 };
 
 export function AddToCartButton({

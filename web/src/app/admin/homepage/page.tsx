@@ -27,7 +27,7 @@ const SECTION_LABELS: Record<string, string> = {
   show_fabric_brands: "Fabric brands",
   show_testimonials: "Testimonials",
   show_stats: "Stats counter",
-  show_latest_blog: "Latest blog (off by default)",
+  show_vlogs: "Vlogs (YouTube)",
 };
 
 export default async function AdminHomepage() {

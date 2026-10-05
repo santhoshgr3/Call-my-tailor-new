@@ -251,6 +251,28 @@ export async function getProductBySlug(slug: string) {
   }
 }
 
+/** Admin-chosen related products (by id), in the chosen order; empty when none are set. */
+export async function getChosenRelated(relatedIdsJson: string | null | undefined, take = 20) {
+  let ids: string[] = [];
+  try {
+    const v = JSON.parse(relatedIdsJson || "[]");
+    if (Array.isArray(v)) ids = v.filter((x) => typeof x === "string").slice(0, take);
+  } catch {
+    /* ignore */
+  }
+  if (!ids.length) return [];
+  try {
+    const rows = await db.product.findMany({
+      where: { id: { in: ids }, isActive: true },
+      select: PRODUCT_CARD_SELECT,
+    });
+    const byId = new Map(rows.map((r) => [r.id, r]));
+    return ids.map((id) => byId.get(id)).filter((r): r is NonNullable<typeof r> => !!r);
+  } catch {
+    return [];
+  }
+}
+
 export async function getRelatedProducts(productId: string, categoryIds: string[], take = 10) {
   try {
     return await db.product.findMany({

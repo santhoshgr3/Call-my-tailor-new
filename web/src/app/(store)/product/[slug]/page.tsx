@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { getProductBySlug, getRelatedProducts } from "@/lib/catalog";
+import { getProductBySlug, getRelatedProducts, getChosenRelated } from "@/lib/catalog";
 import { pageTitle } from "@/lib/seo";
 import { getSiteConfig, DEFAULT_HOME_VISIT } from "@/lib/settings";
 import { getPlugins } from "@/lib/plugins";
@@ -9,8 +9,9 @@ import { ProductJsonLd } from "@/components/plugins/PluginScripts";
 import { ProductGallery } from "@/components/product/ProductGallery";
 import { BuyBox } from "@/components/product/BuyBox";
 import { ProductTabsView } from "@/components/product/ProductTabsView";
-import { ProductCard } from "@/components/product/ProductCard";
+import { RelatedCarousel } from "@/components/product/RelatedCarousel";
 import { dbStatus } from "@/lib/health";
+import { db } from "@/lib/db";
 import { SetupNotice } from "@/components/SetupNotice";
 import { parseTags, parseCustomTabs } from "@/lib/product-extras";
 
@@ -46,7 +47,8 @@ export default async function ProductPage({
   const seoPlugin = plugins["structured-data"];
   const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
   const categoryIds = p.categories.map((c) => c.categoryId);
-  const related = await getRelatedProducts(p.id, categoryIds, 10);
+  const chosen = await getChosenRelated(p.relatedIds);
+  const related = chosen.length ? chosen : await getRelatedProducts(p.id, categoryIds, 12);
 
   const primaryCat = p.categories[0]?.category;
   const parentCat = primaryCat?.parent;
@@ -62,6 +64,13 @@ export default async function ProductPage({
   const visibleSpecs = p.specs
     .filter((s) => !["fabric brand", "brand", "weather type"].includes(s.key.trim().toLowerCase()))
     .slice(0, 5);
+  const brandLogo = brand
+    ? (
+        await db.fabricBrand
+          .findFirst({ where: { isActive: true, name: { equals: brand, mode: "insensitive" } }, select: { logoUrl: true } })
+          .catch(() => null)
+      )?.logoUrl ?? null
+    : null;
   const ownTags = parseTags(p.tags);
   const tagCats = p.categories.map((c) => c.category);
 
@@ -116,8 +125,7 @@ export default async function ProductPage({
           <ProductGallery images={p.images} name={p.name} badge={p.isNewArrival ? "New" : undefined} />
 
           <div className="min-w-0">
-            <h1 className="mb-3 text-[22px] font-bold leading-snug text-ink sm:text-[26px]">{p.name}</h1>
-            <span className="mb-5 block h-[2px] w-[120px] bg-brand" />
+            <h1 className="mb-4 text-[22px] font-bold leading-snug text-ink sm:text-[26px]">{p.name}</h1>
             <ProductTabsView
               productId={p.id}
               descriptionHtml={p.descriptionHtml || `<p>${p.description ?? p.shortDescription ?? ""}</p>`}
@@ -152,6 +160,7 @@ export default async function ProductPage({
                 sku={p.sku}
                 model={model}
                 brand={brand}
+                brandLogo={brandLogo}
                 unit={unit}
                 whatsapp={site.contact?.whatsapp}
               />
@@ -187,11 +196,7 @@ export default async function ProductPage({
         {related.length > 0 && (
           <section className="mt-14">
             <h2 className="section-title">Related Products</h2>
-            <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-              {related.slice(0, 10).map((rp) => (
-                <ProductCard key={rp.id} p={rp} compact />
-              ))}
-            </div>
+            <RelatedCarousel items={related.slice(0, 20)} />
           </section>
         )}
       </div>

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BagIcon } from "@/components/ui/BagIcon";
 import { formatINR } from "@/lib/money";
 import type { ProductCard as TCard } from "@/lib/catalog";
 import { AddToCartButton } from "./AddToCartButton";
@@ -39,7 +40,7 @@ export function ProductCard({ p, compact = false }: { p: TCard; compact?: boolea
           <AddToCartButton
             product={{ productId: p.id, slug: p.slug, name: p.name, price: p.price, image: img }}
             className="grid h-8 w-8 place-items-center bg-brand-dark text-sm text-white transition-colors hover:bg-brand"
-            label="🛒"
+            label={<BagIcon />}
           />
           <button
             type="button"
@@ -93,7 +94,7 @@ export function RailCard({ p }: { p: TCard }) {
   return (
     <div className="group relative flex w-full flex-col bg-white">
       {p.isNewArrival && (
-        <span className="absolute left-1/2 top-3 z-20 grid h-9 w-9 -translate-x-1/2 place-items-center rounded-full bg-green-500 text-[10px] font-bold uppercase text-white shadow">
+        <span className="absolute left-0 top-3 z-20 bg-brand px-2.5 py-1 text-[10px] font-bold uppercase leading-none tracking-wide text-white shadow">
           New
         </span>
       )}
@@ -148,7 +149,7 @@ function RailAction({ p, img }: { p: TCard; img: string }) {
     <AddToCartButton
       product={{ productId: p.id, slug: p.slug, name: p.name, price: p.price, image: img }}
       className="grid h-9 w-9 place-items-center bg-brand-dark text-white transition-colors hover:bg-brand"
-      label="🛍"
+      label={<BagIcon className="h-5 w-5" />}
     />
   );
 }
