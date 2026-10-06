@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { DEFAULT_PAGE_TEXT, type SiteConfig } from "@/lib/settings";
-import { NewsletterForm } from "./NewsletterForm";
 import { SocialIcons } from "./SocialIcons";
 
 function FooterLinkList({ links }: { links: { text: string; href: string }[] }) {
@@ -62,24 +61,10 @@ export function SiteFooter({ site }: { site: SiteConfig }) {
         </div>
       )}
 
-      {/* newsletter */}
+      {/* social links (the newsletter signup was removed) */}
       <div className="border-b border-white/10">
-        <div className="container-cmt flex flex-col items-center justify-between gap-5 py-6 lg:flex-row">
-          <div className="flex items-center gap-4">
-            <span className="text-2xl text-white">➤</span>
-            <div>
-              <h4 className="text-lg font-bold text-white">
-                {site.newsletter_heading || "Signup For Newsletter"}
-              </h4>
-              <p className="text-sm text-white/50">
-                {site.page_text?.newsletter_subtext || DEFAULT_PAGE_TEXT.newsletter_subtext}
-              </p>
-            </div>
-          </div>
-          <NewsletterForm />
-          <div className="flex items-center gap-3 text-sm text-white/70">
-            <SocialIcons socials={site.socials ?? {}} variant="light" withSeparators />
-          </div>
+        <div className="container-cmt flex items-center justify-center py-4 text-sm text-white/70">
+          <SocialIcons socials={site.socials ?? {}} variant="light" withSeparators />
         </div>
       </div>
 
