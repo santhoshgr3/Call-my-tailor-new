@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 type Vlog = { id: string; title: string; videoUrl: string };
 
@@ -9,18 +9,31 @@ function toVideoId(url: string): string {
   return m ? m[1] : url.trim();
 }
 
-/** YouTube vlogs: thumbnails that turn into the player when tapped. */
+/** YouTube vlogs: three wide video cards across (swipe/arrows for more); tap to play in place. */
 export function VlogGrid({ items }: { items: Vlog[] }) {
   const [playing, setPlaying] = useState<string | null>(null);
+  const rail = useRef<HTMLDivElement>(null);
   if (items.length === 0) return null;
+
+  const step = (dir: 1 | -1) => {
+    const el = rail.current;
+    if (el) el.scrollBy({ left: dir * el.clientWidth * 0.9, behavior: "smooth" });
+  };
+
   return (
-    <div className="-mx-4 flex snap-x gap-4 overflow-x-auto px-4 pb-2 no-scrollbar md:mx-0 md:grid md:grid-cols-3 md:overflow-visible md:px-0">
-      {items.map((v) => {
-        const id = toVideoId(v.videoUrl);
-        const on = playing === v.id;
-        return (
-          <div key={v.id} className="w-[78%] shrink-0 snap-start sm:w-[46%] md:w-auto">
-            <div className="relative aspect-video overflow-hidden rounded bg-black">
+    <div className="relative">
+      <div
+        ref={rail}
+        className="no-scrollbar flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth pb-3 md:gap-5"
+      >
+        {items.map((v) => {
+          const id = toVideoId(v.videoUrl);
+          const on = playing === v.id;
+          return (
+            <div
+              key={v.id}
+              className="relative aspect-video w-[86%] shrink-0 snap-center overflow-hidden rounded-lg bg-black shadow-card sm:w-[48.5%] md:w-[calc((100%-2.5rem)/3)] md:snap-start"
+            >
               {on ? (
                 <iframe
                   src={`https://www.youtube.com/embed/${id}?autoplay=1&rel=0`}
@@ -43,18 +56,40 @@ export function VlogGrid({ items }: { items: Vlog[] }) {
                     loading="lazy"
                     className="h-full w-full object-cover"
                   />
-                  <span className="absolute inset-0 grid place-items-center bg-black/20 transition-colors group-hover:bg-black/35">
-                    <span className="grid h-14 w-14 place-items-center rounded-full bg-brand text-xl text-white shadow-lg transition-transform group-hover:scale-110">
-                      ▶
+                  <span className="absolute inset-0 grid place-items-center bg-black/10 transition-colors group-hover:bg-black/25">
+                    <span className="grid h-16 w-16 place-items-center rounded-full bg-[#ef3340] text-white shadow-lg transition-transform group-hover:scale-110">
+                      <svg viewBox="0 0 24 24" className="ml-0.5 h-7 w-7 fill-current" aria-hidden>
+                        <path d="M8 5.5v13l11-6.5z" />
+                      </svg>
                     </span>
                   </span>
                 </button>
               )}
             </div>
-            <p className="mt-2 line-clamp-2 text-sm font-semibold text-brand-dark">{v.title}</p>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
+
+      {items.length > 3 && (
+        <>
+          <button
+            type="button"
+            aria-label="Previous"
+            onClick={() => step(-1)}
+            className="absolute -left-3 top-1/2 hidden h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-white text-xl shadow-pop hover:bg-brand hover:text-white md:grid"
+          >
+            ‹
+          </button>
+          <button
+            type="button"
+            aria-label="Next"
+            onClick={() => step(1)}
+            className="absolute -right-3 top-1/2 hidden h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-white text-xl shadow-pop hover:bg-brand hover:text-white md:grid"
+          >
+            ›
+          </button>
+        </>
+      )}
     </div>
   );
 }

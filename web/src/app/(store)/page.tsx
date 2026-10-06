@@ -326,9 +326,9 @@ export default async function HomePage() {
 
       {/* VLOGS (YouTube) */}
       {layout.show_vlogs !== false && vlogs.length > 0 && (
-        <section className="order-11 py-7 md:order-12">
+        <section className="order-8 bg-soft py-8 md:order-12">
           <div className="container-cmt">
-            <h2 className="section-title">{T.vlog || "Vlogs"}</h2>
+            <h2 className="section-title">{T.vlog || "Vlog"}</h2>
             <div className="mt-5">
               <VlogGrid items={vlogs} />
             </div>
