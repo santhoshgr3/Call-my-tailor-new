@@ -66,10 +66,10 @@ export function ProductCard({ p, compact = false }: { p: TCard; compact?: boolea
         </div>
       )}
 
-      <div className="flex flex-1 flex-col gap-1.5 p-3">
+      <div className="flex flex-1 flex-col gap-1 p-3">
         <Link
           href={`/product/${p.slug}`}
-          className="line-clamp-2 min-h-[2.5em] text-[13px] font-semibold text-brand-dark hover:text-brand"
+          className="line-clamp-2 text-[13px] font-semibold leading-snug text-brand-dark hover:text-brand"
         >
           {p.name}
         </Link>
