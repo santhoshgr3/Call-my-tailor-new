@@ -1,5 +1,5 @@
 import "server-only";
-import { serializeTags } from "@/lib/product-extras";
+import { serializeTags, serializeCustomTabs, serializeIds, parseCustomTabs } from "@/lib/product-extras";
 import ExcelJS from "exceljs";
 import { Readable } from "node:stream";
 import { db } from "./db";
@@ -32,6 +32,10 @@ const BASE_COLUMNS: ColDef[] = [
   { key: "is_new_arrival", header: "New Arrival", width: 11, note: "Yes / No — feeds the New Arrivals rail." },
   { key: "is_trending", header: "Trending", width: 9, note: "Yes / No." },
   { key: "tags", header: "Tags", width: 30, note: "Comma-separated tags shown under the product, e.g. cream trousers, casual pants fabric." },
+  { key: "rating", header: "Rating", width: 8, note: "Star rating shown on the product, 0 to 5 (leave blank for none)." },
+  { key: "rating_count", header: "Review Count", width: 12, note: "Number of reviews shown next to the rating." },
+  { key: "sold_count", header: "Sold Count", width: 11, note: "Units sold so far." },
+  { key: "related_products", header: "Related Products", width: 36, note: "Slugs (safest) or SKUs of the products to show in the Related Products row, separated by | or ; — leave blank for automatic same-category products. Those products must already exist." },
   { key: "meta_title", header: "Meta Title", width: 30, note: "SEO title (optional)." },
   { key: "meta_description", header: "Meta Description", width: 36, note: "SEO description (optional)." },
   { key: "specs", header: "Specs", width: 40, note: "Item specifics as  Key: Value | Key: Value  (you can also use the “Spec: …” columns)." },
@@ -59,7 +63,28 @@ function optionCols(): ColDef[] {
   return out;
 }
 
-const COLUMNS: ColDef[] = [...BASE_COLUMNS, ...optionCols()];
+export const MAX_TABS = 6;
+
+function tabCols(): ColDef[] {
+  const out: ColDef[] = [];
+  for (let i = 1; i <= MAX_TABS; i++) {
+    out.push({
+      key: `custom_tab${i}_title`,
+      header: `Custom Tab ${i} Title`,
+      width: 20,
+      note: i === 1 ? "Extra tab on the product page (e.g. Shipping, Care). Fill the Title and Content columns; up to 6 tabs." : "",
+    });
+    out.push({
+      key: `custom_tab${i}_content`,
+      header: `Custom Tab ${i} Content`,
+      width: 40,
+      note: i === 1 ? "Tab text or HTML." : "",
+    });
+  }
+  return out;
+}
+
+const COLUMNS: ColDef[] = [...BASE_COLUMNS, ...optionCols(), ...tabCols()];
 
 const ALIASES: Record<string, string> = {
   product_name: "name",
@@ -96,6 +121,13 @@ const ALIASES: Record<string, string> = {
   trending: "is_trending",
   seo_title: "meta_title",
   seo_description: "meta_description",
+  reviews: "rating_count",
+  review_count: "rating_count",
+  number_of_reviews: "rating_count",
+  sold: "sold_count",
+  sales: "sold_count",
+  related: "related_products",
+  related_skus: "related_products",
   item_specifics: "specs",
   specifications: "specs",
 };
@@ -118,6 +150,8 @@ function classifyHeader(raw: string): { key?: string; spec?: string } {
   // "option_1_name" / "option1name" style
   const m = k.match(/^option_?(\d)_?(name|values?)$/);
   if (m) k = `option${m[1]}_${m[2] === "name" ? "name" : "values"}`;
+  const t = k.match(/^custom_?tab_?(\d)_?(title|content)$/);
+  if (t) k = `custom_tab${t[1]}_${t[2]}`;
   return COLUMNS.some((c) => c.key === k) ? { key: k } : {};
 }
 
@@ -217,7 +251,7 @@ export type ImportOptions = {
   defaultOptions: boolean;
 };
 
-type OptionData = { label: string; values: { label: string; priceDelta: number }[] };
+type OptionData = { label: string; required?: boolean; values: { label: string; priceDelta: number }[] };
 
 export type Norm = {
   name?: string;
@@ -240,6 +274,11 @@ export type Norm = {
   metaTitle?: string;
   metaDescription?: string;
   tags?: string | null;
+  rating?: number;
+  ratingCount?: number;
+  soldCount?: number;
+  relatedTokens?: string[];
+  customTabs?: string | null;
   specs?: { key: string; value: string }[];
   options?: OptionData[];
 };
@@ -370,6 +409,38 @@ export function normalizeRecord(rec: RawRecord): { data: Norm; errors: string[];
   for (const [k, v] of Object.entries(rec.specs)) specs.push({ key: k, value: v });
   if (specs.length) data.specs = specs;
 
+  if (c.rating != null) {
+    const n = toNumber(c.rating);
+    if (n == null || n < 0 || n > 5) errors.push(`Rating “${c.rating}” must be a number from 0 to 5.`);
+    else data.rating = Math.round(n * 10) / 10;
+  }
+  for (const [col, field] of [
+    ["rating_count", "ratingCount"],
+    ["sold_count", "soldCount"],
+  ] as const) {
+    if (c[col] != null) {
+      const n = toNumber(c[col]);
+      if (n == null || n < 0) errors.push(`${col.replace("_", " ")} “${c[col]}” is not a number.`);
+      else data[field] = Math.round(n);
+    }
+  }
+  if (c.related_products) data.relatedTokens = splitTop(c.related_products, /[|;,\n]/).slice(0, 20);
+
+  const tabList: { title: string; html: string }[] = [];
+  let tabTouched = false;
+  for (let i = 1; i <= MAX_TABS; i++) {
+    const title = c[`custom_tab${i}_title`];
+    const body = c[`custom_tab${i}_content`];
+    if (!title && !body) continue;
+    tabTouched = true;
+    if (!title || !body) {
+      warnings.push(`Custom tab ${i} needs both a title and content — skipped.`);
+      continue;
+    }
+    tabList.push({ title, html: toHtml(body) });
+  }
+  if (tabTouched) data.customTabs = serializeCustomTabs(tabList);
+
   const options: OptionData[] = [];
   for (let i = 1; i <= MAX_OPTIONS; i++) {
     const label = c[`option${i}_name`];
@@ -387,7 +458,12 @@ export function normalizeRecord(rec: RawRecord): { data: Norm; errors: string[];
       }
       return { label: v, priceDelta: 0 };
     });
-    options.push({ label: label.replace(/\*/g, "").trim(), values: values.filter((v) => v.label) });
+    const optional = /(\?|\(\s*optional\s*\))\s*$/i.test(label.trim());
+    options.push({
+      label: label.replace(/\*/g, "").replace(/(\?|\(\s*optional\s*\))\s*$/i, "").trim(),
+      required: !optional,
+      values: values.filter((v) => v.label),
+    });
   }
   if (options.length) data.options = options;
 
@@ -570,6 +646,21 @@ export function planRecord(rec: RawRecord, ctx: Ctx, opts: ImportOptions) {
   return { result, data, existing: found.row };
 }
 
+/** Turn SKUs / slugs / names from the "Related Products" cell into a stored id list. */
+async function resolveRelated(tokens: string[], warnings: string[]): Promise<string | null> {
+  const found: string[] = [];
+  for (const raw of tokens) {
+    const t = raw.trim();
+    const hit = await db.product.findFirst({
+      where: { OR: [{ sku: t }, { slug: slugify(t) }, { name: { equals: t, mode: "insensitive" } }] },
+      select: { id: true },
+    });
+    if (hit) found.push(hit.id);
+    else warnings.push(`Related product “${t.slice(0, 40)}” was not found — skipped.`);
+  }
+  return serializeIds(found);
+}
+
 async function uniqueSlug(base: string, ignoreId?: string) {
   const root = base || "product";
   let slug = root;
@@ -608,6 +699,7 @@ export async function applyRecord(rec: RawRecord, ctx: Ctx, opts: ImportOptions)
   if (result.action === "error" || result.action === "skip") return result;
 
   try {
+    const relatedJson = data.relatedTokens ? await resolveRelated(data.relatedTokens, result.warnings) : undefined;
     const categoryIds = data.categoryTokens
       ? await ensureCategories(data.categoryTokens, ctx, opts.createCategories)
       : undefined;
@@ -619,6 +711,7 @@ export async function applyRecord(rec: RawRecord, ctx: Ctx, opts: ImportOptions)
         (opts.defaultOptions
           ? EMPTY_PRODUCT.options.map((o) => ({
               label: o.label,
+              required: o.required,
               values: o.values.map((v) => ({ label: v.label, priceDelta: v.priceDelta })),
             }))
           : []);
@@ -636,6 +729,11 @@ export async function applyRecord(rec: RawRecord, ctx: Ctx, opts: ImportOptions)
           description: data.description ?? null,
           descriptionHtml: data.descriptionHtml ?? null,
           tags: data.tags ?? null,
+          rating: data.rating ?? 0,
+          ratingCount: data.ratingCount ?? 0,
+          soldCount: data.soldCount ?? 0,
+          customTabs: data.customTabs ?? null,
+          relatedIds: relatedJson ?? null,
           metaTitle: data.metaTitle ?? null,
           metaDescription: data.metaDescription ?? null,
           isActive: data.isActive ?? true,
@@ -651,7 +749,7 @@ export async function applyRecord(rec: RawRecord, ctx: Ctx, opts: ImportOptions)
             create: options.map((o, i) => ({
               label: o.label,
               type: "select",
-              required: true,
+              required: o.required ?? true,
               sortOrder: i,
               values: {
                 create: o.values.map((v, j) => ({ label: v.label, priceDelta: v.priceDelta, sortOrder: j })),
@@ -683,6 +781,11 @@ export async function applyRecord(rec: RawRecord, ctx: Ctx, opts: ImportOptions)
       scalar.descriptionHtml = data.descriptionHtml;
     }
     if (data.tags !== undefined) scalar.tags = data.tags;
+    if (data.rating !== undefined) scalar.rating = data.rating;
+    if (data.ratingCount !== undefined) scalar.ratingCount = data.ratingCount;
+    if (data.soldCount !== undefined) scalar.soldCount = data.soldCount;
+    if (data.customTabs !== undefined) scalar.customTabs = data.customTabs;
+    if (relatedJson !== undefined) scalar.relatedIds = relatedJson;
     if (data.metaTitle !== undefined) scalar.metaTitle = data.metaTitle;
     if (data.metaDescription !== undefined) scalar.metaDescription = data.metaDescription;
     for (const f of ["isActive", "isFeatured", "isBestSeller", "isNewArrival", "isTrending"] as const) {
@@ -708,7 +811,7 @@ export async function applyRecord(rec: RawRecord, ctx: Ctx, opts: ImportOptions)
         create: data.options.map((o, i) => ({
           label: o.label,
           type: "select",
-          required: true,
+          required: o.required ?? true,
           sortOrder: i,
           values: {
             create: o.values.map((v, j) => ({ label: v.label, priceDelta: v.priceDelta, sortOrder: j })),
@@ -762,10 +865,16 @@ type ExportProduct = {
   metaTitle: string | null;
   metaDescription: string | null;
   tags: string | null;
+  rating: number;
+  ratingCount: number;
+  soldCount: number;
+  customTabs: string | null;
+  /** slugs of the admin-chosen related products (resolved by the export route) */
+  relatedSlugs?: string[];
   categories: { category: { slug: string } }[];
   images: { url: string }[];
   specs: { key: string; value: string }[];
-  options: { label: string; values: { label: string; priceDelta: number }[] }[];
+  options: { label: string; required?: boolean; values: { label: string; priceDelta: number }[] }[];
 };
 
 const yn = (b: boolean) => (b ? "Yes" : "No");
@@ -789,6 +898,7 @@ export async function buildWorkbook(products: ExportProduct[], template: boolean
     ...BASE_COLUMNS.filter((c) => c.key !== "specs"),
     ...specKeys.map((k) => ({ key: `spec:${k}`, header: `Spec: ${k}`, width: 18, note: "" })),
     ...optionCols(),
+    ...tabCols(),
   ];
   ws.columns = cols.map((c) => ({ header: c.header, key: c.key, width: c.width }));
   const head = ws.getRow(1);
@@ -816,6 +926,12 @@ export async function buildWorkbook(products: ExportProduct[], template: boolean
       is_new_arrival: "Yes",
       is_trending: "No",
       tags: "navy suit, wedding suit, wool blend",
+      rating: 4.5,
+      rating_count: 12,
+      sold_count: 30,
+      related_products: "MPS901 | MPS902",
+      custom_tab1_title: "Shipping",
+      custom_tab1_content: "Delivered in 7-10 working days.",
       meta_title: "",
       meta_description: "",
       "spec:Color": "Navy Blue",
@@ -825,6 +941,8 @@ export async function buildWorkbook(products: ExportProduct[], template: boolean
       option1_values: "Tailor Home Visit, Customization on Call, Ready to Ship (Standard Size)",
       option2_name: "Size",
       option2_values: "36, 38, 40, 42, 44 (+300), 46 (+300)",
+      option3_name: "Monogram (optional)",
+      option3_values: "None, Initials (+250)",
     });
     ws.getRow(2).font = { italic: true, color: { argb: "FF888888" } };
   } else {
@@ -847,6 +965,10 @@ export async function buildWorkbook(products: ExportProduct[], template: boolean
         is_new_arrival: yn(p.isNewArrival),
         is_trending: yn(p.isTrending),
         tags: p.tags ?? "",
+        rating: p.rating || "",
+        rating_count: p.ratingCount || "",
+        sold_count: p.soldCount || "",
+        related_products: (p.relatedSlugs ?? []).join(" | "),
         meta_title: p.metaTitle ?? "",
         meta_description: p.metaDescription ?? "",
       };
@@ -857,12 +979,16 @@ export async function buildWorkbook(products: ExportProduct[], template: boolean
       // Products with more options than the sheet holds are left blank so an update never drops them.
       if (p.options.length <= MAX_OPTIONS) {
         p.options.forEach((o, i) => {
-          row[`option${i + 1}_name`] = o.label;
+          row[`option${i + 1}_name`] = o.required === false ? `${o.label} (optional)` : o.label;
           row[`option${i + 1}_values`] = o.values
             .map((v) => (v.priceDelta ? `${v.label} (${v.priceDelta > 0 ? "+" : "-"}${Math.abs(v.priceDelta)})` : v.label))
             .join(", ");
         });
       }
+      parseCustomTabs(p.customTabs).forEach((t, i) => {
+        row[`custom_tab${i + 1}_title`] = t.title;
+        row[`custom_tab${i + 1}_content`] = t.html;
+      });
       ws.addRow(row);
     }
   }
@@ -897,6 +1023,8 @@ export async function buildWorkbook(products: ExportProduct[], template: boolean
     help.addRow({ c: "EXAMPLE ROWS", n: "Rows whose name starts with “(example)” are ignored." });
     help.addRow({});
     for (const c of BASE_COLUMNS) help.addRow({ c: c.header, n: c.note });
+    help.addRow({ c: "Option 1–5 Name / Values", n: "Choices the customer picks (Size, Customization Method …). Add “(optional)” or “?” after the name to make a choice optional; otherwise the customer must pick one. Values: S, M, L (+200)." });
+    help.addRow({ c: "Custom Tab 1–6", n: "Extra tabs on the product page. Give each tab a Title and Content (text or HTML)." });
     help.addRow({ c: "Spec: <name>", n: "Any column headed “Spec: Color”, “Spec: Fabric Brand” … becomes an item specific. Add as many as you like." });
     help.addRow({ c: "Option N Name / Values", n: `Up to ${MAX_OPTIONS} choices the customer picks, e.g. Size = 36, 38, 40 (+200). The text after + is the extra price.` });
     help.eachRow((r, n) => {

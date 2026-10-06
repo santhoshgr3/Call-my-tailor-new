@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { buildWorkbook } from "@/lib/product-import";
+import { parseIds } from "@/lib/product-extras";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -36,13 +37,32 @@ export async function GET(req: Request) {
             orderBy: { sortOrder: "asc" },
             select: {
               label: true,
+              required: true,
               values: { orderBy: { sortOrder: "asc" }, select: { label: true, priceDelta: true } },
             },
           },
         },
       });
 
-  const buf = await buildWorkbook(products, template, format);
+  // related products are stored as ids; the sheet uses slugs
+  const relatedIds = new Set<string>();
+  const parsed = new Map<string, string[]>();
+  for (const p of products) {
+    const ids = parseIds(p.relatedIds);
+    parsed.set(p.id, ids);
+    ids.forEach((id) => relatedIds.add(id));
+  }
+  const slugById = new Map<string, string>();
+  if (relatedIds.size) {
+    const rel = await db.product.findMany({ where: { id: { in: [...relatedIds] } }, select: { id: true, slug: true } });
+    rel.forEach((r) => slugById.set(r.id, r.slug));
+  }
+  const withRelated = products.map((p) => ({
+    ...p,
+    relatedSlugs: (parsed.get(p.id) ?? []).map((id) => slugById.get(id)).filter((x): x is string => !!x),
+  }));
+
+  const buf = await buildWorkbook(withRelated, template, format);
   const stamp = new Date().toISOString().slice(0, 10);
   const name = template ? "product-import-template" : `products-${stamp}`;
   return new Response(new Uint8Array(buf), {
