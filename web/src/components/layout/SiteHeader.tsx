@@ -27,7 +27,6 @@ export function SiteHeader({
   const [cat, setCat] = useState("");
   const [mobileOpen, setMobileOpen] = useState(false);
   const [collectionOpen, setCollectionOpen] = useState(false);
-  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
 
   const nav = {
     all_categories_label: site.nav?.all_categories_label || "All Categories",
@@ -73,99 +72,51 @@ export function SiteHeader({
         </div>
       </div>
 
-      {/* top bar (mobile) */}
-      <div className="bg-brand text-white md:hidden">
-        <div className="container-cmt flex h-9 items-center">
-          <Link
-            href={session ? "/account" : "/account/login"}
-            className="flex items-center gap-1 text-sm"
-            aria-label="Account"
-          >
-            <span>👤</span>
-            <span className="text-[10px]">▾</span>
+      {/* mobile header: menu | logo | search, then a scrolling quick-links strip */}
+      <div className="md:hidden">
+        <div className="flex items-center gap-2 px-3 py-2">
+          <button type="button" aria-label="Menu" onClick={() => setMobileOpen(true)} className="shrink-0 p-1.5 text-brand-dark">
+            <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden>
+              <path d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+          <Link href="/" aria-label={site.brand || "Call My Tailor"} className="shrink-0">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={logoSrc} alt={site.brand || "Call My Tailor"} width={160} height={57} className="h-9 w-auto" />
           </Link>
+          <form onSubmit={submitSearch} className="ml-auto flex min-w-0 flex-1 items-stretch rounded border border-line bg-white">
+            <input
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder="Search"
+              aria-label="Search products"
+              className="min-w-0 flex-1 bg-transparent px-2.5 py-1.5 text-sm outline-none"
+            />
+            <button type="submit" aria-label="Search" className="grid w-9 shrink-0 place-items-center text-brand-dark">
+              <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden>
+                <circle cx="11" cy="11" r="6.5" />
+                <path d="M16 16l4.5 4.5" />
+              </svg>
+            </button>
+          </form>
         </div>
-      </div>
-
-      {/* logo (mobile) */}
-      <div className="container-cmt flex justify-center py-4 md:hidden">
-        <Link href="/" aria-label={site.brand || "Call My Tailor"}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={logoSrc}
-            alt={site.brand || "Call My Tailor"}
-            width={220}
-            height={78}
-            className="h-16 w-auto"
-          />
-        </Link>
-      </div>
-
-      {/* action bar (mobile) */}
-      <div className="bg-brand md:hidden">
-        <div className="container-cmt flex items-center justify-between py-2.5 text-white">
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => setMobileOpen((v) => !v)}
-              className="flex items-center gap-1.5 text-xs font-bold uppercase"
-            >
-              <span className="text-base">☰</span> {nav.all_categories_label}
+        <nav className="no-scrollbar flex gap-5 overflow-x-auto whitespace-nowrap border-y border-line bg-white px-4 text-[13px] font-medium text-brand-dark">
+          {nav.show_collection && (
+            <button type="button" onClick={() => setMobileOpen(true)} className="py-2.5">
+              {nav.collection_label}
             </button>
-            <button
-              type="button"
-              aria-label="Search"
-              onClick={() => setMobileSearchOpen((v) => !v)}
-              className="text-base"
-            >
-              🔍
-            </button>
-          </div>
-          <div className="flex items-center gap-4">
-            <Link href="/wishlist" aria-label="Wish list" className="relative">
-              ♡
-              {wishlist.length > 0 && (
-                <span className="absolute -right-2 -top-2 grid h-4 min-w-4 place-items-center rounded-full bg-brand-dark px-1 text-[9px] font-bold">
-                  {wishlist.length}
-                </span>
-              )}
+          )}
+          {headerLinks.map((l) => (
+            <a key={l.href + l.label} href={l.href} className="py-2.5">
+              {l.label}
+            </a>
+          ))}
+          {menu.map((m) => (
+            <Link key={m.id} href={m.href} className="py-2.5">
+              {m.name}
             </Link>
-            <button
-              type="button"
-              onClick={() => setDrawerOpen(true)}
-              className="relative"
-              aria-label="Open cart"
-            >
-              <BagIcon className="h-5 w-5" />
-              <span className="absolute -right-2 -top-2 grid h-4 min-w-4 place-items-center rounded-full bg-brand-dark px-1 text-[9px] font-bold">
-                {count}
-              </span>
-            </button>
-            <button
-              type="button"
-              aria-label="Menu"
-              onClick={() => setMobileOpen((v) => !v)}
-              className="text-lg"
-            >
-              ☰
-            </button>
-          </div>
-        </div>
-        {mobileSearchOpen && (
-          <div className="border-t border-white/20 bg-white">
-            <form onSubmit={submitSearch} className="container-cmt flex py-2">
-              <input
-                value={q}
-                onChange={(e) => setQ(e.target.value)}
-                placeholder="Search products…"
-                className="flex-1 border border-line px-3 py-2 text-sm outline-none"
-              />
-              <button className="bg-brand px-4 text-white" aria-label="Search">
-                ⌕
-              </button>
-            </form>
-          </div>
-        )}
+          ))}
+        </nav>
       </div>
 
       {/* main header (desktop) */}
@@ -382,61 +333,114 @@ export function SiteHeader({
         </div>
       </div>
 
-      {/* mobile menu */}
+      {/* mobile menu: slide-in drawer */}
       {mobileOpen && (
-        <div className="border-t border-line bg-white md:hidden">
-          <form onSubmit={submitSearch} className="flex border-b border-line">
-            <input
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder="Search…"
-              className="flex-1 px-3 py-2 text-sm outline-none"
-            />
-            <button className="bg-brand px-4 text-white">⌕</button>
-          </form>
-          <nav className="max-h-[70vh] overflow-y-auto">
-            <Link href="/" className="block border-b border-line px-4 py-3 text-sm font-semibold">
-              {nav.home_label}
-            </Link>
-            {menu.map((m) => (
-              <details key={m.id} className="border-b border-line">
-                <summary className="cursor-pointer px-4 py-3 text-sm font-semibold">
-                  {m.name}
-                </summary>
-                <div className="bg-soft">
-                  <Link href={m.href} className="block px-6 py-2 text-sm text-brand">
-                    All {m.name}
-                  </Link>
-                  {m.children.map((c) => (
-                    <Link key={c.id} href={c.href} className="block px-6 py-2 text-sm text-muted">
-                      {c.name}
+        <div className="fixed inset-0 z-[90] md:hidden" role="dialog" aria-modal="true" aria-label="Menu">
+          <div className="absolute inset-0 bg-black/55" onClick={() => setMobileOpen(false)} />
+          <aside className="absolute inset-y-0 left-0 flex w-[84%] max-w-[340px] flex-col overflow-y-auto bg-[#f4f4f4] shadow-2xl">
+            <div className="flex items-start justify-between px-4 pt-4">
+              <Link href="/" onClick={() => setMobileOpen(false)} aria-label="Home">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={logoSrc} alt={site.brand || "Call My Tailor"} width={200} height={71} className="h-12 w-auto" />
+              </Link>
+              <button type="button" aria-label="Close menu" onClick={() => setMobileOpen(false)} className="p-1 text-3xl leading-none text-brand-dark">
+                ×
+              </button>
+            </div>
+
+            <form
+              onSubmit={(e) => {
+                submitSearch(e);
+                setMobileOpen(false);
+              }}
+              className="mx-4 mt-4 flex overflow-hidden rounded border border-line bg-white"
+            >
+              <input
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                placeholder="Search"
+                className="min-w-0 flex-1 px-3 py-2.5 text-sm outline-none"
+              />
+              <button type="submit" aria-label="Search" className="grid w-11 place-items-center bg-[#2a7fd4] text-white">
+                <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden>
+                  <circle cx="11" cy="11" r="6.5" />
+                  <path d="M16 16l4.5 4.5" />
+                </svg>
+              </button>
+            </form>
+
+            <ul className="mt-3 text-[15px] text-brand-dark">
+              <li>
+                <Link href="/" onClick={() => setMobileOpen(false)} className="block px-4 py-3">
+                  {nav.home_label}
+                </Link>
+              </li>
+              {headerLinks.map((l) => (
+                <li key={l.href + l.label}>
+                  <a href={l.href} onClick={() => setMobileOpen(false)} className="block px-4 py-3">
+                    {l.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+
+            <div className="mt-2 border-t border-line">
+              {menu.map((m) => (
+                <details key={m.id} className="group border-b border-line/70">
+                  <summary className="flex cursor-pointer list-none items-center gap-3 px-4 py-3 text-[15px] text-brand-dark">
+                    <span aria-hidden className="text-brand-dark">➔</span>
+                    <span className="flex-1">{m.name}</span>
+                    <span aria-hidden className="text-xl leading-none text-faint group-open:hidden">+</span>
+                    <span aria-hidden className="hidden text-xl leading-none text-faint group-open:inline">−</span>
+                  </summary>
+                  <div className="bg-white">
+                    <Link href={m.href} onClick={() => setMobileOpen(false)} className="block px-11 py-2.5 text-sm font-semibold text-brand">
+                      All {m.name}
                     </Link>
-                  ))}
-                </div>
-              </details>
-            ))}
-            {headerLinks.map((l) => (
-              <a
-                key={l.href + l.label}
-                href={l.href}
-                className="block border-b border-line px-4 py-3 text-sm font-semibold"
-              >
-                {l.label}
-              </a>
-            ))}
-            {session ? (
-              <Link href="/account" className="block px-4 py-3 text-sm font-semibold text-brand">
-                My Account
+                    {m.children.map((c) => (
+                      <Link
+                        key={c.id}
+                        href={c.href}
+                        onClick={() => setMobileOpen(false)}
+                        className="block px-11 py-2.5 text-sm text-muted"
+                      >
+                        {c.name}
+                      </Link>
+                    ))}
+                  </div>
+                </details>
+              ))}
+            </div>
+
+            <div className="mt-3 grid grid-cols-2 gap-2 px-4 text-center text-[13px] text-muted">
+              <Link href="/compare" onClick={() => setMobileOpen(false)} className="rounded border border-line bg-white py-3">
+                Compare{compare.length ? ` (${compare.length})` : ""}
               </Link>
-            ) : (
-              <Link
-                href="/account/login"
-                className="block px-4 py-3 text-sm font-semibold text-brand"
-              >
-                Login / Register
+              <Link href="/wishlist" onClick={() => setMobileOpen(false)} className="rounded border border-line bg-white py-3">
+                Wish List ({wishlist.length})
               </Link>
-            )}
-          </nav>
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileOpen(false);
+                  setDrawerOpen(true);
+                }}
+                className="rounded border border-line bg-white py-3"
+              >
+                Order list ({count})
+              </button>
+              {session ? (
+                <Link href="/account" onClick={() => setMobileOpen(false)} className="rounded border border-line bg-white py-3 font-semibold text-brand">
+                  My Account
+                </Link>
+              ) : (
+                <Link href="/account/login" onClick={() => setMobileOpen(false)} className="rounded border border-line bg-white py-3 font-semibold text-brand">
+                  Login / Register
+                </Link>
+              )}
+            </div>
+            <div className="h-8 shrink-0" />
+          </aside>
         </div>
       )}
     </header>

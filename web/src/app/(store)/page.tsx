@@ -45,13 +45,14 @@ export default async function HomePage() {
   const BG = site.backgrounds ?? {};
   const showHero = layout.show_hero !== false;
 
+  // On phones the sections follow the order of the old mobile site (order-N); md: and up keep the desktop order.
   return (
-    <div>
+    <div className="flex flex-col">
       {/* HERO + PROMOS */}
-      <section className="container-cmt py-5">
-        <div className={showHero ? "grid gap-4 lg:grid-cols-[1fr_360px]" : "grid gap-4"}>
+      <section className="container-cmt order-1 py-0 max-md:!px-0 md:py-5">
+        <div className={showHero ? "grid gap-0 md:gap-4 lg:grid-cols-[1fr_360px]" : "grid gap-4"}>
           {showHero && <HeroCarousel slides={slides} />}
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-1 lg:grid-rows-2 lg:gap-4">
+          <div className="grid grid-cols-2 gap-2 px-2 pt-2 md:grid-cols-2 md:gap-3 md:px-0 md:pt-0 lg:grid-cols-1 lg:grid-rows-2 lg:gap-4">
             {promos.map((b) => (
               <a
                 key={b.id}
@@ -73,26 +74,30 @@ export default async function HomePage() {
 
       {/* HOW IT WORK */}
       {layout.show_how_it_works !== false && (site.how_it_works?.length ?? 0) > 0 && (
-        <section className="py-7">
+        <section className="order-10 py-7 md:order-2">
           <div className="container-cmt">
             <h2 className="section-title section-title--left">
               {T.how_it_works || site.section_titles?.[0] || "How It Work"}
             </h2>
-            <div className="mt-5 grid grid-cols-2 gap-x-3 gap-y-6 rounded-lg bg-soft px-3 py-6 sm:px-5 md:flex md:flex-row md:items-center md:justify-between md:gap-2 md:py-5">
+            <div className="mt-5 rounded-lg bg-soft px-4 py-2 md:flex md:flex-row md:items-center md:justify-between md:gap-2 md:px-5 md:py-5">
               {site.how_it_works.map((s, i) => (
-                <div key={s.step} className="flex items-start gap-2 md:flex-1 md:items-center">
-                  <div className="flex w-full flex-col items-center gap-2 text-center md:w-auto md:flex-row md:gap-3 md:text-left">
+                <div key={s.step} className="relative flex items-center gap-2 md:flex-1">
+                  {i < site.how_it_works.length - 1 && (
+                    <span aria-hidden className="absolute left-[13px] top-1/2 h-full w-px bg-ink/60 md:hidden" />
+                  )}
+                  <div className="flex items-center gap-3 py-3.5 md:py-0">
+                    <span className="relative z-10 grid h-7 w-7 shrink-0 place-items-center rounded-full border border-ink bg-soft text-xs font-semibold text-ink md:hidden">
+                      {i + 1}
+                    </span>
                     {s.icon ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={s.icon} alt="" className="h-12 w-auto shrink-0 object-contain md:h-14 md:w-14" />
+                      <img src={s.icon} alt="" className="h-9 w-auto shrink-0 object-contain md:h-14 md:w-14" />
                     ) : (
-                      <HowIcon step={s.step} className="h-12 w-12 shrink-0 md:h-14 md:w-14" />
+                      <HowIcon step={s.step} className="h-9 w-9 shrink-0 md:h-14 md:w-14" />
                     )}
                     <div className="leading-tight">
-                      <p className="text-[12px] font-extrabold uppercase text-brand-dark md:text-[13px]">
-                        {s.title}
-                      </p>
-                      <p className="mt-0.5 text-[11px] uppercase text-ink/80 md:text-[13px]">{s.text}</p>
+                      <p className="text-[13px] font-extrabold uppercase text-brand-dark">{s.title}</p>
+                      <p className="text-[12px] uppercase text-ink/80 md:text-[13px]">{s.text}</p>
                     </div>
                   </div>
                   {i < site.how_it_works.length - 1 && (
@@ -109,7 +114,7 @@ export default async function HomePage() {
 
       {/* OUR SPECIALIZATION */}
       {layout.show_specialization !== false && specThumbs.length > 0 && (
-        <section className="py-7">
+        <section className="order-5 py-7 md:order-3">
           <div className="container-cmt">
             <h2 className="section-title section-title--left">
               {T.specialization || site.section_titles?.[1] || "Our Specialization"}
@@ -129,7 +134,7 @@ export default async function HomePage() {
                       href={`/${s.slug}`}
                       className={`group relative block overflow-hidden rounded ${
                         spanClass[i] ?? ""
-                      } ${i === 0 || i === 3 ? "min-h-[400px] md:min-h-[500px]" : "min-h-[260px] md:min-h-[242px]"}`}
+                      } ${i === 0 || i === 3 ? "min-h-[340px] md:min-h-[500px]" : "min-h-[240px] md:min-h-[242px]"}`}
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
@@ -153,7 +158,7 @@ export default async function HomePage() {
 
       {/* ORDER BY CATEGORY */}
       {layout.show_order_by_category !== false && orderCats.length > 0 && (
-        <section className="py-7">
+        <section className="order-2 py-7 md:order-4">
           <div className="container-cmt">
             <div className="rounded-lg bg-soft p-4">
               <div className="section-head">
@@ -193,7 +198,7 @@ export default async function HomePage() {
 
       {/* RAILS: bestsellers / new / rating */}
       {layout.show_rails !== false && (
-        <section className="py-7">
+        <section className="order-6 py-7 md:order-5">
           <div className="container-cmt">
             <ProductTabs
               tabs={[
@@ -209,7 +214,7 @@ export default async function HomePage() {
       {/* WHY CHOOSE US */}
       {layout.show_why_choose_us !== false && (site.why_choose_us?.length ?? 0) > 0 && (
         <section
-          className="relative bg-cover bg-center py-10 text-white"
+          className="relative order-7 bg-cover bg-center py-10 text-white md:order-6"
           style={{ backgroundImage: `url(${BG.why_choose || "/whychoose-bg.jpg"})` }}
         >
           <div className="absolute inset-0 bg-black/45" />
@@ -235,7 +240,7 @@ export default async function HomePage() {
 
       {/* TRENDING ITEMS */}
       {layout.show_trending !== false && trendingTabs.length > 0 && (
-        <section className="py-7">
+        <section className="order-3 py-7 md:order-7">
           <div className="container-cmt">
             <ProductTabs
               heading={T.trending || site.section_titles?.[3] || "Trending Items"}
@@ -248,7 +253,7 @@ export default async function HomePage() {
       {/* MADE FOR YOU CTA */}
       {layout.show_made_cta !== false && site.made_cta && (
         <section
-          className="relative bg-cover bg-center"
+          className="relative order-4 bg-cover bg-center md:order-8"
           style={{ backgroundImage: `url(${BG.made || "/made-bg.jpg"})` }}
         >
           <div className="absolute inset-0 bg-black/55" />
@@ -273,7 +278,7 @@ export default async function HomePage() {
 
       {/* FABRIC BRANDS */}
       {layout.show_fabric_brands !== false && brands.length > 0 && (
-        <section className="py-7">
+        <section className="order-12 py-7 md:order-9">
           <div className="container-cmt">
             <h2 className="mb-4 text-2xl font-bold uppercase text-brand-dark">
               {T.fabric_brands || "Our Fabric's Branded"}
@@ -286,11 +291,11 @@ export default async function HomePage() {
       {/* STATS */}
       {layout.show_stats !== false && (site.stats?.length ?? 0) > 0 && (
         <section
-          className="relative bg-cover bg-fixed bg-center py-9"
+          className="relative order-9 bg-cover bg-center py-9 md:order-10 md:bg-fixed"
           style={{ backgroundImage: `url(${BG.stats || "/stats-bg.jpg"})` }}
         >
           <div className="absolute inset-0 bg-black/55" />
-          <div className="container-cmt relative grid grid-cols-2 gap-4 lg:grid-cols-4">
+          <div className="container-cmt relative grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
             {site.stats.map((s, i) => (
               <div key={i} className="border border-white/25 px-2 py-6">
                 <StatCounter value={s.value} label={s.label} />
@@ -308,7 +313,7 @@ export default async function HomePage() {
           );
           if (videoTestimonials.length === 0) return null;
           return (
-            <section className="py-7">
+            <section className="order-8 py-7 md:order-11">
               <div className="container-cmt">
                 <h2 className="section-title">{T.testimonials || "Testimonials"}</h2>
                 <div className="mt-5">
@@ -321,7 +326,7 @@ export default async function HomePage() {
 
       {/* VLOGS (YouTube) */}
       {layout.show_vlogs !== false && vlogs.length > 0 && (
-        <section className="py-7">
+        <section className="order-11 py-7 md:order-12">
           <div className="container-cmt">
             <h2 className="section-title">{T.vlog || "Vlogs"}</h2>
             <div className="mt-5">

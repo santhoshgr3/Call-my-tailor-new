@@ -100,7 +100,7 @@ export const PLUGINS: PluginDef[] = [
     description: "An app-style tab bar fixed to the bottom of phone screens: Home, Search, Orders and Account.",
     icon: "📱",
     group: "Store",
-    defaultEnabled: false,
+    defaultEnabled: true,
     fields: [
       { key: "home_label", label: "Home label", type: "text", default: "Home" },
       { key: "search_label", label: "Search label", type: "text", default: "Search" },

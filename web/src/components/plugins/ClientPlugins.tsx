@@ -279,18 +279,18 @@ export function MobileBottomBar({
 }) {
   const { count, setDrawerOpen } = useCart();
   const path = usePathname();
-  const item = "flex flex-col items-center gap-0.5 py-1.5 text-[10px] font-semibold uppercase";
+  const item = "flex flex-col items-center gap-0.5 py-2 text-[10px] font-medium uppercase tracking-wide";
   return (
     <nav
       aria-label="Quick navigation"
-      className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-4 border-t border-line bg-white md:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-4 border-t border-line bg-white shadow-[0_-2px_8px_rgba(0,0,0,0.06)] md:hidden"
     >
       <Link href="/" className={`${item} ${path === "/" ? "text-brand" : "text-muted"}`}>
-        <span className="text-lg leading-none">⌂</span>
+        <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" aria-hidden><path d="M3.5 11.2L12 4l8.5 7.2V20a.5.5 0 01-.5.5h-4.5v-6h-7v6H4a.5.5 0 01-.5-.5z" /></svg>
         {homeLabel}
       </Link>
       <Link href="/search" className={`${item} ${path.startsWith("/search") ? "text-brand" : "text-muted"}`}>
-        <span className="text-lg leading-none">⌕</span>
+        <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" aria-hidden><circle cx="11" cy="11" r="6.5" /><path d="M16 16l4.5 4.5" /></svg>
         {searchLabel}
       </Link>
       <button onClick={() => setDrawerOpen(true)} className={`${item} relative text-muted`}>
@@ -305,7 +305,7 @@ export function MobileBottomBar({
         {cartLabel}
       </button>
       <Link href="/account" className={`${item} ${path.startsWith("/account") ? "text-brand" : "text-muted"}`}>
-        <span className="text-lg leading-none">☺</span>
+        <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden><circle cx="12" cy="8.5" r="3.6" /><path d="M4.5 20c.6-3.7 3.9-5.6 7.5-5.6s6.9 1.9 7.500 5.600" strokeLinecap="round" /></svg>
         {accountLabel}
       </Link>
     </nav>

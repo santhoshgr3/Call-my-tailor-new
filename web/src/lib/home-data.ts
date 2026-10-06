@@ -108,17 +108,25 @@ async function loadHomeData(): Promise<HomeData> {
     ]);
 
   // first image seen per category id
-  const imageByCatId = new Map<string, string>();
+  const imagesByCatId = new Map<string, string[]>();
   for (const row of thumbRows) {
     const url = row.images[0]?.url;
     if (!url) continue;
     for (const c of row.categories) {
-      if (!imageByCatId.has(c.categoryId)) imageByCatId.set(c.categoryId, url);
+      const list = imagesByCatId.get(c.categoryId) ?? [];
+      if (list.length < 12) list.push(url);
+      imagesByCatId.set(c.categoryId, list);
     }
   }
+  // Prefer a photo no other tile in the same group already uses, so neighbouring tiles differ.
+  const usedThumbs = new Set<string>();
   const thumbFor = (slug: string) => {
     const id = idBySlug.get(slug);
-    return (id && imageByCatId.get(id)) || PLACEHOLDER;
+    const list = (id && imagesByCatId.get(id)) || [];
+    const pick = list.find((u) => !usedThumbs.has(u)) ?? list[0];
+    if (!pick) return PLACEHOLDER;
+    usedThumbs.add(pick);
+    return pick;
   };
 
   return {

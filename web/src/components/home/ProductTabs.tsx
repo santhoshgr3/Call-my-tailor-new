@@ -26,7 +26,7 @@ export function ProductTabs({
       <div className="section-head">
         <div className="flex flex-wrap items-center gap-x-6 gap-y-1">
           {heading && <h2 className="text-brand-dark">{heading}</h2>}
-          <div className="flex flex-wrap items-center gap-x-5">
+          <div className="hidden flex-wrap items-center gap-x-5 md:flex">
             {tabs.map((t, i) => (
               <button
                 key={t.label}
@@ -58,9 +58,24 @@ export function ProductTabs({
         </div>
       </div>
 
+      {tabs.length > 1 && (
+        <select
+          aria-label="Choose a list"
+          value={active}
+          onChange={(e) => setActive(Number(e.target.value))}
+          className="mt-4 w-full rounded border border-line bg-white px-3 py-2.5 text-sm font-semibold uppercase text-brand-dark outline-none focus:border-brand md:hidden"
+        >
+          {tabs.map((tb, i) => (
+            <option key={tb.label} value={i}>
+              {tb.label}
+            </option>
+          ))}
+        </select>
+      )}
+
       <div
         ref={railRef}
-        className="no-scrollbar mt-6 flex snap-x gap-4 overflow-x-auto pb-2"
+        className="no-scrollbar mt-4 flex snap-x gap-3 overflow-x-auto pb-2 md:mt-6 md:gap-4"
       >
         {current.items.map((p) => (
           <div key={p.id} className="w-[45%] shrink-0 snap-start sm:w-[31%] lg:w-[19%]">
