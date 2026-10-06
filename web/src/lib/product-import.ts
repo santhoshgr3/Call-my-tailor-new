@@ -877,6 +877,23 @@ type ExportProduct = {
   options: { label: string; required?: boolean; values: { label: string; priceDelta: number }[] }[];
 };
 
+const TEMPLATE_SPECS: [string, string][] = [
+  ["Color", "Navy Blue"],
+  ["Fabric Brand", "Raymond"],
+  ["Material Quality", "Wool blend"],
+  ["Fabric Pattern", "Solid"],
+  ["Weather Type", "All Weather"],
+  ["Occasion Type", "Wedding, Party"],
+  ["Designing Style", "Double breasted, Notch lapel"],
+  ["Ideal For", "Weddings and formal events"],
+  ["Fabric Weave", "Twill"],
+  ["Design Type", "Contemporary"],
+  ["Size", "36 to 48"],
+  ["Weight", "280 GSM"],
+  ["Work", "Hand embroidery"],
+  ["Metal Type", "Brass"],
+];
+
 const yn = (b: boolean) => (b ? "Yes" : "No");
 
 export async function buildWorkbook(products: ExportProduct[], template: boolean, format: "xlsx" | "csv") {
@@ -890,7 +907,8 @@ export async function buildWorkbook(products: ExportProduct[], template: boolean
     for (const p of products) for (const s of p.specs) counts.set(s.key, (counts.get(s.key) ?? 0) + 1);
     specKeys.push(...[...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 40).map(([k]) => k));
   } else {
-    specKeys.push("Color", "Fabric Brand", "Material Quality");
+    // the specs used across the catalogue — add any other as a "Spec: <name>" column
+    specKeys.push(...TEMPLATE_SPECS.map(([k]) => k));
   }
 
   const ws = wb.addWorksheet("Products", { views: [{ state: "frozen", ySplit: 1, xSplit: 1 }] });
@@ -934,9 +952,7 @@ export async function buildWorkbook(products: ExportProduct[], template: boolean
       custom_tab1_content: "Delivered in 7-10 working days.",
       meta_title: "",
       meta_description: "",
-      "spec:Color": "Navy Blue",
-      "spec:Fabric Brand": "Raymond",
-      "spec:Material Quality": "Wool blend",
+      ...Object.fromEntries(TEMPLATE_SPECS.map(([k, v]) => [`spec:${k}`, v])),
       option1_name: "Customization Method",
       option1_values: "Tailor Home Visit, Customization on Call, Ready to Ship (Standard Size)",
       option2_name: "Size",
