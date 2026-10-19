@@ -132,10 +132,10 @@ export default async function AdminMedia({ searchParams }: { searchParams: Promi
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={`/media/${m.id}`} alt={m.filename} className="aspect-square w-full bg-soft object-cover" />
               <div className="space-y-1.5 p-2 text-[11px]">
-                <p className="truncate font-semibold" title={m.filename}>
-                  {m.filename}
+                <p className="break-all font-semibold leading-tight">{m.filename}</p>
+                <p className="break-all leading-tight text-faint" title="Use this in the bulk-import Images column">
+                  {m.folder ? `${m.folder}/${m.filename}` : m.filename}
                 </p>
-                <p className="truncate text-faint">/media/{m.id}</p>
                 <form action={moveMedia} className="flex gap-1">
                   <input type="hidden" name="id" value={m.id} />
                   <input
