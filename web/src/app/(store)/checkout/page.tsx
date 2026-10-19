@@ -3,7 +3,7 @@ import { getCurrentUser, getSessionUserId } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { isRazorpayEnabled } from "@/lib/razorpay";
 import { CheckoutForm } from "./CheckoutForm";
-import { getSiteConfig, DEFAULT_STORE } from "@/lib/settings";
+import { getSiteConfig, DEFAULT_STORE, DEFAULT_HOME_VISIT } from "@/lib/settings";
 
 export const metadata: Metadata = { title: "Checkout" };
 
@@ -35,6 +35,7 @@ export default async function CheckoutPage() {
         razorpayEnabled={(await isRazorpayEnabled()) && site.payments?.online_enabled !== false}
         codEnabled={site.payments?.cod_enabled !== false}
         store={site.store ?? DEFAULT_STORE}
+        homeVisit={site.home_visit ?? DEFAULT_HOME_VISIT}
       />
     </div>
   );

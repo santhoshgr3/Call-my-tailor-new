@@ -43,6 +43,7 @@ export const checkoutSchema = z.object({
   city: z.string().min(1).max(80),
   state: z.string().min(1).max(80),
   pincode: z.string().min(4).max(12),
+  location: z.string().max(500).optional().or(z.literal("")),
   paymentMethod: z.enum(["cod", "razorpay"]),
   couponCode: z.string().max(40).optional().or(z.literal("")),
   notes: z.string().max(1000).optional().or(z.literal("")),

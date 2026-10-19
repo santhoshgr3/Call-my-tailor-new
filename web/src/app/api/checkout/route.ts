@@ -3,8 +3,8 @@ import { db } from "@/lib/db";
 import { getSessionUserId } from "@/lib/auth";
 import { checkoutSchema } from "@/lib/validation";
 import { priceCart, applyCoupon, shippingFor, nextOrderNumber } from "@/lib/orders";
-import { getSiteConfig, DEFAULT_STORE } from "@/lib/settings";
-import { needsFullPayment } from "@/lib/payment-rules";
+import { getSiteConfig, DEFAULT_STORE, DEFAULT_HOME_VISIT } from "@/lib/settings";
+import { needsFullPayment, isHomeVisitLine } from "@/lib/payment-rules";
 import { isRazorpayEnabled, razorpayKeyId, createRazorpayOrder } from "@/lib/razorpay";
 
 export async function POST(req: Request) {
@@ -37,10 +37,19 @@ export async function POST(req: Request) {
   const pay = (await getSiteConfig()).payments ?? {};
   const codOk = pay.cod_enabled !== false;
   const onlineOk = pay.online_enabled !== false && (await isRazorpayEnabled());
-  const fullPayment = lines.some((l) => needsFullPayment(l.options));
+  const hvLabel = ((await getSiteConfig()).home_visit ?? DEFAULT_HOME_VISIT).option_label;
+  const hasHomeVisit = lines.some((l) => isHomeVisitLine(l.options, hvLabel));
+  if (hasHomeVisit && !(d.location || "").trim()) {
+    return NextResponse.json(
+      { error: "Please add your Google Maps location for the home visit." },
+      { status: 400 },
+    );
+  }
+  // home-visit orders pay the visit charge online now; call / ready-to-ship orders pay in full
+  const fullPayment = hasHomeVisit || lines.some((l) => needsFullPayment(l.options));
   if (fullPayment && !onlineOk) {
     return NextResponse.json(
-      { error: "These items must be paid in full online, and online payment is currently unavailable." },
+      { error: "These items must be paid online, and online payment is currently unavailable." },
       { status: 400 },
     );
   }
@@ -77,6 +86,7 @@ export async function POST(req: Request) {
         state: d.state,
         pincode: d.pincode,
         country: "India",
+        location: (d.location || "").trim(),
       }),
       items: {
         create: lines.map((l) => ({

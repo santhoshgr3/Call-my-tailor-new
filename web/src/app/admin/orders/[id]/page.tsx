@@ -106,6 +106,18 @@ export default async function AdminOrderDetail({
                 <p>
                   {addr.city}, {addr.state} — {addr.pincode}
                 </p>
+                {addr.location && (
+                  <p className="mt-1">
+                    <span className="text-xs font-bold uppercase text-faint">Google location: </span>
+                    {/^https?:\/\//i.test(addr.location) ? (
+                      <a href={addr.location} target="_blank" rel="noopener noreferrer" className="break-all text-brand hover:underline">
+                        {addr.location}
+                      </a>
+                    ) : (
+                      addr.location
+                    )}
+                  </p>
+                )}
               </div>
             </div>
           </Card>

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useCart } from "@/components/cart/CartProvider";
 import { formatINR } from "@/lib/money";
-import { needsFullPayment } from "@/lib/payment-rules";
+import { needsFullPayment, isHomeVisitLine } from "@/lib/payment-rules";
 
 type Defaults = {
   email: string;
@@ -47,17 +47,22 @@ export function CheckoutForm({
   razorpayEnabled,
   codEnabled,
   store,
+  homeVisit,
 }: {
   defaults: Defaults;
   loggedIn: boolean;
   razorpayEnabled: boolean;
   codEnabled: boolean;
   store: { shipping_fee: number; free_shipping_over: number };
+  homeVisit: { option_label: string; display_price: number };
 }) {
   const router = useRouter();
   const { lines, subtotal, clear, ready } = useCart();
   const [form, setForm] = useState<Defaults>(defaults);
-  const fullPayment = lines.some((l) => needsFullPayment(l.options));
+  const hasHomeVisit = lines.some((l) => isHomeVisitLine(l.options, homeVisit.option_label));
+  const [location, setLocation] = useState("");
+  const [locating, setLocating] = useState(false);
+  const fullPayment = hasHomeVisit || lines.some((l) => needsFullPayment(l.options));
   const [chosen, setPayment] = useState<"cod" | "razorpay">(
     codEnabled || !razorpayEnabled ? "cod" : "razorpay",
   );
@@ -137,6 +142,7 @@ export function CheckoutForm({
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           ...form,
+          location,
           paymentMethod: payment,
           couponCode: coupon,
           notes,
@@ -263,14 +269,48 @@ export function CheckoutForm({
           </div>
         </section>
 
+        {hasHomeVisit && (
+          <section>
+            <h2 className="mb-3 text-sm font-bold uppercase">Google Location</h2>
+            <input
+              className={field}
+              placeholder="Paste your Google Maps location link"
+              required
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+            />
+            <button
+              type="button"
+              disabled={locating}
+              onClick={() => {
+                if (!navigator.geolocation) return;
+                setLocating(true);
+                navigator.geolocation.getCurrentPosition(
+                  (pos) => {
+                    setLocation(`https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`);
+                    setLocating(false);
+                  },
+                  () => setLocating(false),
+                );
+              }}
+              className="mt-2 text-xs font-semibold text-brand hover:underline"
+            >
+              {locating ? "Getting location…" : "📍 Use my current location"}
+            </button>
+          </section>
+        )}
+
         <section>
           <h2 className="mb-3 text-sm font-bold uppercase">Payment</h2>
           {fullPayment ? (
             <div className="rounded border border-line bg-soft p-3 text-sm">
-              <p className="font-semibold">Full payment online</p>
+              <p className="font-semibold">
+                {hasHomeVisit ? `Pay ${formatINR(total)} online now` : "Full payment online"}
+              </p>
               <p className="mt-1 text-xs text-muted">
-                Orders with Customization on Call or Ready to Ship (Standard Size) are paid in full
-                at checkout ({formatINR(total)}).
+                {hasHomeVisit
+                  ? "This is the home-visit charge. The rest of the payment is made at the home visit."
+                  : `Orders with Customization on Call or Ready to Ship (Standard Size) are paid in full at checkout (${formatINR(total)}).`}
               </p>
               {!razorpayEnabled && (
                 <p className="mt-1 text-xs text-brand">Online payment is currently unavailable — please contact us.</p>
