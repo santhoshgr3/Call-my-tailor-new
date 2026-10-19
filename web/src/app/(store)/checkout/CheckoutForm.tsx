@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useCart } from "@/components/cart/CartProvider";
 import { formatINR } from "@/lib/money";
+import { needsFullPayment } from "@/lib/payment-rules";
 
 type Defaults = {
   email: string;
@@ -56,9 +57,11 @@ export function CheckoutForm({
   const router = useRouter();
   const { lines, subtotal, clear, ready } = useCart();
   const [form, setForm] = useState<Defaults>(defaults);
-  const [payment, setPayment] = useState<"cod" | "razorpay">(
+  const fullPayment = lines.some((l) => needsFullPayment(l.options));
+  const [chosen, setPayment] = useState<"cod" | "razorpay">(
     codEnabled || !razorpayEnabled ? "cod" : "razorpay",
   );
+  const payment = fullPayment ? "razorpay" : chosen;
   const [coupon, setCoupon] = useState("");
   const [notes, setNotes] = useState("");
   const [busy, setBusy] = useState(false);
@@ -262,6 +265,18 @@ export function CheckoutForm({
 
         <section>
           <h2 className="mb-3 text-sm font-bold uppercase">Payment</h2>
+          {fullPayment ? (
+            <div className="rounded border border-line bg-soft p-3 text-sm">
+              <p className="font-semibold">Full payment online</p>
+              <p className="mt-1 text-xs text-muted">
+                Orders with Customization on Call or Ready to Ship (Standard Size) are paid in full
+                at checkout ({formatINR(total)}).
+              </p>
+              {!razorpayEnabled && (
+                <p className="mt-1 text-xs text-brand">Online payment is currently unavailable — please contact us.</p>
+              )}
+            </div>
+          ) : (
           <div className="space-y-2 text-sm">
             {codEnabled && (
               <label className="flex items-center gap-2">
@@ -288,6 +303,7 @@ export function CheckoutForm({
               {!razorpayEnabled && " (currently unavailable)"}
             </label>
           </div>
+          )}
         </section>
 
         <section>

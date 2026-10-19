@@ -4,6 +4,7 @@ import { getSessionUserId } from "@/lib/auth";
 import { checkoutSchema } from "@/lib/validation";
 import { priceCart, applyCoupon, shippingFor, nextOrderNumber } from "@/lib/orders";
 import { getSiteConfig, DEFAULT_STORE } from "@/lib/settings";
+import { needsFullPayment } from "@/lib/payment-rules";
 import { isRazorpayEnabled, razorpayKeyId, createRazorpayOrder } from "@/lib/razorpay";
 
 export async function POST(req: Request) {
@@ -36,6 +37,14 @@ export async function POST(req: Request) {
   const pay = (await getSiteConfig()).payments ?? {};
   const codOk = pay.cod_enabled !== false;
   const onlineOk = pay.online_enabled !== false && (await isRazorpayEnabled());
+  const fullPayment = lines.some((l) => needsFullPayment(l.options));
+  if (fullPayment && !onlineOk) {
+    return NextResponse.json(
+      { error: "These items must be paid in full online, and online payment is currently unavailable." },
+      { status: 400 },
+    );
+  }
+  if (fullPayment) d.paymentMethod = "razorpay";
   if (d.paymentMethod === "cod" && !codOk) {
     return NextResponse.json({ error: "Cash on delivery is not available." }, { status: 400 });
   }
@@ -43,6 +52,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Online payment is currently unavailable." }, { status: 400 });
   }
   const wantsOnline = d.paymentMethod === "razorpay" && onlineOk;
+  const allowCodFallback = codOk && !fullPayment;
 
   const order = await db.order.create({
     data: {
@@ -107,7 +117,7 @@ export async function POST(req: Request) {
         },
       });
     } catch (e) {
-      if (!codOk) {
+      if (!allowCodFallback) {
         // no offline fallback allowed: undo the order and report the failure
         await db.orderItem.deleteMany({ where: { orderId: order.id } });
         await db.order.delete({ where: { id: order.id } });
