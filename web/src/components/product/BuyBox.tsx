@@ -204,7 +204,12 @@ export function BuyBox({
           </div>
         )}
       </div>
-      {homeVisitSelected && <p className="-mt-2 text-xs text-faint">{homeVisit.note}</p>}
+      {homeVisitSelected && (
+        <div className="-mt-2 space-y-0.5">
+          <p className="text-xs text-faint">{homeVisit.note}</p>
+          <p className="text-xs font-bold text-brand">Only for Delhi &amp; NCR</p>
+        </div>
+      )}
 
       {/* Options as chips — the size chart is hidden once a home visit or call is chosen,
           since sizing is then handled during that visit / call instead. */}
@@ -243,7 +248,7 @@ export function BuyBox({
 
       {scheduleNeeded && (
         <div>
-          <label className="mb-1 block text-xs font-bold uppercase text-faint">
+          <label className="mb-1 block text-[15px] font-bold text-ink">
             {scheduleLabel}
             <span className="text-brand"> *</span>
           </label>
