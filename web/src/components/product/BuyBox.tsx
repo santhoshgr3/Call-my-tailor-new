@@ -78,6 +78,7 @@ export function BuyBox({
   const [added, setAdded] = useState(false);
   const [error, setError] = useState("");
   const [schedule, setSchedule] = useState("");
+  const [measurement, setMeasurement] = useState("");
   const { wishlist, compare, toggleWish, toggleCompare } = useShopLists();
   const [listMsg, setListMsg] = useState("");
   const inWish = wishlist.includes(product.slug);
@@ -88,6 +89,8 @@ export function BuyBox({
 
   const homeVisitSelected = Object.values(selected).some(isHomeVisit);
   const scheduleNeeded = Object.values(selected).some(needsSchedule);
+  const callSelected =
+    !homeVisitSelected && Object.values(selected).some((v) => /call/i.test(v));
   const inStock = !/out of stock/i.test(stock);
   const scheduleLabel = homeVisitSelected
     ? "Home Visit Schedule"
@@ -113,6 +116,10 @@ export function BuyBox({
         return false;
       }
     }
+    if (callSelected && !measurement) {
+      setError("Please choose a measurement option");
+      return false;
+    }
     if (scheduleNeeded && !schedule) {
       setError("Please choose a date and time for the home visit / call");
       return false;
@@ -122,7 +129,11 @@ export function BuyBox({
       ...product,
       price: effectivePrice,
       qty,
-      options: scheduleNeeded ? { ...selected, Schedule: schedule } : selected,
+      options: {
+        ...selected,
+        ...(callSelected ? { Measurement: measurement } : {}),
+        ...(scheduleNeeded ? { Schedule: schedule } : {}),
+      },
     });
     setAdded(true);
     setTimeout(() => setAdded(false), 1600);
@@ -245,6 +256,32 @@ export function BuyBox({
           </div>
         </div>
       ))}
+
+      {callSelected && (
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+          <span className="text-[15px] font-bold text-ink">
+            Measurement<span className="text-brand"> *</span>
+          </span>
+          <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Measurement">
+            {["I know my size", "I'll send my reference size"].map((m) => (
+              <button
+                key={m}
+                type="button"
+                role="radio"
+                aria-checked={measurement === m}
+                onClick={() => setMeasurement(m)}
+                className={`border px-3 py-2 text-sm transition-colors ${
+                  measurement === m
+                    ? "border-[#1f2d5a] bg-[#eceef5] font-semibold text-ink"
+                    : "border-line bg-white text-muted hover:border-[#1f2d5a]"
+                }`}
+              >
+                {m}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {scheduleNeeded && (
         <div>
