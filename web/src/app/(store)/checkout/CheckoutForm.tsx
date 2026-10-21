@@ -72,8 +72,9 @@ export function CheckoutForm({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
+  const onlyHomeVisit = lines.length > 0 && lines.every((l) => isHomeVisitLine(l.options, homeVisit.option_label));
   const shipping =
-    subtotal >= store.free_shipping_over || subtotal === 0 ? 0 : store.shipping_fee;
+    onlyHomeVisit || subtotal >= store.free_shipping_over || subtotal === 0 ? 0 : store.shipping_fee;
   const total = subtotal + shipping;
 
   function set<K extends keyof Defaults>(k: K, v: string) {
@@ -223,7 +224,7 @@ export function CheckoutForm({
         </section>
 
         <section>
-          <h2 className="mb-3 text-sm font-bold uppercase">Shipping Address</h2>
+          <h2 className="mb-3 text-sm font-bold uppercase">{onlyHomeVisit ? "Visit Address" : "Shipping Address"}</h2>
           <div className="grid gap-3 sm:grid-cols-2">
             <input
               className={`${field} sm:col-span-2`}
@@ -300,6 +301,7 @@ export function CheckoutForm({
           </section>
         )}
 
+        {!hasHomeVisit && (
         <section>
           <h2 className="mb-3 text-sm font-bold uppercase">Payment</h2>
           {fullPayment ? (
@@ -345,6 +347,7 @@ export function CheckoutForm({
           </div>
           )}
         </section>
+        )}
 
         <section>
           <h2 className="mb-3 text-sm font-bold uppercase">Order Notes</h2>
@@ -358,7 +361,7 @@ export function CheckoutForm({
         </section>
       </div>
 
-      <aside className="h-fit rounded border border-line p-5 text-sm">
+      <aside className={`h-fit rounded border border-line p-5 text-sm ${hasHomeVisit ? "order-first lg:order-none" : ""}`}>
         <h3 className="mb-3 text-sm font-bold uppercase">Your Order</h3>
         <ul className="mb-3 space-y-2">
           {lines.map((l) => (
@@ -385,10 +388,12 @@ export function CheckoutForm({
             <span className="text-muted">Subtotal</span>
             <span>{formatINR(subtotal)}</span>
           </div>
-          <div className="flex justify-between">
-            <span className="text-muted">Shipping</span>
-            <span>{shipping ? formatINR(shipping) : "Free"}</span>
-          </div>
+          {!onlyHomeVisit && (
+            <div className="flex justify-between">
+              <span className="text-muted">Shipping</span>
+              <span>{shipping ? formatINR(shipping) : "Free"}</span>
+            </div>
+          )}
           <div className="flex justify-between border-t border-line pt-2 text-base font-bold">
             <span>Total</span>
             <span className="text-brand">{formatINR(total)}</span>
@@ -400,9 +405,19 @@ export function CheckoutForm({
         <button className="btn-brand mt-4 w-full" disabled={busy}>
           {busy ? "Processing…" : payment === "razorpay" ? "Pay Now" : "Place Order"}
         </button>
-        <p className="mt-2 text-[11px] text-faint">
-          Final amount is recalculated on the server, including any option pricing.
-        </p>
+        {hasHomeVisit ? (
+          <div className="mt-3 text-[11px] text-muted">
+            <p className="font-semibold">Pay {formatINR(total)} online now</p>
+            <p>This is the home-visit charge. The rest of the payment is made at the home visit.</p>
+            {!razorpayEnabled && (
+              <p className="mt-1 text-brand">Online payment is currently unavailable — please contact us.</p>
+            )}
+          </div>
+        ) : (
+          <p className="mt-2 text-[11px] text-faint">
+            Final amount is recalculated on the server, including any option pricing.
+          </p>
+        )}
       </aside>
     </form>
   );

@@ -28,8 +28,6 @@ export async function POST(req: Request) {
 
   const { discount, coupon } = await applyCoupon(d.couponCode || "", subtotal);
   const store = (await getSiteConfig()).store ?? DEFAULT_STORE;
-  const shipping = shippingFor(subtotal - discount, store);
-  const total = Math.max(0, subtotal - discount + shipping);
 
   const userId = await getSessionUserId();
   const orderNumber = await nextOrderNumber();
@@ -45,6 +43,9 @@ export async function POST(req: Request) {
       { status: 400 },
     );
   }
+  const onlyHomeVisit = lines.every((l) => isHomeVisitLine(l.options, hvLabel));
+  const shipping = onlyHomeVisit ? 0 : shippingFor(subtotal - discount, store);
+  const total = Math.max(0, subtotal - discount + shipping);
   // home-visit orders pay the visit charge online now; call / ready-to-ship orders pay in full
   const fullPayment = hasHomeVisit || lines.some((l) => needsFullPayment(l.options));
   if (fullPayment && !onlineOk) {
