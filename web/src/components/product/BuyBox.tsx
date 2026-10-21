@@ -42,7 +42,6 @@ export function BuyBox({
   product,
   oldPrice,
   options,
-  bookingUrl,
   homeVisit,
   stock,
   sku,
@@ -55,7 +54,7 @@ export function BuyBox({
   product: { productId: string; slug: string; name: string; price: number; image: string };
   oldPrice?: number | null;
   options: Option[];
-  bookingUrl: string;
+  bookingUrl?: string;
   homeVisit: { option_label: string; display_price: number; note: string };
   stock: string;
   sku?: string | null;
@@ -363,21 +362,15 @@ export function BuyBox({
         </a>
       </div>
 
-      {scheduleNeeded ? (
-        <a href={bookingUrl} className="btn-outline w-full">
-          Book Now
-        </a>
-      ) : (
-        <Link
-          href="/checkout"
-          onClick={(e) => {
-            if (!inStock || !handleAdd()) e.preventDefault();
-          }}
-          className="btn-outline w-full"
-        >
-          Order Now
-        </Link>
-      )}
+      <Link
+        href="/checkout"
+        onClick={(e) => {
+          if (!inStock || !handleAdd()) e.preventDefault();
+        }}
+        className="btn-outline w-full"
+      >
+        {scheduleNeeded ? "Book Now" : "Order Now"}
+      </Link>
 
       <hr className="border-line" />
 
