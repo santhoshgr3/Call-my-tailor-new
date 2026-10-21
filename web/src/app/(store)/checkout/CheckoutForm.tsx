@@ -270,7 +270,7 @@ export function CheckoutForm({
           </div>
         </section>
 
-        {hasHomeVisit && (
+        {onlyHomeVisit && (
           <section>
             <h2 className="mb-3 text-sm font-bold uppercase">Google Location</h2>
             <input
@@ -301,7 +301,7 @@ export function CheckoutForm({
           </section>
         )}
 
-        {!hasHomeVisit && (
+        {!fullPayment && (
         <section>
           <h2 className="mb-3 text-sm font-bold uppercase">Payment</h2>
           {fullPayment ? (
@@ -361,7 +361,7 @@ export function CheckoutForm({
         </section>
       </div>
 
-      <aside className={`h-fit rounded border border-line p-5 text-sm ${hasHomeVisit ? "order-first lg:order-none" : ""}`}>
+      <aside className={`h-fit rounded border border-line p-5 text-sm ${fullPayment ? "order-first lg:order-none" : ""}`}>
         <h3 className="mb-3 text-sm font-bold uppercase">Your Order</h3>
         <ul className="mb-3 space-y-2">
           {lines.map((l) => (
@@ -405,7 +405,7 @@ export function CheckoutForm({
         <button className="btn-brand mt-4 w-full" disabled={busy}>
           {busy ? "Processing…" : payment === "razorpay" ? "Pay Now" : "Place Order"}
         </button>
-        {hasHomeVisit ? (
+        {onlyHomeVisit ? (
           <div className="mt-3 text-[11px] text-muted">
             <p className="font-semibold">Pay {formatINR(total)} online now</p>
             <p>This is the home-visit charge. The rest of the payment is made at the home visit.</p>
@@ -414,9 +414,11 @@ export function CheckoutForm({
             )}
           </div>
         ) : (
-          <p className="mt-2 text-[11px] text-faint">
-            Final amount is recalculated on the server, including any option pricing.
-          </p>
+          !fullPayment && (
+            <p className="mt-2 text-[11px] text-faint">
+              Final amount is recalculated on the server, including any option pricing.
+            </p>
+          )
         )}
       </aside>
     </form>

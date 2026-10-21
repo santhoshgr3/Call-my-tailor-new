@@ -37,13 +37,13 @@ export async function POST(req: Request) {
   const onlineOk = pay.online_enabled !== false && (await isRazorpayEnabled());
   const hvLabel = ((await getSiteConfig()).home_visit ?? DEFAULT_HOME_VISIT).option_label;
   const hasHomeVisit = lines.some((l) => isHomeVisitLine(l.options, hvLabel));
-  if (hasHomeVisit && !(d.location || "").trim()) {
+  const onlyHomeVisit = lines.every((l) => isHomeVisitLine(l.options, hvLabel));
+  if (onlyHomeVisit && !(d.location || "").trim()) {
     return NextResponse.json(
       { error: "Please add your Google Maps location for the home visit." },
       { status: 400 },
     );
   }
-  const onlyHomeVisit = lines.every((l) => isHomeVisitLine(l.options, hvLabel));
   const shipping = onlyHomeVisit ? 0 : shippingFor(subtotal - discount, store);
   const total = Math.max(0, subtotal - discount + shipping);
   // home-visit orders pay the visit charge online now; call / ready-to-ship orders pay in full
