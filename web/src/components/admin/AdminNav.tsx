@@ -27,6 +27,7 @@ const GROUPS: { title: string; items: { href: string; label: string }[] }[] = [
       { href: "/admin/bookings", label: "Home Visits" },
       { href: "/admin/customers", label: "Customers" },
       { href: "/admin/payments", label: "Payments" },
+      { href: "/admin/whatsapp", label: "WhatsApp" },
     ],
   },
   {

@@ -5,6 +5,7 @@ import { checkoutSchema } from "@/lib/validation";
 import { priceCart, applyCoupon, shippingFor, nextOrderNumber } from "@/lib/orders";
 import { getSiteConfig, DEFAULT_STORE, DEFAULT_HOME_VISIT } from "@/lib/settings";
 import { needsFullPayment, isHomeVisitLine } from "@/lib/payment-rules";
+import { notifyOrderPlaced } from "@/lib/whatsapp-notify";
 import { isRazorpayEnabled, razorpayKeyId, createRazorpayOrder } from "@/lib/razorpay";
 
 export async function POST(req: Request) {
@@ -145,6 +146,7 @@ export async function POST(req: Request) {
         where: { id: order.id },
         data: { paymentMethod: "cod" },
       });
+      await notifyOrderPlaced(order.id);
       return NextResponse.json({
         ok: true,
         orderId: order.id,
@@ -158,6 +160,7 @@ export async function POST(req: Request) {
     }
   }
 
+  await notifyOrderPlaced(order.id);
   return NextResponse.json({
     ok: true,
     orderId: order.id,

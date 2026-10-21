@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { verifyRazorpaySignature } from "@/lib/razorpay";
+import { notifyOrderPlaced } from "@/lib/whatsapp-notify";
 
 const schema = z.object({
   orderId: z.string(),
@@ -41,6 +42,8 @@ export async function POST(req: Request) {
       paymentRef: razorpay_payment_id,
     },
   });
+
+  if (order.paymentStatus !== "paid") await notifyOrderPlaced(orderId);
 
   return NextResponse.json({ ok: true, orderNumber: order.orderNumber });
 }
