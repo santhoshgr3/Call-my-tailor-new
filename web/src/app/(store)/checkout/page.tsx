@@ -7,7 +7,12 @@ import { getSiteConfig, DEFAULT_STORE, DEFAULT_HOME_VISIT } from "@/lib/settings
 
 export const metadata: Metadata = { title: "Checkout" };
 
-export default async function CheckoutPage() {
+export default async function CheckoutPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ payment?: string }>;
+}) {
+  const { payment } = await searchParams;
   const site = await getSiteConfig();
   const user = await getCurrentUser();
   const uid = await getSessionUserId();
@@ -36,6 +41,13 @@ export default async function CheckoutPage() {
         codEnabled={site.payments?.cod_enabled !== false}
         store={site.store ?? DEFAULT_STORE}
         homeVisit={site.home_visit ?? DEFAULT_HOME_VISIT}
+        notice={
+          payment === "failed"
+            ? "Your payment could not be confirmed. If money was deducted it will be refunded or the order confirmed shortly — please contact us."
+            : payment === "cancelled"
+              ? "Payment cancelled. Your order is saved as unpaid — you can try again."
+              : ""
+        }
       />
     </div>
   );

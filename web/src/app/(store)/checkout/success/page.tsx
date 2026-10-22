@@ -1,16 +1,18 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { ClearCart } from "./ClearCart";
 
 export const metadata: Metadata = { title: "Order placed" };
 
 export default async function SuccessPage({
   searchParams,
 }: {
-  searchParams: Promise<{ order?: string }>;
+  searchParams: Promise<{ order?: string; paid?: string }>;
 }) {
-  const { order } = await searchParams;
+  const { order, paid } = await searchParams;
   return (
     <div className="container-cmt py-20 text-center">
+      {paid && <ClearCart />}
       <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-green-100 text-3xl text-green-600">
         ✓
       </div>

@@ -48,6 +48,7 @@ export function CheckoutForm({
   codEnabled,
   store,
   homeVisit,
+  notice = "",
 }: {
   defaults: Defaults;
   loggedIn: boolean;
@@ -55,6 +56,7 @@ export function CheckoutForm({
   codEnabled: boolean;
   store: { shipping_fee: number; free_shipping_over: number };
   homeVisit: { option_label: string; display_price: number };
+  notice?: string;
 }) {
   const router = useRouter();
   const { lines, subtotal, clear, ready } = useCart();
@@ -70,7 +72,7 @@ export function CheckoutForm({
   const [coupon, setCoupon] = useState("");
   const [notes, setNotes] = useState("");
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(notice);
 
   const onlyHomeVisit = lines.length > 0 && lines.every((l) => isHomeVisitLine(l.options, homeVisit.option_label));
   const shipping =
@@ -108,19 +110,11 @@ export function CheckoutForm({
       order_id: data.razorpay.orderId,
       prefill: { name: form.fullName, email: form.email, contact: form.phone },
       theme: { color: "#eb3740" },
-      handler: async (resp: RazorpayResponse) => {
-        const v = await fetch("/api/payment/verify", {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({ orderId: data.orderId, ...resp }),
-        });
-        if (v.ok) {
-          await finishSuccess(data.orderNumber);
-        } else {
-          setError("Payment could not be verified. If you were charged, contact support.");
-          setBusy(false);
-        }
-      },
+      // redirect style: Razorpay sends the customer back to our callback after paying,
+      // which works even when UPI opens another app on a phone
+      redirect: true,
+      callback_url: `${window.location.origin}/api/payment/callback`,
+      cancel_url: `${window.location.origin}/checkout?payment=cancelled`,
       modal: {
         ondismiss: () => {
           setBusy(false);
