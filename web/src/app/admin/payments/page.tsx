@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 export default async function AdminPayments() {
   const site = await getSiteConfig();
   const row = await db.setting.findUnique({ where: { key: "razorpay" } }).catch(() => null);
-  let saved: { key_id?: string; key_secret?: string } = {};
+  let saved: { key_id?: string; key_secret?: string; webhook_secret?: string } = {};
   try {
     saved = row ? JSON.parse(row.value) : {};
   } catch {
@@ -79,6 +79,24 @@ export default async function AdminPayments() {
                 type="password"
                 autoComplete="new-password"
                 placeholder={hasSaved ? "•••••••• (saved)" : ""}
+                className={inputCls}
+              />
+            </Field>
+          </div>
+          <div className="mt-4">
+            <Field
+              label="Webhook secret (optional)"
+              hint={
+                saved.webhook_secret
+                  ? "A webhook secret is saved. Leave blank to keep it."
+                  : "The secret you enter in Razorpay → Developers → Webhooks. Webhook URL: /api/payment/webhook on this site."
+              }
+            >
+              <input
+                name="webhook_secret"
+                type="password"
+                autoComplete="new-password"
+                placeholder={saved.webhook_secret ? "•••••••• (saved)" : ""}
                 className={inputCls}
               />
             </Field>

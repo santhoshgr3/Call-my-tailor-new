@@ -13,16 +13,17 @@ export async function savePayments(fd: FormData) {
 
   // Keep the existing secret when the field is left blank.
   const row = await db.setting.findUnique({ where: { key: "razorpay" } });
-  let existing: { key_id?: string; key_secret?: string } = {};
+  let existing: { key_id?: string; key_secret?: string; webhook_secret?: string } = {};
   try {
     existing = row ? JSON.parse(row.value) : {};
   } catch {
     existing = {};
   }
   const keySecret = secretIn || existing.key_secret || "";
+  const webhookSecret = String(fd.get("webhook_secret") ?? "").trim() || existing.webhook_secret || "";
 
   if (keyId && keySecret) {
-    const value = JSON.stringify({ key_id: keyId, key_secret: keySecret });
+    const value = JSON.stringify({ key_id: keyId, key_secret: keySecret, webhook_secret: webhookSecret });
     await db.setting.upsert({
       where: { key: "razorpay" },
       create: { key: "razorpay", value },

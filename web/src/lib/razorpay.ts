@@ -80,3 +80,17 @@ export async function verifyRazorpaySignature(
     return false;
   }
 }
+
+/** Webhook secret: saved from Admin → Payments, or RAZORPAY_WEBHOOK_SECRET. */
+export async function getRazorpayWebhookSecret(): Promise<string> {
+  try {
+    const row = await db.setting.findUnique({ where: { key: "razorpay" } });
+    if (row) {
+      const v = JSON.parse(row.value) as { webhook_secret?: string };
+      if (v.webhook_secret) return v.webhook_secret;
+    }
+  } catch {
+    /* fall back to env */
+  }
+  return process.env.RAZORPAY_WEBHOOK_SECRET || "";
+}
