@@ -4,73 +4,94 @@ import { useMemo, useState } from "react";
 
 type Item = { id: string; imageUrl: string; category: string; caption: string | null };
 
+/**
+ * Gallery in the old site's markup (nav-pills filter + 4-up cards). Must be rendered inside .legacy-page,
+ * which supplies the styling.
+ */
 export function GalleryView({ items }: { items: Item[] }) {
   const cats = useMemo(() => Array.from(new Set(items.map((i) => i.category).filter(Boolean))), [items]);
   const [tab, setTab] = useState("All Work");
   const [shown, setShown] = useState(24);
   const [lightbox, setLightbox] = useState<Item | null>(null);
   const visible = tab === "All Work" ? items : items.filter((i) => i.category === tab);
-
-  const pill = (label: string) => (
-    <button
-      key={label}
-      onClick={() => {
-        setTab(label);
-        setShown(24);
-      }}
-      className={`rounded px-3 py-1.5 text-xs font-semibold ${
-        tab === label ? "bg-brand text-white" : "bg-[#dcdcdc] text-brand-dark hover:bg-brand/10"
-      }`}
-    >
-      {label}
-    </button>
-  );
+  const rows: Item[][] = [];
+  const list = visible.slice(0, shown);
+  for (let i = 0; i < list.length; i += 4) rows.push(list.slice(i, i + 4));
 
   return (
-    <div>
-      <div className="mb-4 flex flex-wrap gap-2">{["All Work", ...cats].map(pill)}</div>
-      {visible.length === 0 ? (
-        <p className="py-16 text-center text-sm text-faint">No photos here yet.</p>
-      ) : (
-        <div className="grid grid-cols-2 gap-2 sm:gap-3 md:grid-cols-3 lg:grid-cols-4">
-          {visible.slice(0, shown).map((g) => (
-            <button
-              key={g.id}
-              type="button"
-              onClick={() => setLightbox(g)}
-              className="group overflow-hidden bg-soft shadow-sm"
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={g.imageUrl}
-                alt={g.caption || "Our work"}
-                loading="lazy"
-                className="aspect-[3/4] w-full object-cover transition-transform duration-500 group-hover:scale-105"
-              />
-            </button>
-          ))}
+    <div className="container-fluid mt-5">
+      <div className="row">
+        <div className="col-sm-12">
+          <div className="row category">
+            <ul className="nav nav-pills">
+              {["All Work", ...cats].map((label) => (
+                <li key={label} className={tab === label ? "active" : ""}>
+                  <a
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setTab(label);
+                      setShown(24);
+                    }}
+                  >
+                    {label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+            <div className="tab-content">
+              {visible.length === 0 ? (
+                <p style={{ padding: "60px 0", textAlign: "center" }}>No photos here yet.</p>
+              ) : (
+                <div id="menu">
+                  {rows.map((row, r) => (
+                    <div className="row p_row" key={r}>
+                      {row.map((g, i) => (
+                        <div className="col-sm-3" key={g.id}>
+                          <div className={`card${i === 3 ? " useless" : ""}`}>
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                              src={g.imageUrl}
+                              alt={g.caption || "Our work"}
+                              loading="lazy"
+                              style={{ width: "100%", cursor: "pointer" }}
+                              onClick={() => setLightbox(g)}
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+          {visible.length > shown && (
+            <div style={{ margin: "20px 0", textAlign: "center" }}>
+              <button type="button" onClick={() => setShown((n) => n + 24)}>
+                Load more
+              </button>
+            </div>
+          )}
         </div>
-      )}
-      {visible.length > shown && (
-        <div className="mt-6 text-center">
-          <button onClick={() => setShown((n) => n + 24)} className="btn-outline">
-            Load more
-          </button>
-        </div>
-      )}
+      </div>
       {lightbox && (
         <div
-          className="fixed inset-0 z-[100] grid place-items-center bg-black/85 p-4"
+          style={{ position: "fixed", inset: 0, zIndex: 100, display: "grid", placeItems: "center", background: "rgba(0,0,0,.85)", padding: 16 }}
           onClick={() => setLightbox(null)}
         >
-          <button className="absolute right-4 top-3 text-3xl leading-none text-white" aria-label="Close">
+          <button
+            type="button"
+            aria-label="Close"
+            style={{ position: "absolute", right: 16, top: 12, background: "none", width: "auto", height: "auto", fontSize: 32, lineHeight: 1, padding: 0, margin: 0 }}
+          >
             ×
           </button>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={lightbox.imageUrl}
             alt={lightbox.caption || "Our work"}
-            className="max-h-[90vh] max-w-full object-contain"
+            style={{ maxHeight: "90vh", maxWidth: "100%", objectFit: "contain" }}
             onClick={(e) => e.stopPropagation()}
           />
         </div>

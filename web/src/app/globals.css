@@ -266,13 +266,11 @@
 }
 
 /* ===== LEGACY-PAGE: Bootstrap-3-style layer for pages imported from the old site (scoped) ===== */
-.legacy-page { width: 100%; max-width: 1400px; margin: 0 auto; padding: 0 32px; overflow-x: hidden; font-family: Arial, Helvetica, sans-serif; font-size: 14px; line-height: 1.5; color: #666; }
+.legacy-page { width: 100%; margin: 0; padding: 0 max(15px, calc((100% - 1184px) / 2)); overflow-x: hidden; font-family: var(--font-sans), Roboto, sans-serif; font-size: 14px; line-height: 1.625; color: #10131d; }
 .legacy-page, .legacy-page *, .legacy-page *::before, .legacy-page *::after { box-sizing: border-box; }
-.legacy-page .container, .legacy-page .container-fluid { width: 100%; margin: 0 auto; padding: 0 15px; }
+.legacy-page .container, .legacy-page .container-fluid { width: auto; margin: 0 auto; padding: 0 15px; }
+.legacy-page .container-fluid::before, .legacy-page .container::before, .legacy-page .row::before { content: " "; display: table; }
 .legacy-page .container-fluid::after, .legacy-page .container::after, .legacy-page .row::after, .legacy-page .clearfix::after { content: ""; display: table; clear: both; }
-@media (min-width: 768px) { .legacy-page .container { max-width: 750px; } }
-@media (min-width: 992px) { .legacy-page .container { max-width: 970px; } }
-@media (min-width: 1200px) { .legacy-page .container { max-width: 1170px; } }
 .legacy-page .row { margin-left: -15px; margin-right: -15px; }
 .legacy-page [class*="col-xs-"], .legacy-page [class*="col-sm-"], .legacy-page [class*="col-md-"], .legacy-page [class*="col-lg-"] { position: relative; min-height: 1px; padding-left: 15px; padding-right: 15px; width: 100%; float: left; }
 .legacy-page .col-xs-1 { width: 8.333333%; }
@@ -330,7 +328,7 @@
   .legacy-page .col-lg-12 { width: 100%; }
 }
 
-.legacy-page h1, .legacy-page h2, .legacy-page h3, .legacy-page h4, .legacy-page h5, .legacy-page h6 { font-family: inherit; font-weight: 500; line-height: 1.1; color: #10131d; margin: 20px 0 10px; }
+.legacy-page h1, .legacy-page h2, .legacy-page h3, .legacy-page h4, .legacy-page h5, .legacy-page h6 { font-family: inherit; font-weight: 600; line-height: 1.1; color: #10131d; margin: 20px 0 10px; }
 .legacy-page h1 { font-size: 36px; } .legacy-page h2 { font-size: 30px; } .legacy-page h3 { font-size: 24px; } .legacy-page h4 { font-size: 18px; } .legacy-page h5 { font-size: 14px; } .legacy-page h6 { font-size: 12px; }
 .legacy-page p { margin: 0 0 10px; }
 .legacy-page a { color: inherit; text-decoration: none; }
@@ -354,3 +352,16 @@
 .legacy-page .yt-accordion-inner { display: none; padding: 15px 15px 10px; background: #f1f1f1; font-size: 13px; color: #10131d; }
 .legacy-page .yt-accordion-inner.open { display: block; }
 .legacy-page .faq-category > h3 { margin: 0 0 15px; font-weight: 600; }
+
+.legacy-page .nav { padding-left: 0; margin: 0; list-style: none; }
+.legacy-page .nav::before, .legacy-page .nav::after { content: " "; display: table; clear: both; }
+.legacy-page .nav > li { position: relative; display: block; }
+.legacy-page .nav > li > a { position: relative; display: block; padding: 10px 15px; }
+.legacy-page .nav-tabs > li { float: left; }
+
+.legacy-page .section-title { text-align: left; font-size: inherit; text-transform: none; letter-spacing: normal; margin: 0; position: static; }
+.legacy-page .section-title::after { display: none; }
+.legacy-page .nav-pills > li { float: left; }
+.legacy-page .nav-pills > li + li { margin-left: 2px; }
+.legacy-page .nav-pills > li.active > a { background: #eb3740 !important; color: #fff !important; }
+.legacy-page .tab-content > .tab-pane.fade { opacity: 1; }

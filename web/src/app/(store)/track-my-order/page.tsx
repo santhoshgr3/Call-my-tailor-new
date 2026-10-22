@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { formatINR } from "@/lib/money";
+import { LegacyPage, isLegacyHtml } from "@/components/legacy/LegacyPage";
 
 export const metadata: Metadata = { title: "Track My Order" };
 
@@ -20,6 +21,7 @@ export default async function TrackOrderPage({
   searchParams: Promise<{ order?: string; contact?: string }>;
 }) {
   const sp = await searchParams;
+  const page = await db.infoPage.findUnique({ where: { slug: "track-my-order" } }).catch(() => null);
   const orderNo = (sp.order || "").trim();
   const contact = (sp.contact || "").trim().toLowerCase();
 
@@ -37,27 +39,20 @@ export default async function TrackOrderPage({
     : -1;
 
   return (
-    <div className="container-cmt py-10">
-      <h1 className="section-title">Track My Order</h1>
-
-      <form className="mx-auto mt-8 flex max-w-xl flex-col gap-3 sm:flex-row" action="/track-my-order">
-        <input
-          name="order"
-          defaultValue={orderNo}
-          required
-          placeholder="Order number (e.g. CMT-100001)"
-          className="flex-1 border border-line px-3 py-2 text-sm outline-none focus:border-brand"
-        />
-        <input
-          name="contact"
-          defaultValue={sp.contact || ""}
-          required
-          placeholder="Email or phone on the order"
-          className="flex-1 border border-line px-3 py-2 text-sm outline-none focus:border-brand"
-        />
-        <button className="btn-brand">Track</button>
-      </form>
-
+    <div>
+      {page && isLegacyHtml(page.contentHtml) ? (
+        <LegacyPage html={page.contentHtml} />
+      ) : (
+        <div className="container-cmt pt-10">
+          <h1 className="section-title">Track My Order</h1>
+          <form className="mx-auto mt-8 flex max-w-xl flex-col gap-3 sm:flex-row" action="/track-my-order">
+            <input name="order" required placeholder="Order number (e.g. CMT-100001)" className="flex-1 border border-line px-3 py-2 text-sm" />
+            <input name="contact" required placeholder="Email or phone on the order" className="flex-1 border border-line px-3 py-2 text-sm" />
+            <button className="btn-brand">Track</button>
+          </form>
+        </div>
+      )}
+      <div className="container-cmt py-6">
       {notFound && (
         <p className="mx-auto mt-6 max-w-xl rounded border border-brand/40 bg-brand/5 p-3 text-center text-sm text-brand">
           No order found with that number and contact. Check the details and try again.
@@ -133,6 +128,7 @@ export default async function TrackOrderPage({
           </p>
         </div>
       )}
+      </div>
     </div>
   );
 }

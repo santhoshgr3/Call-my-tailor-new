@@ -58,7 +58,10 @@ export function scopeCss(css: string, scope: string): string {
     } else if (/^@/.test(head)) {
       out += `${head}{${inner}}\n`; // @font-face, @keyframes … kept as-is
     } else if (head) {
-      out += `${scopeSelector(head)}{${inner}}\n`;
+      // the old theme's own fonts win over a page-level `body { font-family }`; keep the site font
+      const isRoot = /^(html|body|:root)$/i.test(head.trim());
+      const decls = isRoot ? inner.replace(/font-family\s*:[^;}]*;?/gi, "") : inner;
+      out += `${scopeSelector(head)}{${decls}}\n`;
     }
   }
   return out;
