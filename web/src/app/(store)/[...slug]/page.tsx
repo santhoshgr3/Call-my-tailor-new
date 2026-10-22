@@ -10,6 +10,7 @@ import { PriceRangeSlider } from "@/components/catalog/PriceRangeSlider";
 import { pageTitle } from "@/lib/seo";
 import { dbStatus } from "@/lib/health";
 import { SetupNotice } from "@/components/SetupNotice";
+import { LegacyPage, isLegacyHtml } from "@/components/legacy/LegacyPage";
 
 async function safeInfoPage(slug: string) {
   try {
@@ -70,6 +71,7 @@ export default async function CatchAllPage({
 
   if (slug.length === 1) {
     const page = await safeInfoPage(slug[0]);
+    if (page && isLegacyHtml(page.contentHtml)) return <LegacyPage html={page.contentHtml} />;
     if (page) {
       return (
         <article className="container-cmt py-10">
