@@ -2,17 +2,24 @@ import type { ReactNode } from "react";
 import { scopeCss, splitLegacyHtml } from "@/lib/legacy-css";
 import { LegacyEnhance } from "./LegacyEnhance";
 import { LegacySlots } from "./LegacySlots";
-import { LEGACY_THEME_CSS } from "@/lib/legacy-theme-css";
-
-const THEME_SCOPED = scopeCss(LEGACY_THEME_CSS, ".legacy-page");
+import { LEGACY_CSS_VERSION } from "@/lib/legacy-css-version";
 
 /** Wrapper that gives children the old site's look: theme CSS + the page's own CSS, both scoped under .legacy-page. */
 export function LegacyShell({ css, children }: { css?: string; children: ReactNode }) {
   return (
-    <div className="legacy-page">
-      <style dangerouslySetInnerHTML={{ __html: THEME_SCOPED }} />
+    <div className="legacy-page layout-2">
+      <link rel="stylesheet" href={`/legacy-theme.css?v=${LEGACY_CSS_VERSION}`} precedence="legacy" />
+      <link rel="stylesheet" href={`/legacy-mobile.css?v=${LEGACY_CSS_VERSION}`} precedence="legacy" />
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" precedence="legacy" />
       {css ? <style dangerouslySetInnerHTML={{ __html: scopeCss(css, ".legacy-page") }} /> : null}
-      <div className="item-article">{children}</div>
+      {/* same nesting as the old theme: page container > row > #content column */}
+      <div className="container">
+        <div className="row">
+          <div id="content" className="col-sm-12 item-article">
+            {children}
+          </div>
+        </div>
+      </div>
       <LegacyEnhance />
     </div>
   );

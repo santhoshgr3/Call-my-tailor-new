@@ -34,7 +34,9 @@ export function scopeCss(css: string, scope: string): string {
       .filter(Boolean)
       .map((s) => {
         if (/^(html|body|:root)$/i.test(s)) return scope;
-        s = s.replace(/^(html|body)\s+/i, "");
+        // body.layout-2 .x  ->  .legacy-page.layout-2 .x  (keeps the old specificity)
+        const root = s.match(/^(?:html|body)((?:\.[A-Za-z0-9_-]+)*)(\s.*)?$/i);
+        if (root) return `${scope}${root[1]}${root[2] ?? ""}`;
         return `${scope} ${s}`;
       })
       .join(", ");
