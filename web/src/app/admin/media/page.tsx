@@ -105,9 +105,14 @@ export default async function AdminMedia({ searchParams }: { searchParams: Promi
           chip(`/admin/media?folder=${encodeURIComponent(f)}`, `📁 ${f} (${counts.get(f) ?? 0})`, current === f),
         )}
         {chip("/admin/media?folder=", `No folder (${counts.get("") ?? 0})`, current === "")}
-        <form action={createFolder} className="ml-auto flex gap-2">
-          <input name="name" placeholder="New folder name" maxLength={40} className={inputCls + " !w-44 !py-1.5"} />
-          <button className="btn-outline !py-1.5 !text-[11px]">+ Create folder</button>
+        <form action={createFolder} className="flex w-full gap-2 sm:ml-auto sm:w-auto">
+          <input
+            name="name"
+            placeholder="New folder name"
+            maxLength={40}
+            className="min-w-0 flex-1 rounded border border-line bg-white px-3 py-1.5 text-sm outline-none focus:border-brand sm:w-44 sm:flex-none"
+          />
+          <button className="btn-outline shrink-0 !py-1.5 !text-[11px]">+ Create folder</button>
         </form>
       </div>
 
@@ -126,31 +131,47 @@ export default async function AdminMedia({ searchParams }: { searchParams: Promi
       {items.length === 0 ? (
         <p className="text-sm text-faint">No images here yet.</p>
       ) : (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-6">
+        <div className="grid grid-cols-2 items-stretch gap-3 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
           {items.map((m) => (
-            <div key={m.id} className="overflow-hidden rounded-lg border border-line bg-white">
+            <div key={m.id} className="flex h-full flex-col overflow-hidden rounded-lg border border-line bg-white">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={`/media/${m.id}`} alt={m.filename} className="aspect-square w-full bg-soft object-cover" />
-              <div className="space-y-1.5 p-2 text-[11px]">
-                <p className="break-all font-semibold leading-tight">{m.filename}</p>
-                <p className="break-all leading-tight text-faint" title="Use this in the bulk-import Images column">
+              <img
+                src={`/media/${m.id}`}
+                alt={m.filename}
+                loading="lazy"
+                className="aspect-[3/4] w-full shrink-0 bg-soft object-cover"
+              />
+              <div className="flex flex-1 flex-col gap-1.5 p-2.5 text-[11px]">
+                <p className="line-clamp-2 min-h-[2.6em] break-all font-semibold leading-snug" title={m.filename}>
+                  {m.filename}
+                </p>
+                <p
+                  className="line-clamp-1 break-all leading-snug text-faint"
+                  title={`Use in the bulk-import Images column: ${m.folder ? `${m.folder}/${m.filename}` : m.filename}`}
+                >
                   {m.folder ? `${m.folder}/${m.filename}` : m.filename}
                 </p>
-                <form action={moveMedia} className="flex gap-1">
-                  <input type="hidden" name="id" value={m.id} />
-                  <input
-                    name="folder"
-                    list="media-folders"
-                    defaultValue={m.folder}
-                    placeholder="Folder…"
-                    className="min-w-0 flex-1 rounded border border-line px-1.5 py-1 text-[11px] outline-none focus:border-brand"
-                  />
-                  <button className="rounded border border-line px-1.5 hover:border-brand hover:text-brand">Move</button>
-                </form>
-                <form action={deleteMedia}>
-                  <input type="hidden" name="id" value={m.id} />
-                  <button className="text-faint hover:text-brand">Delete</button>
-                </form>
+                <div className="mt-auto space-y-2 pt-1">
+                  <form action={moveMedia} className="flex gap-1">
+                    <input type="hidden" name="id" value={m.id} />
+                    <input
+                      name="folder"
+                      list="media-folders"
+                      defaultValue={m.folder}
+                      placeholder="Folder…"
+                      className="min-w-0 flex-1 rounded border border-line px-2 py-1.5 text-[11px] outline-none focus:border-brand"
+                    />
+                    <button className="shrink-0 rounded border border-line px-2.5 py-1.5 font-semibold hover:border-brand hover:text-brand">
+                      Move
+                    </button>
+                  </form>
+                  <form action={deleteMedia}>
+                    <input type="hidden" name="id" value={m.id} />
+                    <button className="w-full rounded border border-line py-1.5 text-faint hover:border-brand hover:text-brand">
+                      Delete
+                    </button>
+                  </form>
+                </div>
               </div>
             </div>
           ))}
