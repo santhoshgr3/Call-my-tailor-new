@@ -14,9 +14,7 @@ export function GalleryView({ items }: { items: Item[] }) {
   const [shown, setShown] = useState(24);
   const [lightbox, setLightbox] = useState<Item | null>(null);
   const visible = tab === "All Work" ? items : items.filter((i) => i.category === tab);
-  const rows: Item[][] = [];
   const list = visible.slice(0, shown);
-  for (let i = 0; i < list.length; i += 4) rows.push(list.slice(i, i + 4));
 
   return (
     <div className="container-fluid mt-5">
@@ -43,23 +41,17 @@ export function GalleryView({ items }: { items: Item[] }) {
               {visible.length === 0 ? (
                 <p style={{ padding: "60px 0", textAlign: "center" }}>No photos here yet.</p>
               ) : (
-                <div id="menu">
-                  {rows.map((row, r) => (
-                    <div className="row p_row" key={r}>
-                      {row.map((g, i) => (
-                        <div className="col-sm-3" key={g.id}>
-                          <div className={`card${i === 3 ? " useless" : ""}`}>
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img
-                              src={g.imageUrl}
-                              alt={g.caption || "Our work"}
-                              loading="lazy"
-                              style={{ width: "100%", cursor: "pointer" }}
-                              onClick={() => setLightbox(g)}
-                            />
-                          </div>
-                        </div>
-                      ))}
+                <div id="menu" className="cmt-gal-grid">
+                  {list.map((g) => (
+                    <div className="card" key={g.id}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={g.imageUrl}
+                        alt={g.caption || "Our work"}
+                        loading="lazy"
+                        style={{ cursor: "pointer" }}
+                        onClick={() => setLightbox(g)}
+                      />
                     </div>
                   ))}
                 </div>
