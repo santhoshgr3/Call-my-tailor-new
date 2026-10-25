@@ -60,9 +60,18 @@ export function scopeCss(css: string, scope: string): string {
     } else if (/^@/.test(head)) {
       out += `${head}{${inner}}\n`; // @font-face, @keyframes … kept as-is
     } else if (head) {
-      // the old theme's own fonts win over a page-level `body { font-family }`; keep the site font
-      const isRoot = /^(html|body|:root)$/i.test(head.trim());
-      const decls = isRoot ? inner.replace(/font-family\s*:[^;}]*;?/gi, "") : inner;
+      // Rules aimed at the old page's <html>/<body> land on our wrapper. Drop what would break our page:
+      // the site font, and the old mobile app-shell layout (body pinned with position:fixed / 100% height /
+      // overflow:hidden), which froze scrolling on phones.
+      const isRoot = head
+        .split(",")
+        .every((sel) => /^(html|body|:root)((\.[A-Za-z0-9_-]+)*)$/i.test(sel.trim()));
+      const decls = isRoot
+        ? inner.replace(
+            /(^|[;{\s])(font-family|position|top|right|bottom|left|height|max-height|min-height|overflow|overflow-x|overflow-y)\s*:[^;}]*;?/gi,
+            "$1",
+          )
+        : inner;
       out += `${scopeSelector(head)}{${decls}}\n`;
     }
   }

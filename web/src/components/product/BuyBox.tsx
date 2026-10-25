@@ -87,6 +87,9 @@ export function BuyBox({
   const scheduleRef = useRef<HTMLInputElement>(null);
 
   const homeVisitSelected = Object.values(selected).some(isHomeVisit);
+  // with a home visit the price is the fixed visit charge, so extra options (monogram etc.) don't apply
+  const isMethodOption = (label: string) => /customization method/i.test(label);
+  const optionShown = (label: string) => (homeVisitSelected ? isMethodOption(label) : true);
   const scheduleNeeded = Object.values(selected).some(needsSchedule);
   const callSelected =
     !homeVisitSelected && Object.values(selected).some((v) => /call/i.test(v));
@@ -110,6 +113,7 @@ export function BuyBox({
 
   function handleAdd(): boolean {
     for (const o of options) {
+      if (!optionShown(o.label)) continue;
       if (o.required && !selected[o.label]) {
         setError(`Please choose ${o.label}`);
         return false;
@@ -129,7 +133,7 @@ export function BuyBox({
       price: effectivePrice,
       qty,
       options: {
-        ...selected,
+        ...Object.fromEntries(Object.entries(selected).filter(([k]) => optionShown(k))),
         ...(callSelected ? { Measurement: measurement } : {}),
         ...(scheduleNeeded ? { Schedule: schedule } : {}),
       },
@@ -217,16 +221,16 @@ export function BuyBox({
       {homeVisitSelected && (
         <div className="-mt-2 space-y-0.5">
           <p className="text-xs text-faint">{homeVisit.note}</p>
-          <p className="text-xs font-bold text-brand">Only for Delhi &amp; NCR</p>
         </div>
       )}
 
       {/* Options as chips — the size chart is hidden once a home visit or call is chosen,
           since sizing is then handled during that visit / call instead. */}
       {options
-        .filter((o) => !(scheduleNeeded && isSizeOption(o.label)))
+        .filter((o) => !(scheduleNeeded && isSizeOption(o.label)) && optionShown(o.label))
         .map((o) => (
-        <div key={o.id} className="flex flex-wrap items-center gap-x-4 gap-y-2">
+        <div key={o.id} className="space-y-2">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
           <span className="text-[15px] font-bold text-ink">
             {o.label}
             {o.required && <span className="text-brand"> *</span>}
@@ -253,6 +257,10 @@ export function BuyBox({
               );
             })}
           </div>
+        </div>
+        {homeVisitSelected && isMethodOption(o.label) && (
+          <p className="text-sm font-bold text-brand">Only in Delhi &amp; NCR</p>
+        )}
         </div>
       ))}
 
