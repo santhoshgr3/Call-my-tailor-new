@@ -87,9 +87,9 @@ export function BuyBox({
   const scheduleRef = useRef<HTMLInputElement>(null);
 
   const homeVisitSelected = Object.values(selected).some(isHomeVisit);
-  // with a home visit the price is the fixed visit charge, so extra options (monogram etc.) don't apply
   const isMethodOption = (label: string) => /customization method/i.test(label);
-  const optionShown = (label: string) => (homeVisitSelected ? isMethodOption(label) : true);
+  // the Monogram option is not offered on the storefront (whatever the customization method)
+  const isHiddenOption = (label: string) => /monogram/i.test(label);
   const scheduleNeeded = Object.values(selected).some(needsSchedule);
   const callSelected =
     !homeVisitSelected && Object.values(selected).some((v) => /call/i.test(v));
@@ -104,6 +104,7 @@ export function BuyBox({
     if (Object.values(selected).some(isHomeVisit)) return homeVisit.display_price;
     let delta = 0;
     for (const o of options) {
+      if (/monogram/i.test(o.label)) continue; // not offered on the storefront
       const v = o.values.find((x) => x.label === selected[o.label]);
       if (v) delta += v.priceDelta;
     }
@@ -113,7 +114,7 @@ export function BuyBox({
 
   function handleAdd(): boolean {
     for (const o of options) {
-      if (!optionShown(o.label)) continue;
+      if (isHiddenOption(o.label)) continue;
       if (o.required && !selected[o.label]) {
         setError(`Please choose ${o.label}`);
         return false;
@@ -133,7 +134,7 @@ export function BuyBox({
       price: effectivePrice,
       qty,
       options: {
-        ...Object.fromEntries(Object.entries(selected).filter(([k]) => optionShown(k))),
+        ...Object.fromEntries(Object.entries(selected).filter(([k]) => !isHiddenOption(k))),
         ...(callSelected ? { Measurement: measurement } : {}),
         ...(scheduleNeeded ? { Schedule: schedule } : {}),
       },
@@ -227,7 +228,7 @@ export function BuyBox({
       {/* Options as chips — the size chart is hidden once a home visit or call is chosen,
           since sizing is then handled during that visit / call instead. */}
       {options
-        .filter((o) => !(scheduleNeeded && isSizeOption(o.label)) && optionShown(o.label))
+        .filter((o) => !(scheduleNeeded && isSizeOption(o.label)) && !isHiddenOption(o.label))
         .map((o) => (
         <div key={o.id} className="space-y-2">
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
