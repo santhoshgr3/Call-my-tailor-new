@@ -282,3 +282,20 @@
 @media (min-width: 1100px) { .legacy-page .cmt-gal-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; } }
 .legacy-page .cmt-gal-grid .card { margin: 0 !important; width: 100% !important; float: none !important; aspect-ratio: 3 / 4; overflow: hidden; }
 .legacy-page .cmt-gal-grid .card img { display: block; width: 100%; height: 100%; margin: 0 !important; object-fit: cover; }
+
+/* phone fixes on top of the old mobile theme (which had these bugs too) */
+@media (max-width: 767px) {
+  /* testimonials: review text was white on a white page, names pale yellow */
+  .legacy-page.layout-2 #content .reviewtxt h2 { color: #333 !important; }
+  .legacy-page.layout-2 #content .reviewtxt h3 { color: #eb3740 !important; }
+  /* pages that are only a banner (Complaint, Payment Method, Customer Support) were blank on phones,
+     because the mobile theme hides banners: show the banner there, scaled to the screen */
+  .legacy-page.layout-2 #content > div > .banner_img:only-child {
+    display: block !important;
+    height: auto !important;
+    aspect-ratio: 16 / 5;
+    background-size: cover !important;
+    background-position: center !important;
+    margin: 0 -15px 20px !important;
+  }
+}

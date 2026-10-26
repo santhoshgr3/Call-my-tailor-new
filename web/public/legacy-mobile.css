@@ -496,10 +496,9 @@
   --highlight-border: #d32f2f;
 }
 .legacy-page{
-  
+
   background: var(--bg);
   color: var(--text);
-  line-height: 1.8;
 }
 .legacy-page .cmt-section{
   background: var(--white);

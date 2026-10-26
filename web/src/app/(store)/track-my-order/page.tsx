@@ -52,7 +52,7 @@ export default async function TrackOrderPage({
           </form>
         </div>
       )}
-      <div className="container-cmt py-6">
+      <div className={notFound || order ? "container-cmt py-6" : "hidden"}>
       {notFound && (
         <p className="mx-auto mt-6 max-w-xl rounded border border-brand/40 bg-brand/5 p-3 text-center text-sm text-brand">
           No order found with that number and contact. Check the details and try again.
